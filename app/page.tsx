@@ -10,6 +10,14 @@ export default function Home() {
       searchRef.current.focus();
     }
   }, [searchOpen]);
+
+  const handleSearch = () => {
+    if (searchOpen && searchRef.current) {
+      /* function to handle search */
+      console.log("click happened", searchRef.current.value);
+      searchRef.current.value = "";
+    }
+  };
   return (
     <main>
       <header className="py-5">
@@ -35,7 +43,13 @@ export default function Home() {
               } hover:bg-gray-100 transition-colors relative`}
               onClick={() => setSearchOpen(true)}
             >
-              <SearchIcon size={25} />
+              <SearchIcon
+                size={25}
+                onClick={() => {
+                  handleSearch();
+                }}
+                onMouseDown={(e) => e.preventDefault()}
+              />
 
               <input
                 ref={searchRef}
