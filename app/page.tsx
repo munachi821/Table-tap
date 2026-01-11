@@ -32,7 +32,7 @@ export default function Home() {
             <div
               className={`flex flex-row-reverse gap-2 text-gray-600 p-2 rounded-full ${
                 searchOpen && "bg-gray-100"
-              } hover:bg-gray-100 transition-colors`}
+              } hover:bg-gray-100 transition-colors relative`}
               onClick={() => setSearchOpen(true)}
             >
               <SearchIcon size={25} />
@@ -41,6 +41,7 @@ export default function Home() {
                 ref={searchRef}
                 type="search"
                 placeholder="Search Food"
+                onBlur={() => setSearchOpen(false)}
                 className={`bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400 transition-all duration-300 ease-in-out ${
                   searchOpen
                     ? "w-60 opacity-100 pl-2"
