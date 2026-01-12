@@ -1,10 +1,26 @@
 "use client";
-import { MapPin, SearchIcon, ShoppingBasketIcon } from "lucide-react";
+import { MapPin, Plus, SearchIcon, ShoppingBasketIcon } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import food1 from "@/public/menu-items/food1.png";
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const categories = [
+    "All",
+    "Rice",
+    "Swallow",
+    "Beverages",
+    "Snacks",
+    "Desert",
+    "Mocktails",
+    "Cocktails",
+    "Continental",
+  ];
+
   useEffect(() => {
     if (searchOpen && searchRef.current) {
       searchRef.current.focus();
@@ -14,14 +30,14 @@ export default function Home() {
   const handleSearch = () => {
     if (searchOpen && searchRef.current) {
       /* function to handle search */
-      console.log("click happened", searchRef.current.value);
+      console.log("click happened");
       searchRef.current.value = "";
     }
   };
   return (
     <main>
-      <header className="py-5">
-        <nav className="bg-white text-black flex items-center justify-between px-4 py-2 rounded-lg">
+      <header className="py-5 px-4">
+        <nav className="bg-white text-black flex items-center justify-between py-2 rounded-lg">
           <div className="flex gap-2 items-center">
             <div className="size-13 rounded-full border border-orange-200"></div>
             <div>
@@ -72,7 +88,59 @@ export default function Home() {
             </div>
           </div>
         </nav>
+
+        <div className="flex items-center gap-2 my-2 max-w-full overflow-x-auto hide-scrollbar">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`
+              px-5 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap 
+              ${
+                activeCategory === category
+                  ? "bg-orange-500 text-white shadow-md shadow-orange-200"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-orange-200"
+              }
+            `}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
       </header>
+
+      {/* Menu Items */}
+      <div className="pl-10">
+        <div>
+          <p className="text-2xl mb-3">Most Ordered</p>
+          <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
+            <div className="shadow-lg h-fit w-62 shrink-0 rounded-xl overflow-hidden">
+              <div className="rounded-lg overflow-hidden">
+                <Image
+                  src={food1}
+                  alt="detail about food 1"
+                  className="min-w-full"
+                />
+              </div>
+
+              <div className="p-3 py-5 flex justify-between">
+                <div>
+                  <p className="text-xl font-bold text-orange-500">₦5,400</p>
+                  <p className="text-base font-semibold text-gray-800">
+                    Catfish pepper soup
+                  </p>
+                </div>
+                <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-2 px-5">
+                  <Plus size={25} />
+                </button>
+              </div>
+            </div>
+            <div className="border h-90 w-62 shrink-0 rounded-xl overflow-hidden"></div>
+            <div className="border h-90 w-62 shrink-0 rounded-xl overflow-hidden"></div>
+            <div className="border h-90 w-62 shrink-0 rounded-xl overflow-hidden"></div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
