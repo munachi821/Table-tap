@@ -3,6 +3,9 @@ import { MapPin, Plus, SearchIcon, ShoppingBasketIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import food1 from "@/public/menu-items/food1.png";
+import food2 from "@/public/menu-items/food2.jpg";
+import food3 from "@/public/menu-items/food3.jpg";
+import food4 from "@/public/menu-items/food4.jpg";
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -19,6 +22,25 @@ export default function Home() {
     "Mocktails",
     "Cocktails",
     "Continental",
+  ];
+
+  const mostOrdered = [
+    {
+      foodName: "Catfish pepper Soup with scented leaves",
+      price: "5,400",
+      image: food1,
+    },
+    { foodName: "Goat meat pepper Soup", price: "6,700", image: food2 },
+    {
+      foodName: "Egusi soup with 2 wraps of fufu",
+      price: "3,400",
+      image: food3,
+    },
+    {
+      foodName: "Fried rice with chicken and salad",
+      price: "4,000",
+      image: food4,
+    },
   ];
 
   useEffect(() => {
@@ -49,7 +71,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-3">
-            <p className="text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4">
+            <p className="text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4 font-semibold">
               Table 1
             </p>
             {/* if the search bar is open the background should be gray-100 */}
@@ -88,13 +110,14 @@ export default function Home() {
             </div>
           </div>
         </nav>
+      </header>
 
-        <div className="flex items-center gap-2 my-2 max-w-full overflow-x-auto hide-scrollbar">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`
+      <div className="flex items-center gap-2 my-2 max-w-full overflow-x-auto hide-scrollbar pl-9">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setActiveCategory(category)}
+            className={`
               px-5 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap 
               ${
                 activeCategory === category
@@ -102,42 +125,45 @@ export default function Home() {
                   : "bg-white text-gray-600 border border-gray-200 hover:border-orange-200"
               }
             `}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </header>
+          >
+            {category}
+          </button>
+        ))}
+      </div>
 
       {/* Menu Items */}
-      <div className="pl-10">
+      <div className="pl-10 mt-5">
         <div>
-          <p className="text-2xl mb-3">Most Ordered</p>
+          <p className="text-2xl mb-2.5">Most Ordered</p>
           <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
-            <div className="shadow-lg h-fit w-62 shrink-0 rounded-xl overflow-hidden">
-              <div className="rounded-lg overflow-hidden">
-                <Image
-                  src={food1}
-                  alt="detail about food 1"
-                  className="min-w-full"
-                />
-              </div>
-
-              <div className="p-3 py-5 flex justify-between">
-                <div>
-                  <p className="text-xl font-bold text-orange-500">₦5,400</p>
-                  <p className="text-base font-semibold text-gray-800">
-                    Catfish pepper soup
-                  </p>
+            {mostOrdered.map((mostOrdered, i) => (
+              <div
+                className="shadow-md h-fit w-62 shrink-0 rounded-xl overflow-hidden"
+                key={i}
+              >
+                <div className="rounded-lg overflow-hidden">
+                  <Image
+                    src={mostOrdered.image}
+                    alt="detail about food 1"
+                    className="min-w-full"
+                  />
                 </div>
-                <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-2 px-5">
-                  <Plus size={25} />
-                </button>
+
+                <div className="p-3 py-5 flex gap-2 items-end">
+                  <div>
+                    <p className="text-xl font-bold text-orange-500">
+                      ₦{mostOrdered.price}
+                    </p>
+                    <p className="text-base font-semibold text-gray-800">
+                      {mostOrdered.foodName}
+                    </p>
+                  </div>
+                  <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-3 px-4.5">
+                    <Plus size={25} />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div className="border h-90 w-62 shrink-0 rounded-xl overflow-hidden"></div>
-            <div className="border h-90 w-62 shrink-0 rounded-xl overflow-hidden"></div>
-            <div className="border h-90 w-62 shrink-0 rounded-xl overflow-hidden"></div>
+            ))}
           </div>
         </div>
       </div>
