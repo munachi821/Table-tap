@@ -1,16 +1,43 @@
 "use client";
-import { MapPin, Plus, SearchIcon, ShoppingBasketIcon } from "lucide-react";
-import Image from "next/image";
+import {
+  MapPin,
+  Minus,
+  Plus,
+  SearchIcon,
+  ShoppingBasketIcon,
+  ShoppingCart,
+  X,
+} from "lucide-react";
+import Image, { StaticImageData } from "next/image";
 import { useEffect, useRef, useState } from "react";
 import food1 from "@/public/menu-items/food1.png";
 import food2 from "@/public/menu-items/food2.jpg";
 import food3 from "@/public/menu-items/food3.jpg";
 import food4 from "@/public/menu-items/food4.jpg";
+import mod1 from "@/public/menu-items/mod1.jpg";
+import mod2 from "@/public/menu-items/mod2.jpg";
+import mod3 from "@/public/menu-items/mod3.jpg";
+import mod4 from "@/public/menu-items/mod4.jpg";
+
+export interface foodItem {
+  foodName: string;
+  price: string;
+  image: StaticImageData;
+  modifiers: {
+    name: string;
+    price: string;
+    img: StaticImageData;
+    count: number;
+  }[];
+  isAvailable: boolean;
+}
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [openModifierMenu, setOpenModifierMenu] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<foodItem | null>(null);
 
   const categories = [
     "All",
@@ -29,17 +56,36 @@ export default function Home() {
       foodName: "Catfish pepper Soup with scented leaves",
       price: "5,400",
       image: food1,
+      modifiers: [],
+      isAvailable: true,
     },
-    { foodName: "Goat meat pepper Soup", price: "6,700", image: food2 },
+    {
+      foodName: "Goat meat pepper Soup",
+      price: "6,700",
+      image: food2,
+      modifiers: [],
+      isAvailable: true,
+    },
     {
       foodName: "Egusi soup with 2 wraps of fufu",
       price: "3,400",
       image: food3,
+      modifiers: [
+        { name: "pounded yam", price: "500", img: mod3, count: 0 },
+        { name: "Peppered meat", price: "600", img: mod4, count: 0 },
+        { name: "cow skin (ponmo)", price: "500", img: mod2, count: 0 },
+      ],
+      isAvailable: true,
     },
     {
       foodName: "Fried rice with chicken and salad",
       price: "4,000",
       image: food4,
+      modifiers: [
+        { name: "Fried chicken", price: "700", img: mod1, count: 0 },
+        { name: "coleslaw", price: "200", img: mod2, count: 0 },
+      ],
+      isAvailable: true,
     },
   ];
 
@@ -54,6 +100,15 @@ export default function Home() {
       /* function to handle search */
       console.log("click happened");
       searchRef.current.value = "";
+    }
+  };
+
+  const addToCart = (foodItem: foodItem) => {
+    if (foodItem.modifiers.length > 0) {
+      setSelectedItem(foodItem);
+      setOpenModifierMenu(true);
+    } else {
+      console.log(`${foodItem.foodName} added to cart`);
     }
   };
   return (
@@ -158,12 +213,118 @@ export default function Home() {
                       {mostOrdered.foodName}
                     </p>
                   </div>
-                  <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-3 px-4.5">
+                  <button
+                    className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-3 px-4.5"
+                    onClick={() => addToCart(mostOrdered)}
+                  >
                     <Plus size={25} />
                   </button>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Modifiers menu (Extra food items) */}
+          <div
+            className={`${
+              openModifierMenu ? "flex" : "hidden"
+            } flex-col rounded-2xl border border-gray-200 fixed bottom-0 right-0 m-5 bg-white p-2`}
+          >
+            <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
+              <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
+                Extra items for {selectedItem?.foodName}
+              </p>
+
+              <button
+                className="text-orange-400 cursor-pointer"
+                onClick={() => {
+                  setOpenModifierMenu(false);
+                }}
+              >
+                <X />
+              </button>
+            </div>
+
+            <div className="flex w-90 max-h-95 h-90 overflow-y-auto shrink-0 gap-2 flex-col">
+              {selectedItem?.modifiers.map((items, i) => (
+                <div
+                  className="border border-gray-100 rounded-xl p-2 flex gap-2 items-end"
+                  key={i}
+                >
+                  <div className="w-20 h-20 overflow-hidden rounded-lg">
+                    <Image
+                      src={items.img}
+                      alt="modifier for a particular category"
+                      className="min-w-full h-full object-cover object-center"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-lg font-semibold leading-4 text-orange-500">
+                      {items.name}
+                    </p>
+                    <p className="font-semibold text-gray-800">
+                      ₦{items.price}
+                    </p>
+                    <div className="flex gap-3 items-center">
+                      <button
+                        className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
+                        onClick={() =>
+                          setSelectedItem((selectedItem) => {
+                            if (selectedItem) {
+                              return {
+                                ...selectedItem,
+                                modifiers: selectedItem.modifiers.map(
+                                  (mod, idx) =>
+                                    idx === i
+                                      ? {
+                                          ...mod,
+                                          count: Math.max(0, mod.count - 1),
+                                        }
+                                      : mod
+                                ),
+                              };
+                            }
+                            return selectedItem;
+                          })
+                        }
+                      >
+                        <Minus size={18} />
+                      </button>
+                      <p className="font-semibold text-lg">{items.count}</p>
+                      <button
+                        className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
+                        onClick={() =>
+                          setSelectedItem((selectedItem) => {
+                            if (selectedItem) {
+                              return {
+                                ...selectedItem,
+                                modifiers: selectedItem.modifiers.map(
+                                  (mod, idx) =>
+                                    idx === i
+                                      ? {
+                                          ...mod,
+                                          count: Math.max(0, mod.count + 1),
+                                        }
+                                      : mod
+                                ),
+                              };
+                            }
+                            return selectedItem;
+                          })
+                        }
+                      >
+                        <Plus size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors">
+              Add to cart <ShoppingCart size={20} />
+            </button>
           </div>
         </div>
       </div>
