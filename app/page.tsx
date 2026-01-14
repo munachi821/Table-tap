@@ -25,9 +25,10 @@ export interface foodItem {
   image: StaticImageData;
   modifiers: {
     name: string;
-    price: string;
+    price: number;
     img: StaticImageData;
     count: number;
+    total: number;
   }[];
   isAvailable: boolean;
 }
@@ -71,9 +72,15 @@ export default function Home() {
       price: "3,400",
       image: food3,
       modifiers: [
-        { name: "pounded yam", price: "500", img: mod3, count: 0 },
-        { name: "Peppered meat", price: "600", img: mod4, count: 0 },
-        { name: "cow skin (ponmo)", price: "500", img: mod2, count: 0 },
+        { name: "pounded yam", price: 500, img: mod3, count: 0, total: 0 },
+        { name: "Peppered meat", price: 600, img: mod4, count: 0, total: 0 },
+        {
+          name: "cow skin (ponmo)",
+          price: 500,
+          img: mod2,
+          count: 0,
+          total: 0,
+        },
       ],
       isAvailable: true,
     },
@@ -82,8 +89,8 @@ export default function Home() {
       price: "4,000",
       image: food4,
       modifiers: [
-        { name: "Fried chicken", price: "700", img: mod1, count: 0 },
-        { name: "coleslaw", price: "200", img: mod2, count: 0 },
+        { name: "Fried chicken", price: 700, img: mod1, count: 0, total: 0 },
+        { name: "coleslaw", price: 700, img: mod2, count: 0, total: 0 },
       ],
       isAvailable: true,
     },
@@ -280,6 +287,10 @@ export default function Home() {
                                       ? {
                                           ...mod,
                                           count: Math.max(0, mod.count - 1),
+                                          total: Math.max(
+                                            0,
+                                            mod.total - mod.price
+                                          ),
                                         }
                                       : mod
                                 ),
@@ -305,6 +316,10 @@ export default function Home() {
                                       ? {
                                           ...mod,
                                           count: Math.max(0, mod.count + 1),
+                                          total: Math.max(
+                                            0,
+                                            (mod.count + 1) * mod.price
+                                          ),
                                         }
                                       : mod
                                 ),
