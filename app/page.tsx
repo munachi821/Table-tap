@@ -343,7 +343,6 @@ export default function Home() {
               disabled={
                 !selectedItem?.modifiers.some((item) => item.total > 0)
               }
-              onClick={() => console.log("disabled not working")}
             >
               Add to cart <ShoppingCart size={20} />
             </button>
