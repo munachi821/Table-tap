@@ -246,6 +246,7 @@ export default function Home() {
                 className="text-orange-400 cursor-pointer"
                 onClick={() => {
                   setOpenModifierMenu(false);
+                  setSelectedItem(null);
                 }}
               >
                 <X />
@@ -337,7 +338,13 @@ export default function Home() {
               ))}
             </div>
 
-            <button className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors">
+            <button
+              className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
+              disabled={
+                !selectedItem?.modifiers.some((item) => item.total > 0)
+              }
+              onClick={() => console.log("disabled not working")}
+            >
               Add to cart <ShoppingCart size={20} />
             </button>
           </div>
