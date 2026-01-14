@@ -18,6 +18,7 @@ import mod1 from "@/public/menu-items/mod1.jpg";
 import mod2 from "@/public/menu-items/mod2.jpg";
 import mod3 from "@/public/menu-items/mod3.jpg";
 import mod4 from "@/public/menu-items/mod4.jpg";
+import drink7 from "@/public/menu-items/drink7.jpg";
 
 export interface foodItem {
   foodName: string;
@@ -42,6 +43,7 @@ export default function Home() {
 
   const categories = [
     "All",
+    "Available",
     "Rice",
     "Swallow",
     "Beverages",
@@ -340,12 +342,50 @@ export default function Home() {
 
             <button
               className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
-              disabled={
-                !selectedItem?.modifiers.some((item) => item.total > 0)
-              }
+              disabled={!selectedItem?.modifiers.some((item) => item.total > 0)}
             >
               Add to cart <ShoppingCart size={20} />
             </button>
+          </div>
+        </div>
+
+        {/* Beverages */}
+        <div>
+          <p className="text-2xl m-2.5">Beverages</p>
+          <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
+            <div className="border border-gray-300 p-1 rounded-xl flex gap-2 bg-gray-100 h-50 shrink-0">
+              <div className="overflow-hidden rounded-xl">
+                <Image
+                  src={drink7}
+                  alt="drink 5"
+                  className="w-fit h-full object-center object-contain"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5 bg-white justify-end shrink-0 p-1.5 w-50 rounded-r-lg">
+                <p className="text-lg font-semibold leading-6 text-gray-800 my-1">
+                  Strawberry flavoured Hollandia Yoghurt
+                </p>
+                <div className="flex gap-3">
+                  <p className="font-bold text-lg text-orange-500">₦2,400</p>
+                  <div className="flex gap-3">
+                    <button className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400">
+                      {" "}
+                      <Plus size={22} />{" "}
+                    </button>
+                    <p className="font-semibold text-lg">0</p>
+                    <button className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400">
+                      {" "}
+                      <Minus size={22} />{" "}
+                    </button>
+                  </div>
+                </div>
+                <button className="py-2 rounded-lg text-white font-semibold bg-orange-400 hover:bg-orange-400/80 transition-colors cursor-pointer flex items-center justify-center gap-1 m-0.5">
+                  Add to Cart{" "}
+                  <ShoppingCart size={18} fill="#fff" strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
