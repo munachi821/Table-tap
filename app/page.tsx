@@ -6,6 +6,7 @@ import {
   SearchIcon,
   ShoppingBasketIcon,
   ShoppingCart,
+  Tag,
   X,
 } from "lucide-react";
 import Image, { StaticImageData } from "next/image";
@@ -19,9 +20,13 @@ import mod2 from "@/public/menu-items/mod2.jpg";
 import mod3 from "@/public/menu-items/mod3.jpg";
 import mod4 from "@/public/menu-items/mod4.jpg";
 import drink7 from "@/public/menu-items/drink7.jpg";
+import drink2 from "@/public/menu-items/drink2.jpg";
+import drink1 from "@/public/menu-items/drink1.jpg";
+import drink3 from "@/public/menu-items/drink3.jpg";
 
 export interface foodItem {
-  foodName: string;
+  tag: string[];
+  itemName: string;
   price: string;
   image: StaticImageData;
   modifiers: {
@@ -54,23 +59,26 @@ export default function Home() {
     "Continental",
   ];
 
-  const mostOrdered = [
+  const menuItems = [
     {
-      foodName: "Catfish pepper Soup with scented leaves",
+      tag: ["most-ordered"],
+      itemName: "Catfish pepper Soup with scented leaves",
       price: "5,400",
       image: food1,
       modifiers: [],
       isAvailable: true,
     },
     {
-      foodName: "Goat meat pepper Soup",
+      tag: ["most-ordered"],
+      itemName: "Goat meat pepper Soup",
       price: "6,700",
       image: food2,
       modifiers: [],
       isAvailable: true,
     },
     {
-      foodName: "Egusi soup with 2 wraps of fufu",
+      tag: ["most-ordered"],
+      itemName: "Egusi soup with 2 wraps of fufu",
       price: "3,400",
       image: food3,
       modifiers: [
@@ -87,7 +95,8 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      foodName: "Fried rice with chicken and salad",
+      tag: ["most-ordered"],
+      itemName: "Fried rice with chicken and salad",
       price: "4,000",
       image: food4,
       modifiers: [
@@ -96,14 +105,48 @@ export default function Home() {
       ],
       isAvailable: true,
     },
+    {
+      tag: ["beverage", "most-ordered"],
+      itemName: "Strawberry Flavoured Hollandia Yoghurt",
+      price: "2,400",
+      image: drink7,
+      modifiers: [],
+      isAvailable: true,
+    },
+    {
+      tag: ["beverage"],
+      itemName: "Canned sprite",
+      price: "1,200",
+      image: drink2,
+      modifiers: [],
+      isAvailable: true,
+    },
+    {
+      tag: ["beverage"],
+      itemName: "Canned coke",
+      price: "1,200",
+      image: drink1,
+      modifiers: [],
+      isAvailable: true,
+    },
+    {
+      tag: ["beverage"],
+      itemName: "Monster Energy",
+      price: "1,200",
+      image: drink3,
+      modifiers: [],
+      isAvailable: true,
+    },
   ];
 
+  /* adding focus when the user clicks the search btn */
   useEffect(() => {
     if (searchOpen && searchRef.current) {
       searchRef.current.focus();
     }
   }, [searchOpen]);
 
+  /* handling search */
   const handleSearch = () => {
     if (searchOpen && searchRef.current) {
       /* function to handle search */
@@ -112,14 +155,21 @@ export default function Home() {
     }
   };
 
+  /* filtering tags */
+  const filterTags = (tag: string) => {
+    return menuItems.filter((items) => items.tag.includes(tag));
+  };
+
+  /* add to cart */
   const addToCart = (foodItem: foodItem) => {
     if (foodItem.modifiers.length > 0) {
       setSelectedItem(foodItem);
       setOpenModifierMenu(true);
     } else {
-      console.log(`${foodItem.foodName} added to cart`);
+      console.log(`${foodItem.itemName} added to cart`);
     }
   };
+
   return (
     <main>
       <header className="py-5 px-4">
@@ -200,16 +250,16 @@ export default function Home() {
         <div>
           <p className="text-2xl mb-2.5">Most Ordered</p>
           <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
-            {mostOrdered.map((mostOrdered, i) => (
+            {filterTags("most-ordered").map((mostOrdered, i) => (
               <div
-                className="shadow-md h-fit w-62 shrink-0 rounded-xl overflow-hidden"
+                className="shadow-md h-91 w-62 shrink-0 rounded-xl overflow-hidden"
                 key={i}
               >
-                <div className="rounded-lg overflow-hidden">
+                <div className="rounded-lg overflow-hidden h-62">
                   <Image
                     src={mostOrdered.image}
                     alt="detail about food 1"
-                    className="min-w-full"
+                    className="w-full h-full object-contain object-center"
                   />
                 </div>
 
@@ -219,7 +269,7 @@ export default function Home() {
                       ₦{mostOrdered.price}
                     </p>
                     <p className="text-base font-semibold text-gray-800">
-                      {mostOrdered.foodName}
+                      {mostOrdered.itemName}
                     </p>
                   </div>
                   <button
@@ -241,7 +291,7 @@ export default function Home() {
           >
             <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
               <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
-                Extra items for {selectedItem?.foodName}
+                Extra items for {selectedItem?.itemName}
               </p>
 
               <button
@@ -353,39 +403,46 @@ export default function Home() {
         <div>
           <p className="text-2xl m-2.5">Beverages</p>
           <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
-            <div className="border border-gray-300 p-1 rounded-xl flex gap-2 bg-gray-100 h-50 shrink-0">
-              <div className="overflow-hidden rounded-xl">
-                <Image
-                  src={drink7}
-                  alt="drink 5"
-                  className="w-fit h-full object-center object-contain"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5 bg-white justify-end shrink-0 p-1.5 w-50 rounded-r-lg">
-                <p className="text-lg font-semibold leading-6 text-gray-800 my-1">
-                  Strawberry flavoured Hollandia Yoghurt
-                </p>
-                <div className="flex gap-3">
-                  <p className="font-bold text-lg text-orange-500">₦2,400</p>
-                  <div className="flex gap-3">
-                    <button className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400">
-                      {" "}
-                      <Plus size={22} />{" "}
-                    </button>
-                    <p className="font-semibold text-lg">0</p>
-                    <button className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400">
-                      {" "}
-                      <Minus size={22} />{" "}
-                    </button>
-                  </div>
+            {filterTags("beverage").map((beverage, i) => (
+              <div
+                className="border border-gray-300 p-1 rounded-xl flex gap-2 bg-gray-100 h-50 shrink-0"
+                key={i}
+              >
+                <div className="overflow-hidden rounded-xl">
+                  <Image
+                    src={beverage.image}
+                    alt="drink 5"
+                    className="w-fit h-full object-center object-contain"
+                  />
                 </div>
-                <button className="py-2 rounded-lg text-white font-semibold bg-orange-400 hover:bg-orange-400/80 transition-colors cursor-pointer flex items-center justify-center gap-1 m-0.5">
-                  Add to Cart{" "}
-                  <ShoppingCart size={18} fill="#fff" strokeWidth={2.5} />
-                </button>
+
+                <div className="flex flex-col gap-1.5 bg-white justify-end shrink-0 p-1.5 w-50 rounded-r-lg">
+                  <p className="text-lg font-semibold leading-6 text-gray-800 my-1">
+                    {beverage.itemName}
+                  </p>
+                  <div className="flex gap-3">
+                    <p className="font-bold text-lg text-orange-500">
+                      ₦{beverage.price}
+                    </p>
+                    <div className="flex gap-3">
+                      <button className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400">
+                        {" "}
+                        <Plus size={22} />{" "}
+                      </button>
+                      <p className="font-semibold text-lg">0</p>
+                      <button className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400">
+                        {" "}
+                        <Minus size={22} />{" "}
+                      </button>
+                    </div>
+                  </div>
+                  <button className="py-2 rounded-lg text-white font-semibold bg-orange-400 hover:bg-orange-400/80 transition-colors cursor-pointer flex items-center justify-center gap-1 m-0.5">
+                    Add to Cart{" "}
+                    <ShoppingCart size={18} fill="#fff" strokeWidth={2.5} />
+                  </button>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
