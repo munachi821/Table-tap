@@ -9,7 +9,7 @@ interface itemProps {
   onAddToCart: (item: foodItem, quantity: number) => void;
 }
 
-const Item = ({ item, onAddToCart }: itemProps) => {
+const Beverage = ({ item, onAddToCart }: itemProps) => {
   const [count, setCount] = useState(1);
 
   function incrementCount() {
@@ -67,4 +67,4 @@ const Item = ({ item, onAddToCart }: itemProps) => {
     </div>
   );
 };
-export default Item;
+export default Beverage;

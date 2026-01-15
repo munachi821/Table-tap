@@ -22,7 +22,7 @@ import drink7 from "@/public/menu-items/drink7.jpg";
 import drink2 from "@/public/menu-items/drink2.jpg";
 import drink1 from "@/public/menu-items/drink1.jpg";
 import drink3 from "@/public/menu-items/drink3.jpg";
-import Item from "@/components/item";
+import Beverage from "@/components/beverageItem";
 
 export interface foodItem {
   tag: string[];
@@ -160,19 +160,34 @@ export default function Home() {
     return menuItems.filter((items) => items.tag.includes(tag));
   };
 
-  /* add to cart function */
-  const addToCart = (foodItem: foodItem, quantity: number) => {
+  /* checking if the function */
+  const handleItemClick = (foodItem: foodItem, quantity: number) => {
     if (foodItem.modifiers.length > 0) {
       setSelectedItem(foodItem);
       setOpenModifierMenu(true);
-    } else {
-      if (quantity) {
-        console.log(`${quantity} ${foodItem.itemName} added to cart`);
-        console.log(foodItem);
-      } else {
-        console.log(`${foodItem.itemName} added to cart`);
-      }
+      return;
     }
+    addToCart(foodItem, quantity, []);
+  };
+
+  const handleModifierConfirm = () => {
+    if (!selectedItem) return;
+
+    /* calculate the final price */
+
+    console.log("sucessfully added to cart");
+    addToCart(selectedItem, 1, selectedItem.modifiers);
+
+    setSelectedItem(null);
+    setOpenModifierMenu(false);
+  };
+
+  const addToCart = (
+    item: foodItem,
+    quantity: number,
+    finalModifiers: any[] /* this needs to be changed to the cart data type */
+  ) => {
+    console.log("Item added to cart:", item, "Quantity:", quantity);
   };
 
   return (
@@ -279,7 +294,7 @@ export default function Home() {
                   </div>
                   <button
                     className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-3 px-4.5"
-                    onClick={() => addToCart(mostOrdered, 1)}
+                    onClick={() => handleItemClick(mostOrdered, 1)}
                   >
                     <Plus size={25} />
                   </button>
@@ -398,6 +413,7 @@ export default function Home() {
             <button
               className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
               disabled={!selectedItem?.modifiers.some((item) => item.count > 0)}
+              onClick={() => handleModifierConfirm()}
             >
               Add to cart <ShoppingCart size={20} />
             </button>
@@ -409,7 +425,7 @@ export default function Home() {
           <p className="text-2xl m-2.5">Beverages</p>
           <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
             {filterTags("beverage").map((beverage, i) => (
-              <Item key={i} item={beverage} onAddToCart={addToCart} />
+              <Beverage key={i} item={beverage} onAddToCart={handleItemClick} />
             ))}
           </div>
         </div>
