@@ -24,19 +24,30 @@ import drink1 from "@/public/menu-items/drink1.jpg";
 import drink3 from "@/public/menu-items/drink3.jpg";
 import Beverage from "@/components/beverageItem";
 
+export interface modifier {
+  name: string;
+  price: number;
+  img: StaticImageData;
+  count: number;
+  total: number;
+}
+
 export interface foodItem {
   tag: string[];
   itemName: string;
   price: string;
   image: StaticImageData;
-  modifiers: {
-    name: string;
-    price: number;
-    img: StaticImageData;
-    count: number;
-    total: number;
-  }[];
+  modifiers: modifier[];
   isAvailable: boolean;
+}
+
+interface CartItem {
+  cartId: string;
+  name: string;
+  price: number;
+  image: StaticImageData;
+  quantity: number;
+  selectedModifiers: modifier[];
 }
 
 export default function Home() {
@@ -45,6 +56,7 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [openModifierMenu, setOpenModifierMenu] = useState(false);
   const [selectedItem, setSelectedItem] = useState<foodItem | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const categories = [
     "All",
@@ -167,28 +179,64 @@ export default function Home() {
       setOpenModifierMenu(true);
       return;
     }
-    addToCart(foodItem, quantity, []);
+    addToCart(foodItem, quantity);
   };
 
   const handleModifierConfirm = () => {
     if (!selectedItem) return;
 
-    /* calculate the final price */
+    const selectedModifiers = selectedItem.modifiers.filter(
+      (mod) => mod.count > 0
+    );
 
-    console.log("sucessfully added to cart");
-    addToCart(selectedItem, 1, selectedItem.modifiers);
+    const modifiersTotalCost = selectedModifiers.reduce(
+      (sum, mod) => sum + mod.total,
+      0
+    );
+    const basePrice = parseInt(selectedItem.price.replace(",", ""));
+    const finalTotalPrice = basePrice + modifiersTotalCost;
+
+    const cartPayload = {
+      cartId: crypto.randomUUID(),
+      name: selectedItem.itemName,
+      image: selectedItem.image,
+      price: finalTotalPrice,
+      quantity: 1,
+      selectedModifiers: selectedModifiers,
+    };
+
+    addToCart(cartPayload);
 
     setSelectedItem(null);
     setOpenModifierMenu(false);
   };
 
-  const addToCart = (
-    item: foodItem,
-    quantity: number,
-    finalModifiers: any[] /* this needs to be changed to the cart data type */
-  ) => {
-    console.log("Item added to cart:", item, "Quantity:", quantity);
+  const addToCart = (payload: CartItem | foodItem, quantity?: number) => {
+    if ("cartId" in payload) {
+      console.log("Adding Complex Item to Cart:", payload);
+      setCart((prev) => [...prev, payload]);
+      return;
+    }
+
+    const simpleItem = payload as foodItem;
+    const simplePrice = parseInt(simpleItem.price.replace(",", ""));
+
+    const simplePayload = {
+      cartId: crypto.randomUUID(),
+      name: simpleItem.itemName,
+      price: simplePrice * (quantity || 1),
+      image: simpleItem.image,
+      quantity: quantity || 1,
+      selectedModifiers: [],
+    };
+
+    console.log("Adding Simple Item to Cart:", simplePayload);
+    setCart((prev) => [...prev, simplePayload]);
   };
+
+  useEffect(() => {
+    console.log("Current Cart:", cart);
+  }, [cart]);
 
   return (
     <main>
@@ -237,9 +285,11 @@ export default function Home() {
               />
             </div>
             <div className="relative text-orange-400 bg-orange-50 rounded-full p-2 hover:bg-orange-100 transition-colors">
-              <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
-                3
-              </div>
+              {cart.length > 0 && (
+                <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
+                  {cart.length}
+                </div>
+              )}
               <ShoppingBasketIcon size={25} />
             </div>
           </div>
