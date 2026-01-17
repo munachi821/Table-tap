@@ -55,27 +55,27 @@ interface CartItem {
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [openModifierMenu, setOpenModifierMenu] = useState(false);
   const [selectedItem, setSelectedItem] = useState<foodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const categories = [
-    "All",
-    "Available",
-    "Rice",
-    "Swallow",
-    "Beverages",
-    "Snacks",
-    "Desert",
-    "Mocktails",
-    "Cocktails",
-    "Continental",
+    "all",
+    "available",
+    "rice",
+    "swallow",
+    "beverage",
+    "snacks",
+    "desert",
+    "mocktails",
+    "cocktails",
+    "continental",
   ];
 
   const menuItems = [
     {
-      tag: ["most-ordered", "item"],
+      tag: ["most-ordered", "item", "all", "soup"],
       itemName: "Catfish pepper Soup with scented leaves",
       price: "5,400",
       image: food1,
@@ -83,7 +83,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["most-ordered", "item"],
+      tag: ["most-ordered", "item", "all", "soup"],
       itemName: "Goat meat pepper Soup",
       price: "6,700",
       image: food2,
@@ -91,7 +91,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["most-ordered", "item"],
+      tag: ["most-ordered", "item", "all", "swallow"],
       itemName: "Egusi soup with 2 wraps of fufu",
       price: "3,400",
       image: food3,
@@ -109,7 +109,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["most-ordered", "item"],
+      tag: ["most-ordered", "item", "all", "rice"],
       itemName: "Fried rice with chicken and salad",
       price: "4,000",
       image: food4,
@@ -120,7 +120,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["beverage", "most-ordered"],
+      tag: ["beverage", "most-ordered", "all"],
       itemName: "Strawberry Flavoured Hollandia Yoghurt",
       price: "2,400",
       image: drink7,
@@ -128,7 +128,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["beverage"],
+      tag: ["beverage", "all"],
       itemName: "Canned sprite",
       price: "1,200",
       image: drink2,
@@ -136,7 +136,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["beverage"],
+      tag: ["beverage", "all"],
       itemName: "Canned coke",
       price: "1,200",
       image: drink1,
@@ -144,7 +144,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["beverage", "item"],
+      tag: ["beverage", "item", "all"],
       itemName: "Monster Energy",
       price: "1,400",
       image: drink3,
@@ -152,7 +152,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["beverage", "item"],
+      tag: ["beverage", "item", "all"],
       itemName: "Canned pepsi",
       price: "1,200",
       image: drink6,
@@ -160,6 +160,10 @@ export default function Home() {
       isAvailable: true,
     },
   ];
+
+  const categoryTags = (activeCategory: string) => {
+    return menuItems.filter((items) => items.tag.includes(activeCategory));
+  };
 
   /* adding focus when the user clicks the search btn */
   useEffect(() => {
@@ -179,7 +183,9 @@ export default function Home() {
 
   /* filtering tags */
   const filterTags = (tag: string) => {
-    return menuItems.filter((items) => items.tag.includes(tag));
+    return categoryTags(activeCategory).filter((items) =>
+      items.tag.includes(tag),
+    );
   };
 
   /* checking if the item has modifiers */
@@ -311,9 +317,11 @@ export default function Home() {
         {categories.map((category) => (
           <button
             key={category}
-            onClick={() => setActiveCategory(category)}
+            onClick={() => {
+              setActiveCategory(category);
+            }}
             className={`
-              px-5 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap 
+              px-5 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap capitalize 
               ${
                 activeCategory === category
                   ? "bg-orange-500 text-white shadow-md shadow-orange-200"
@@ -368,7 +376,7 @@ export default function Home() {
           <div
             className={`${
               openModifierMenu ? "flex" : "hidden"
-            } flex-col rounded-2xl border border-gray-200 fixed bottom-0 right-0 m-5 bg-white p-2`}
+            } flex-col rounded-2xl border border-gray-200 fixed bottom-0 right-0 m-5 bg-white p-2 z-50`}
           >
             <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
               <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
@@ -481,7 +489,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Beverages */}
+        {/* Beverage */}
         <div>
           <p className="text-2xl m-2.5">Beverages</p>
           <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
@@ -505,7 +513,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="text-orange-400 bg-orange-200/60 rounded-full p-4 hover:bg-orange-200/50 transition-colors fixed bottom-0 right-0 m-4 cursor-pointer">
+      <div className="text-orange-400 bg-orange-100 rounded-full p-4 fixed bottom-0 right-0 m-4 cursor-pointer z-20">
         {cart.length > 0 && (
           <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
             {cart.length}
