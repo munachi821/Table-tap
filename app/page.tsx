@@ -59,6 +59,7 @@ export default function Home() {
   const [openModifierMenu, setOpenModifierMenu] = useState(false);
   const [selectedItem, setSelectedItem] = useState<foodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [search, setSearch] = useState("");
 
   const categories = [
     "all",
@@ -67,7 +68,7 @@ export default function Home() {
     "swallow",
     "beverage",
     "snacks",
-    "desert",
+    "dessert",
     "mocktails",
     "cocktails",
     "continental",
@@ -161,8 +162,24 @@ export default function Home() {
     },
   ];
 
+  const searchItems = () => {
+    if (search === "") {
+      return;
+    }
+    return menuItems.filter((items) =>
+      items.itemName.toLowerCase().includes(search.toLowerCase()),
+    );
+  };
+
   const categoryTags = (activeCategory: string) => {
     return menuItems.filter((items) => items.tag.includes(activeCategory));
+  };
+
+  /* filtering tags */
+  const filterTags = (tag: string) => {
+    return categoryTags(activeCategory).filter((items) =>
+      items.tag.includes(tag),
+    );
   };
 
   /* adding focus when the user clicks the search btn */
@@ -173,20 +190,14 @@ export default function Home() {
   }, [searchOpen]);
 
   /* handling search */
-  const handleSearch = () => {
+  /* const handleSearch = () => {
     if (searchOpen && searchRef.current) {
-      /* function to handle search */
-      console.log("click happened");
+      searchItems(search);
+      console.log(searchItems(search));
       searchRef.current.value = "";
+      setSearch("");
     }
-  };
-
-  /* filtering tags */
-  const filterTags = (tag: string) => {
-    return categoryTags(activeCategory).filter((items) =>
-      items.tag.includes(tag),
-    );
-  };
+  }; */
 
   /* checking if the item has modifiers */
   const handleItemClick = (foodItem: foodItem, quantity: number) => {
@@ -280,19 +291,21 @@ export default function Home() {
               } hover:bg-gray-100 transition-colors relative`}
               onClick={() => setSearchOpen(true)}
             >
-              <SearchIcon
-                size={25}
-                onClick={() => {
-                  handleSearch();
-                }}
-                onMouseDown={(e) => e.preventDefault()}
-              />
+              <button>
+                <SearchIcon size={25} />
+              </button>
 
               <input
                 ref={searchRef}
                 type="search"
                 placeholder="Search Food"
-                onBlur={() => setSearchOpen(false)}
+                onBlur={() => {
+                  if (search === "") setSearchOpen(false);
+                }}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                }}
                 className={`bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400 transition-all duration-300 ease-in-out ${
                   searchOpen
                     ? "w-60 opacity-100 pl-2"
