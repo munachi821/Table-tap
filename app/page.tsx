@@ -189,16 +189,6 @@ export default function Home() {
     }
   }, [searchOpen]);
 
-  /* handling search */
-  /* const handleSearch = () => {
-    if (searchOpen && searchRef.current) {
-      searchItems(search);
-      console.log(searchItems(search));
-      searchRef.current.value = "";
-      setSearch("");
-    }
-  }; */
-
   /* checking if the item has modifiers */
   const handleItemClick = (foodItem: foodItem, quantity: number) => {
     if (foodItem.modifiers.length > 0) {
