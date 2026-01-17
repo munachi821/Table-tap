@@ -6,10 +6,10 @@ import { useState } from "react";
 
 interface itemProps {
   item: foodItem;
-  onAddToCart: (item: foodItem, quantity: number) => void;
+  handleItemClick: (item: foodItem, quantity: number) => void;
 }
 
-const Beverage = ({ item, onAddToCart }: itemProps) => {
+const Beverage = ({ item, handleItemClick }: itemProps) => {
   const [count, setCount] = useState(1);
 
   function incrementCount() {
@@ -57,7 +57,7 @@ const Beverage = ({ item, onAddToCart }: itemProps) => {
         <button
           className="py-2 rounded-lg text-white font-semibold bg-orange-400 hover:bg-orange-400/80 transition-colors cursor-pointer flex items-center justify-center gap-1 m-0.5"
           onClick={() => {
-            onAddToCart(item, count);
+            handleItemClick(item, count);
             setCount(1);
           }}
         >

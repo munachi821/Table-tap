@@ -24,6 +24,7 @@ import drink1 from "@/public/menu-items/drink1.jpg";
 import drink3 from "@/public/menu-items/drink3.jpg";
 import drink6 from "@/public/menu-items/drink6.jpg";
 import Beverage from "@/components/beverageItem";
+import Item from "@/components/item";
 
 export interface modifier {
   name: string;
@@ -74,7 +75,7 @@ export default function Home() {
 
   const menuItems = [
     {
-      tag: ["most-ordered"],
+      tag: ["most-ordered", "item"],
       itemName: "Catfish pepper Soup with scented leaves",
       price: "5,400",
       image: food1,
@@ -82,7 +83,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["most-ordered"],
+      tag: ["most-ordered", "item"],
       itemName: "Goat meat pepper Soup",
       price: "6,700",
       image: food2,
@@ -90,7 +91,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["most-ordered"],
+      tag: ["most-ordered", "item"],
       itemName: "Egusi soup with 2 wraps of fufu",
       price: "3,400",
       image: food3,
@@ -108,7 +109,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["most-ordered"],
+      tag: ["most-ordered", "item"],
       itemName: "Fried rice with chicken and salad",
       price: "4,000",
       image: food4,
@@ -143,7 +144,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["beverage"],
+      tag: ["beverage", "item"],
       itemName: "Monster Energy",
       price: "1,400",
       image: drink3,
@@ -151,7 +152,7 @@ export default function Home() {
       isAvailable: true,
     },
     {
-      tag: ["beverage"],
+      tag: ["beverage", "item"],
       itemName: "Canned pepsi",
       price: "1,200",
       image: drink6,
@@ -196,12 +197,12 @@ export default function Home() {
     if (!selectedItem) return;
 
     const selectedModifiers = selectedItem.modifiers.filter(
-      (mod) => mod.count > 0
+      (mod) => mod.count > 0,
     );
 
     const modifiersTotalCost = selectedModifiers.reduce(
       (sum, mod) => sum + mod.total,
-      0
+      0,
     );
     const basePrice = parseInt(selectedItem.price.replace(",", ""));
     const finalTotalPrice = basePrice + modifiersTotalCost;
@@ -422,10 +423,10 @@ export default function Home() {
                                           count: Math.max(0, mod.count - 1),
                                           total: Math.max(
                                             0,
-                                            mod.total - mod.price
+                                            mod.total - mod.price,
                                           ),
                                         }
-                                      : mod
+                                      : mod,
                                 ),
                               };
                             }
@@ -451,10 +452,10 @@ export default function Home() {
                                           count: Math.max(0, mod.count + 1),
                                           total: Math.max(
                                             0,
-                                            (mod.count + 1) * mod.price
+                                            (mod.count + 1) * mod.price,
                                           ),
                                         }
-                                      : mod
+                                      : mod,
                                 ),
                               };
                             }
@@ -485,7 +486,11 @@ export default function Home() {
           <p className="text-2xl m-2.5">Beverages</p>
           <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
             {filterTags("beverage").map((beverage, i) => (
-              <Beverage key={i} item={beverage} onAddToCart={handleItemClick} />
+              <Beverage
+                key={i}
+                item={beverage}
+                handleItemClick={handleItemClick}
+              />
             ))}
           </div>
         </div>
@@ -494,38 +499,9 @@ export default function Home() {
         <div className="pr-10">
           <p className="text-2xl my-2.5">Other Meals</p>
           <div className="grid grid-cols-3 gap-3">
-            <div className="shadow-lg h-fit shrink-0 rounded-xl overflow-hidden p-3">
-              <div className="rounded-xl overflow-hidden h-62">
-                <Image
-                  src={food1}
-                  alt="other food"
-                  className="w-full h-full object-cover object-center"
-                />
-              </div>
-              <div className="mt-3">
-                <div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-xl font-bold text-orange-500">₦5000</p>
-
-                    <div className="flex gap-2.5">
-                      <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1">
-                        <Plus size={20} />
-                      </button>
-                      <p className="text-lg font-semibold">1</p>
-                      <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1">
-                        <Minus size={20} />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-base font-semibold text-gray-800">
-                    Catfish pepper Soup with scented leaves
-                  </p>
-                </div>
-                <button className="w-full py-2 rounded-full text-sm mt-2 bg-orange-400 text-white font-semibold">
-                  Add to Cart
-                </button>
-              </div>
-            </div>
+            {filterTags("item").map((item, i) => (
+              <Item key={i} item={item} handleItemClick={handleItemClick} />
+            ))}
           </div>
         </div>
       </div>
