@@ -253,7 +253,7 @@ export default function Home() {
   return (
     <main className="pb-10">
       <header className="py-5 px-4">
-        <nav className="bg-white text-black flex items-center justify-between py-2 rounded-lg">
+        <nav className="bg-white text-black flex items-center justify-between rounded-lg px-2">
           <div className="flex gap-2 items-center">
             <div className="size-13 rounded-full border border-orange-200"></div>
             <div>
@@ -504,6 +504,14 @@ export default function Home() {
             ))}
           </div>
         </div>
+      </div>
+      <div className="text-orange-400 bg-orange-200/60 rounded-full p-4 hover:bg-orange-200/50 transition-colors fixed bottom-0 right-0 m-4 cursor-pointer">
+        {cart.length > 0 && (
+          <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
+            {cart.length}
+          </div>
+        )}
+        <ShoppingBasketIcon size={30} />
       </div>
     </main>
   );
