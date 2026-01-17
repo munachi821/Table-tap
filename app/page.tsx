@@ -212,6 +212,7 @@ export default function Home() {
     setOpenModifierMenu(false);
   };
 
+  //add to cart function
   const addToCart = (payload: CartItem | foodItem, quantity?: number) => {
     if ("cartId" in payload) {
       console.log("Adding Complex Item to Cart:", payload);
