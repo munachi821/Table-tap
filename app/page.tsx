@@ -22,6 +22,7 @@ import drink7 from "@/public/menu-items/drink7.jpg";
 import drink2 from "@/public/menu-items/drink2.jpg";
 import drink1 from "@/public/menu-items/drink1.jpg";
 import drink3 from "@/public/menu-items/drink3.jpg";
+import drink6 from "@/public/menu-items/drink6.jpg";
 import Beverage from "@/components/beverageItem";
 
 export interface modifier {
@@ -144,8 +145,16 @@ export default function Home() {
     {
       tag: ["beverage"],
       itemName: "Monster Energy",
-      price: "1,200",
+      price: "1,400",
       image: drink3,
+      modifiers: [],
+      isAvailable: true,
+    },
+    {
+      tag: ["beverage"],
+      itemName: "Canned pepsi",
+      price: "1,200",
+      image: drink6,
       modifiers: [],
       isAvailable: true,
     },
@@ -241,7 +250,7 @@ export default function Home() {
   }, [cart]);
 
   return (
-    <main>
+    <main className="pb-10">
       <header className="py-5 px-4">
         <nav className="bg-white text-black flex items-center justify-between py-2 rounded-lg">
           <div className="flex gap-2 items-center">
@@ -478,6 +487,45 @@ export default function Home() {
             {filterTags("beverage").map((beverage, i) => (
               <Beverage key={i} item={beverage} onAddToCart={handleItemClick} />
             ))}
+          </div>
+        </div>
+
+        {/* Other tags */}
+        <div className="pr-10">
+          <p className="text-2xl my-2.5">Other Meals</p>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="shadow-lg h-fit shrink-0 rounded-xl overflow-hidden p-3">
+              <div className="rounded-xl overflow-hidden h-62">
+                <Image
+                  src={food1}
+                  alt="other food"
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+              <div className="mt-3">
+                <div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-xl font-bold text-orange-500">₦5000</p>
+
+                    <div className="flex gap-2.5">
+                      <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1">
+                        <Plus size={20} />
+                      </button>
+                      <p className="text-lg font-semibold">1</p>
+                      <button className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1">
+                        <Minus size={20} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-base font-semibold text-gray-800">
+                    Catfish pepper Soup with scented leaves
+                  </p>
+                </div>
+                <button className="w-full py-2 rounded-full text-sm mt-2 bg-orange-400 text-white font-semibold">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
