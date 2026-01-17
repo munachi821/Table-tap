@@ -172,7 +172,7 @@ export default function Home() {
     return menuItems.filter((items) => items.tag.includes(tag));
   };
 
-  /* checking if the function */
+  /* checking if the item has modifiers */
   const handleItemClick = (foodItem: foodItem, quantity: number) => {
     if (foodItem.modifiers.length > 0) {
       setSelectedItem(foodItem);
@@ -182,6 +182,7 @@ export default function Home() {
     addToCart(foodItem, quantity);
   };
 
+  //confirming selected modifiers and adding to cart
   const handleModifierConfirm = () => {
     if (!selectedItem) return;
 
@@ -256,7 +257,6 @@ export default function Home() {
             <p className="text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4 font-semibold">
               Table 1
             </p>
-            {/* if the search bar is open the background should be gray-100 */}
             <div
               className={`flex flex-row-reverse gap-2 text-gray-600 p-2 rounded-full ${
                 searchOpen && "bg-gray-100"
