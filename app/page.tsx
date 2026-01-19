@@ -6,6 +6,7 @@ import {
   SearchIcon,
   ShoppingBasketIcon,
   ShoppingCart,
+  Trash2,
   X,
 } from "lucide-react";
 import Image, { StaticImageData } from "next/image";
@@ -328,7 +329,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Menu Items */}
       {search.length > 0 ? (
         <div className="px-10">
           <p className="text-2xl mb-4">
@@ -474,6 +474,7 @@ export default function Home() {
           ).length === 0 && <p className="text-gray-500">No food found.</p>}
         </div>
       ) : (
+        /* Menu Items */
         <div className="pl-10 mt-5">
           <div>
             <p className="text-2xl mb-2.5">Most Ordered</p>
@@ -663,6 +664,58 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <div className="p-2 w-fit bg-white border rounded-xl">
+        <div className="flex justify-between items-center sticky top-2 rounded-b-xl">
+          <p className="my-1 font-semibold text-gray-800 mb-2">Checkout</p>
+          <button className="text-orange-400 cursor-pointer">
+            <X />
+          </button>
+        </div>
+
+        <div className="w-90 max-h-95 h-90">
+          <div className="border border-gray-200 rounded-lg p-1">
+            <div className="flex gap-2 items-end relative">
+              <div className="w-20 h-20 overflow-hidden rounded-lg shrink-0">
+                <Image
+                  src={drink2}
+                  alt="checkout image"
+                  className="min-w-full h-full object-cover object-center"
+                />
+              </div>
+
+              <div>
+                <p className="font-bold text-lg text-orange-400 leading-6">
+                  ₦1,200
+                </p>
+                <span className="flex gap-2 font-semibold leading-6 text-gray-800">
+                  <p>Can Sprite</p> -<p>3x</p>
+                </span>
+                <p className="leading-4 font-semibold">
+                  <span className="text-orange-400">Total:</span> ₦3,600
+                </p>
+              </div>
+
+              <button className="absolute right-0 top-0 m-2 text-orange-400 hover:text-orange-400/80 transition-colors cursor-pointer">
+                <Trash2 size={22} />
+              </button>
+            </div>
+
+            {/* Modifiers section */}
+            <div className="mt-2 hide-scrollbar max-w-full overflow-x-auto flex gap-2">
+              <p className="border border-orange-300 rounded-full px-2.5 py-px text-xs font-semibold text-gray-700 w-fit shrink-0">
+                1x Chicken
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <button className="bg-orange-400 text-white font-semibold w-full mt-2 py-2 rounded-full">
+            Checkout - 5,200
+          </button>
+        </div>
+      </div>
 
       <div className="text-orange-400 bg-orange-100 rounded-full p-4 fixed bottom-0 right-0 m-4 cursor-pointer z-20">
         {cart.length > 0 && (
