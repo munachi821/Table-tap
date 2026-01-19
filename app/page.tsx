@@ -162,15 +162,6 @@ export default function Home() {
     },
   ];
 
-  const searchItems = () => {
-    if (search === "") {
-      return;
-    }
-    return menuItems.filter((items) =>
-      items.itemName.toLowerCase().includes(search.toLowerCase()),
-    );
-  };
-
   const categoryTags = (activeCategory: string) => {
     return menuItems.filter((items) => items.tag.includes(activeCategory));
   };
@@ -338,184 +329,341 @@ export default function Home() {
       </div>
 
       {/* Menu Items */}
-      <div className="pl-10 mt-5">
-        <div>
-          <p className="text-2xl mb-2.5">Most Ordered</p>
-          <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
-            {filterTags("most-ordered").map((mostOrdered, i) => (
+      {search.length > 0 ? (
+        <div className="px-10">
+          <p className="text-2xl mb-4">
+            Results for{" "}
+            <span className="text-orange-400">&quot;{search}&quot;</span>
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {menuItems
+              .filter((item) =>
+                item.itemName.toLowerCase().includes(search.toLowerCase()),
+              )
+              .map((item, i) => (
+                <Item key={i} item={item} handleItemClick={handleItemClick} />
+              ))}
+            <div
+              className={`${
+                openModifierMenu ? "flex" : "hidden"
+              } fixed top-0 bottom-0 right-0 left-0`}
+              onClick={() => {
+                setOpenModifierMenu(false);
+              }}
+            >
               <div
-                className="shadow-md h-91 w-62 shrink-0 rounded-xl overflow-hidden"
-                key={i}
+                className={`flex-col rounded-2xl border border-gray-200 absolute bottom-0 right-0 m-5 bg-white p-2 z-50`}
+                onClick={(e) => e.stopPropagation()}
               >
-                <div className="rounded-lg overflow-hidden h-62">
-                  <Image
-                    src={mostOrdered.image}
-                    alt="detail about food 1"
-                    className="w-full h-full object-contain object-center"
-                  />
-                </div>
+                <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
+                  <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
+                    Extra items for {selectedItem?.itemName}
+                  </p>
 
-                <div className="p-3 py-5 flex gap-2 items-end">
-                  <div>
-                    <p className="text-xl font-bold text-orange-500">
-                      ₦{mostOrdered.price}
-                    </p>
-                    <p className="text-base font-semibold text-gray-800">
-                      {mostOrdered.itemName}
-                    </p>
-                  </div>
                   <button
-                    className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-3 px-4.5"
-                    onClick={() => handleItemClick(mostOrdered, 1)}
+                    className="text-orange-400 cursor-pointer"
+                    onClick={() => {
+                      setOpenModifierMenu(false);
+                      setSelectedItem(null);
+                    }}
                   >
-                    <Plus size={25} />
+                    <X />
                   </button>
                 </div>
+
+                <div className="flex w-90 max-h-95 h-90 overflow-y-auto shrink-0 gap-2 flex-col">
+                  {selectedItem?.modifiers.map((items, i) => (
+                    <div
+                      className="border border-gray-100 rounded-xl p-2 flex gap-2 items-end"
+                      key={i}
+                    >
+                      <div className="w-20 h-20 overflow-hidden rounded-lg">
+                        <Image
+                          src={items.img}
+                          alt="modifier for a particular category"
+                          className="min-w-full h-full object-cover object-center"
+                        />
+                      </div>
+
+                      <div>
+                        <p className="text-lg font-semibold leading-4 text-orange-500">
+                          {items.name}
+                        </p>
+                        <p className="font-semibold text-gray-800">
+                          ₦{items.price}
+                        </p>
+                        <div className="flex gap-3 items-center">
+                          <button
+                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
+                            onClick={() =>
+                              setSelectedItem((selectedItem) => {
+                                if (selectedItem) {
+                                  return {
+                                    ...selectedItem,
+                                    modifiers: selectedItem.modifiers.map(
+                                      (mod, idx) =>
+                                        idx === i
+                                          ? {
+                                              ...mod,
+                                              count: Math.max(0, mod.count - 1),
+                                              total: Math.max(
+                                                0,
+                                                mod.total - mod.price,
+                                              ),
+                                            }
+                                          : mod,
+                                    ),
+                                  };
+                                }
+                                return selectedItem;
+                              })
+                            }
+                          >
+                            <Minus size={18} />
+                          </button>
+                          <p className="font-semibold text-lg">{items.count}</p>
+                          <button
+                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
+                            onClick={() =>
+                              setSelectedItem((selectedItem) => {
+                                if (selectedItem) {
+                                  return {
+                                    ...selectedItem,
+                                    modifiers: selectedItem.modifiers.map(
+                                      (mod, idx) =>
+                                        idx === i
+                                          ? {
+                                              ...mod,
+                                              count: Math.max(0, mod.count + 1),
+                                              total: Math.max(
+                                                0,
+                                                (mod.count + 1) * mod.price,
+                                              ),
+                                            }
+                                          : mod,
+                                    ),
+                                  };
+                                }
+                                return selectedItem;
+                              })
+                            }
+                          >
+                            <Plus size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
+                  disabled={
+                    !selectedItem?.modifiers.some((item) => item.count > 0)
+                  }
+                  onClick={() => handleModifierConfirm()}
+                >
+                  Add to cart <ShoppingCart size={20} />
+                </button>
               </div>
-            ))}
-          </div>
-
-          {/* Modifiers menu (Extra food items) */}
-          <div
-            className={`${
-              openModifierMenu ? "flex" : "hidden"
-            } flex-col rounded-2xl border border-gray-200 fixed bottom-0 right-0 m-5 bg-white p-2 z-50`}
-          >
-            <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
-              <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
-                Extra items for {selectedItem?.itemName}
-              </p>
-
-              <button
-                className="text-orange-400 cursor-pointer"
-                onClick={() => {
-                  setOpenModifierMenu(false);
-                  setSelectedItem(null);
-                }}
-              >
-                <X />
-              </button>
             </div>
-
-            <div className="flex w-90 max-h-95 h-90 overflow-y-auto shrink-0 gap-2 flex-col">
-              {selectedItem?.modifiers.map((items, i) => (
+          </div>
+          {/* No Results Message */}
+          {menuItems.filter((item) =>
+            item.itemName.toLowerCase().includes(search.toLowerCase()),
+          ).length === 0 && <p className="text-gray-500">No food found.</p>}
+        </div>
+      ) : (
+        <div className="pl-10 mt-5">
+          <div>
+            <p className="text-2xl mb-2.5">Most Ordered</p>
+            <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
+              {filterTags("most-ordered").map((mostOrdered, i) => (
                 <div
-                  className="border border-gray-100 rounded-xl p-2 flex gap-2 items-end"
+                  className="shadow-md h-91 w-62 shrink-0 rounded-xl overflow-hidden"
                   key={i}
                 >
-                  <div className="w-20 h-20 overflow-hidden rounded-lg">
+                  <div className="rounded-lg overflow-hidden h-62">
                     <Image
-                      src={items.img}
-                      alt="modifier for a particular category"
-                      className="min-w-full h-full object-cover object-center"
+                      src={mostOrdered.image}
+                      alt="detail about food 1"
+                      className="w-full h-full object-contain object-center"
                     />
                   </div>
 
-                  <div>
-                    <p className="text-lg font-semibold leading-4 text-orange-500">
-                      {items.name}
-                    </p>
-                    <p className="font-semibold text-gray-800">
-                      ₦{items.price}
-                    </p>
-                    <div className="flex gap-3 items-center">
-                      <button
-                        className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
-                        onClick={() =>
-                          setSelectedItem((selectedItem) => {
-                            if (selectedItem) {
-                              return {
-                                ...selectedItem,
-                                modifiers: selectedItem.modifiers.map(
-                                  (mod, idx) =>
-                                    idx === i
-                                      ? {
-                                          ...mod,
-                                          count: Math.max(0, mod.count - 1),
-                                          total: Math.max(
-                                            0,
-                                            mod.total - mod.price,
-                                          ),
-                                        }
-                                      : mod,
-                                ),
-                              };
-                            }
-                            return selectedItem;
-                          })
-                        }
-                      >
-                        <Minus size={18} />
-                      </button>
-                      <p className="font-semibold text-lg">{items.count}</p>
-                      <button
-                        className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
-                        onClick={() =>
-                          setSelectedItem((selectedItem) => {
-                            if (selectedItem) {
-                              return {
-                                ...selectedItem,
-                                modifiers: selectedItem.modifiers.map(
-                                  (mod, idx) =>
-                                    idx === i
-                                      ? {
-                                          ...mod,
-                                          count: Math.max(0, mod.count + 1),
-                                          total: Math.max(
-                                            0,
-                                            (mod.count + 1) * mod.price,
-                                          ),
-                                        }
-                                      : mod,
-                                ),
-                              };
-                            }
-                            return selectedItem;
-                          })
-                        }
-                      >
-                        <Plus size={18} />
-                      </button>
+                  <div className="p-3 py-5 flex gap-2 items-end">
+                    <div>
+                      <p className="text-xl font-bold text-orange-500">
+                        ₦{mostOrdered.price}
+                      </p>
+                      <p className="text-base font-semibold text-gray-800">
+                        {mostOrdered.itemName}
+                      </p>
                     </div>
+                    <button
+                      className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-3 px-4.5"
+                      onClick={() => handleItemClick(mostOrdered, 1)}
+                    >
+                      <Plus size={25} />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
 
-            <button
-              className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
-              disabled={!selectedItem?.modifiers.some((item) => item.count > 0)}
-              onClick={() => handleModifierConfirm()}
+            {/* Modifiers menu (Extra food items) */}
+            <div
+              className={`${
+                openModifierMenu ? "flex" : "hidden"
+              } fixed top-0 bottom-0 right-0 left-0`}
+              onClick={() => {
+                setOpenModifierMenu(false);
+              }}
             >
-              Add to cart <ShoppingCart size={20} />
-            </button>
-          </div>
-        </div>
+              <div
+                className={`flex-col rounded-2xl border border-gray-200 absolute bottom-0 right-0 m-5 bg-white p-2 z-50`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
+                  <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
+                    Extra items for {selectedItem?.itemName}
+                  </p>
 
-        {/* Beverage */}
-        <div>
-          <p className="text-2xl m-2.5">Beverages</p>
-          <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
-            {filterTags("beverage").map((beverage, i) => (
-              <Beverage
-                key={i}
-                item={beverage}
-                handleItemClick={handleItemClick}
-              />
-            ))}
-          </div>
-        </div>
+                  <button
+                    className="text-orange-400 cursor-pointer"
+                    onClick={() => {
+                      setOpenModifierMenu(false);
+                      setSelectedItem(null);
+                    }}
+                  >
+                    <X />
+                  </button>
+                </div>
 
-        {/* Other tags */}
-        <div className="pr-10">
-          <p className="text-2xl my-2.5">Other Meals</p>
-          <div className="grid grid-cols-3 gap-3">
-            {filterTags("item").map((item, i) => (
-              <Item key={i} item={item} handleItemClick={handleItemClick} />
-            ))}
+                <div className="flex w-90 max-h-95 h-90 overflow-y-auto shrink-0 gap-2 flex-col">
+                  {selectedItem?.modifiers.map((items, i) => (
+                    <div
+                      className="border border-gray-100 rounded-xl p-2 flex gap-2 items-end"
+                      key={i}
+                    >
+                      <div className="w-20 h-20 overflow-hidden rounded-lg">
+                        <Image
+                          src={items.img}
+                          alt="modifier for a particular category"
+                          className="min-w-full h-full object-cover object-center"
+                        />
+                      </div>
+
+                      <div>
+                        <p className="text-lg font-semibold leading-4 text-orange-500">
+                          {items.name}
+                        </p>
+                        <p className="font-semibold text-gray-800">
+                          ₦{items.price}
+                        </p>
+                        <div className="flex gap-3 items-center">
+                          <button
+                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
+                            onClick={() =>
+                              setSelectedItem((selectedItem) => {
+                                if (selectedItem) {
+                                  return {
+                                    ...selectedItem,
+                                    modifiers: selectedItem.modifiers.map(
+                                      (mod, idx) =>
+                                        idx === i
+                                          ? {
+                                              ...mod,
+                                              count: Math.max(0, mod.count - 1),
+                                              total: Math.max(
+                                                0,
+                                                mod.total - mod.price,
+                                              ),
+                                            }
+                                          : mod,
+                                    ),
+                                  };
+                                }
+                                return selectedItem;
+                              })
+                            }
+                          >
+                            <Minus size={18} />
+                          </button>
+                          <p className="font-semibold text-lg">{items.count}</p>
+                          <button
+                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
+                            onClick={() =>
+                              setSelectedItem((selectedItem) => {
+                                if (selectedItem) {
+                                  return {
+                                    ...selectedItem,
+                                    modifiers: selectedItem.modifiers.map(
+                                      (mod, idx) =>
+                                        idx === i
+                                          ? {
+                                              ...mod,
+                                              count: Math.max(0, mod.count + 1),
+                                              total: Math.max(
+                                                0,
+                                                (mod.count + 1) * mod.price,
+                                              ),
+                                            }
+                                          : mod,
+                                    ),
+                                  };
+                                }
+                                return selectedItem;
+                              })
+                            }
+                          >
+                            <Plus size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
+                  disabled={
+                    !selectedItem?.modifiers.some((item) => item.count > 0)
+                  }
+                  onClick={() => handleModifierConfirm()}
+                >
+                  Add to cart <ShoppingCart size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Beverage */}
+          <div>
+            <p className="text-2xl m-2.5">Beverages</p>
+            <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
+              {filterTags("beverage").map((beverage, i) => (
+                <Beverage
+                  key={i}
+                  item={beverage}
+                  handleItemClick={handleItemClick}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Other tags */}
+          <div className="pr-10">
+            <p className="text-2xl my-2.5">Other Meals</p>
+            <div className="grid grid-cols-3 gap-3">
+              {filterTags("item").map((item, i) => (
+                <Item key={i} item={item} handleItemClick={handleItemClick} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
       <div className="text-orange-400 bg-orange-100 rounded-full p-4 fixed bottom-0 right-0 m-4 cursor-pointer z-20">
         {cart.length > 0 && (
           <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
