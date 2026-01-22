@@ -61,6 +61,7 @@ export default function Home() {
   const [selectedItem, setSelectedItem] = useState<foodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState("");
+  const [cartOpen, setCartOpen] = useState(false);
 
   const categories = [
     "all",
@@ -665,65 +666,74 @@ export default function Home() {
         </div>
       )}
 
-      <div className="p-2 w-fit bg-white border rounded-xl">
-        <div className="flex justify-between items-center sticky top-2 rounded-b-xl">
-          <p className="my-1 font-semibold text-gray-800 mb-2">Checkout</p>
-          <button className="text-orange-400 cursor-pointer">
-            <X />
-          </button>
-        </div>
+      <div className="fixed bottom-0 right-0 m-4 z-20 flex items-end flex-col gap-3">
+        {/* Cart */}
+        <div
+          className={`p-2 w-fit bg-white border border-gray-300 rounded-xl ${cartOpen ? "block" : "hidden"}`}
+        >
+          <div className="flex justify-between items-center sticky top-2 rounded-b-xl">
+            <p className="my-1 font-semibold text-gray-800 mb-2">Checkout</p>
+            <button className="text-orange-400 cursor-pointer">
+              <X />
+            </button>
+          </div>
 
-        <div className="w-90 max-h-95 h-90">
-          <div className="border border-gray-200 rounded-lg p-1">
-            <div className="flex gap-2 items-end relative">
-              <div className="w-20 h-20 overflow-hidden rounded-lg shrink-0">
-                <Image
-                  src={drink2}
-                  alt="checkout image"
-                  className="min-w-full h-full object-cover object-center"
-                />
+          <div className="w-90 max-h-95 h-90">
+            <div className="border border-gray-200 rounded-lg p-1">
+              <div className="flex gap-2 items-end relative">
+                <div className="w-20 h-20 overflow-hidden rounded-lg shrink-0">
+                  <Image
+                    src={drink2}
+                    alt="checkout image"
+                    className="min-w-full h-full object-cover object-center"
+                  />
+                </div>
+
+                <div>
+                  <p className="font-bold text-lg text-orange-400 leading-6">
+                    ₦1,200
+                  </p>
+                  <span className="flex gap-2 font-semibold leading-6 text-gray-800">
+                    <p>Can Sprite</p> -<p>3x</p>
+                  </span>
+                  <p className="leading-4 font-semibold">
+                    <span className="text-orange-400">Total:</span> ₦3,600
+                  </p>
+                </div>
+
+                <button className="absolute right-0 top-0 m-2 text-orange-400 hover:text-orange-400/80 transition-colors cursor-pointer">
+                  <Trash2 size={22} />
+                </button>
               </div>
 
-              <div>
-                <p className="font-bold text-lg text-orange-400 leading-6">
-                  ₦1,200
-                </p>
-                <span className="flex gap-2 font-semibold leading-6 text-gray-800">
-                  <p>Can Sprite</p> -<p>3x</p>
-                </span>
-                <p className="leading-4 font-semibold">
-                  <span className="text-orange-400">Total:</span> ₦3,600
+              {/* Modifiers section */}
+              <div className="mt-2 hide-scrollbar max-w-full overflow-x-auto flex gap-2">
+                <p className="border border-orange-300 rounded-full px-2.5 py-px text-xs font-semibold text-gray-700 w-fit shrink-0">
+                  1x Chicken
                 </p>
               </div>
-
-              <button className="absolute right-0 top-0 m-2 text-orange-400 hover:text-orange-400/80 transition-colors cursor-pointer">
-                <Trash2 size={22} />
-              </button>
             </div>
+          </div>
 
-            {/* Modifiers section */}
-            <div className="mt-2 hide-scrollbar max-w-full overflow-x-auto flex gap-2">
-              <p className="border border-orange-300 rounded-full px-2.5 py-px text-xs font-semibold text-gray-700 w-fit shrink-0">
-                1x Chicken
-              </p>
-            </div>
+          <div>
+            <button className="bg-orange-400 text-white font-semibold w-full mt-2 py-2 rounded-full">
+              Checkout - 5,200
+            </button>
           </div>
         </div>
 
-        <div>
-          <button className="bg-orange-400 text-white font-semibold w-full mt-2 py-2 rounded-full">
-            Checkout - 5,200
-          </button>
-        </div>
-      </div>
-
-      <div className="text-orange-400 bg-orange-100 rounded-full p-4 fixed bottom-0 right-0 m-4 cursor-pointer z-20">
-        {cart.length > 0 && (
-          <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
-            {cart.length}
-          </div>
-        )}
-        <ShoppingBasketIcon size={30} />
+        {/* Cart Open and count */}
+        <button
+          className="text-orange-400 bg-orange-100 rounded-full p-4 cursor-pointer w-fit relative"
+          onClick={() => setCartOpen(!cartOpen)}
+        >
+          {cart.length > 0 && (
+            <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
+              {cart.length}
+            </div>
+          )}
+          <ShoppingBasketIcon size={30} />
+        </button>
       </div>
     </main>
   );
