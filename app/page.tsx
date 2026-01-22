@@ -257,6 +257,11 @@ export default function Home() {
     console.log("Current Cart:", cart);
   }, [cart]);
 
+  const onCheckout = () => {
+    setCart([]);
+    console.log("Checkout complete!");
+  };
+
   return (
     <main className="pb-10">
       <header className="py-5 px-4">
@@ -765,6 +770,7 @@ export default function Home() {
               <button
                 className="bg-orange-400 hover:bg-orange-400/90 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full disabled:bg-orange-300"
                 disabled={cart.length === 0}
+                onClick={onCheckout}
               >
                 Checkout - ₦
                 {cart
