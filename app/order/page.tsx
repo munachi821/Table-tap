@@ -53,8 +53,7 @@ interface CartItem {
   quantity: number;
   selectedModifiers: modifier[];
 }
-
-export default function Home() {
+const Order = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -261,7 +260,6 @@ export default function Home() {
     setCart([]);
     console.log("Checkout complete!");
   };
-
   return (
     <main className="pb-10">
       <header className="py-5 px-4">
@@ -796,4 +794,5 @@ export default function Home() {
       </div>
     </main>
   );
-}
+};
+export default Order;
