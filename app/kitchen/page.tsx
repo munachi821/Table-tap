@@ -91,7 +91,7 @@ const Kitchen = () => {
               </div>
 
               <div className="mt-2">
-                <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-all hover:bg-slate-600 transition-all bg-slate-700 text-white shadow-base cursor-pointer">
+                <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-slate-600 bg-slate-700 text-white shadow-base cursor-pointer">
                   Order Completed
                 </button>
               </div>
