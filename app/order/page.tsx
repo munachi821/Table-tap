@@ -1,11 +1,9 @@
 "use client";
 import {
   MapPin,
-  Minus,
   Plus,
   SearchIcon,
   ShoppingBasketIcon,
-  ShoppingCart,
   Trash2,
   X,
 } from "lucide-react";
@@ -15,10 +13,6 @@ import food1 from "@/public/menu-items/food1.png";
 import food2 from "@/public/menu-items/food2.jpg";
 import food3 from "@/public/menu-items/food3.jpg";
 import food4 from "@/public/menu-items/food4.jpg";
-import mod1 from "@/public/menu-items/mod1.jpg";
-import mod2 from "@/public/menu-items/mod2.jpg";
-import mod3 from "@/public/menu-items/mod3.jpg";
-import mod4 from "@/public/menu-items/mod4.jpg";
 import drink7 from "@/public/menu-items/drink7.jpg";
 import drink2 from "@/public/menu-items/drink2.jpg";
 import drink1 from "@/public/menu-items/drink1.jpg";
@@ -27,20 +21,11 @@ import drink6 from "@/public/menu-items/drink6.jpg";
 import Beverage from "@/components/beverageItem";
 import Item from "@/components/item";
 
-export interface modifier {
-  name: string;
-  price: number;
-  img: StaticImageData;
-  count: number;
-  total: number;
-}
-
 export interface foodItem {
   tag: string[];
   itemName: string;
   price: string;
   image: StaticImageData;
-  modifiers: modifier[];
   isAvailable: boolean;
 }
 
@@ -51,18 +36,14 @@ interface CartItem {
   price: number;
   image: StaticImageData;
   quantity: number;
-  selectedModifiers: modifier[];
 }
 const Order = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const [activeCategory, setActiveCategory] = useState("all");
-  const [openModifierMenu, setOpenModifierMenu] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<foodItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
-  const [qtyForModal, setQtyForModal] = useState(1);
 
   const categories = [
     "all",
@@ -83,7 +64,6 @@ const Order = () => {
       itemName: "Catfish pepper Soup with scented leaves",
       price: "5,400",
       image: food1,
-      modifiers: [],
       isAvailable: true,
     },
     {
@@ -91,7 +71,6 @@ const Order = () => {
       itemName: "Goat meat pepper Soup",
       price: "6,700",
       image: food2,
-      modifiers: [],
       isAvailable: true,
     },
     {
@@ -99,17 +78,6 @@ const Order = () => {
       itemName: "Egusi soup with 2 wraps of fufu",
       price: "3,400",
       image: food3,
-      modifiers: [
-        { name: "pounded yam", price: 500, img: mod3, count: 0, total: 0 },
-        { name: "Peppered meat", price: 600, img: mod4, count: 0, total: 0 },
-        {
-          name: "cow skin (ponmo)",
-          price: 500,
-          img: mod2,
-          count: 0,
-          total: 0,
-        },
-      ],
       isAvailable: true,
     },
     {
@@ -117,10 +85,6 @@ const Order = () => {
       itemName: "Fried rice with chicken and salad",
       price: "4,000",
       image: food4,
-      modifiers: [
-        { name: "Fried chicken", price: 700, img: mod1, count: 0, total: 0 },
-        { name: "coleslaw", price: 700, img: mod2, count: 0, total: 0 },
-      ],
       isAvailable: true,
     },
     {
@@ -128,7 +92,6 @@ const Order = () => {
       itemName: "Strawberry Flavoured Hollandia Yoghurt",
       price: "2,400",
       image: drink7,
-      modifiers: [],
       isAvailable: true,
     },
     {
@@ -136,7 +99,6 @@ const Order = () => {
       itemName: "Canned sprite",
       price: "1,200",
       image: drink2,
-      modifiers: [],
       isAvailable: true,
     },
     {
@@ -144,7 +106,6 @@ const Order = () => {
       itemName: "Canned coke",
       price: "1,200",
       image: drink1,
-      modifiers: [],
       isAvailable: true,
     },
     {
@@ -152,7 +113,6 @@ const Order = () => {
       itemName: "Monster Energy",
       price: "1,400",
       image: drink3,
-      modifiers: [],
       isAvailable: true,
     },
     {
@@ -160,7 +120,6 @@ const Order = () => {
       itemName: "Canned pepsi",
       price: "1,200",
       image: drink6,
-      modifiers: [],
       isAvailable: true,
     },
   ];
@@ -183,73 +142,21 @@ const Order = () => {
     }
   }, [searchOpen]);
 
-  /* checking if the item has modifiers */
   const handleItemClick = (foodItem: foodItem, quantity: number) => {
-    if (foodItem.modifiers.length > 0) {
-      setSelectedItem(foodItem);
-      setQtyForModal(quantity);
-      setOpenModifierMenu(true);
-      return;
-    }
     addToCart(foodItem, quantity);
   };
 
-  //confirming selected modifiers and adding to cart
-  const handleModifierConfirm = () => {
-    if (!selectedItem) return;
-
-    const selectedModifiers = selectedItem.modifiers.filter(
-      (mod) => mod.count > 0,
-    );
-
-    const modifiersTotalCost = selectedModifiers.reduce(
-      (sum, mod) => sum + mod.total,
-      0,
-    );
-    const basePrice = parseInt(selectedItem.price.replace(",", ""));
-    const singlePlateTotal = basePrice + modifiersTotalCost;
-    const finalTotalPrice = singlePlateTotal * qtyForModal;
-
-    const cartPayload = {
+  const addToCart = (item: foodItem, quantity: number = 1) => {
+    const price = parseInt(item.price.replace(",", ""));
+    const cartItem: CartItem = {
       cartId: crypto.randomUUID(),
-      name: selectedItem.itemName,
-      originalPrice: selectedItem.price,
-      image: selectedItem.image,
-      price: finalTotalPrice,
-      quantity: qtyForModal,
-      selectedModifiers: selectedModifiers,
+      name: item.itemName,
+      originalPrice: item.price,
+      price: price * quantity,
+      image: item.image,
+      quantity: quantity,
     };
-
-    addToCart(cartPayload);
-
-    setSelectedItem(null);
-    setOpenModifierMenu(false);
-    setQtyForModal(1);
-  };
-
-  //add to cart function
-  const addToCart = (payload: CartItem | foodItem, quantity?: number) => {
-    if ("cartId" in payload) {
-      console.log("Adding Complex Item to Cart:", payload);
-      setCart((prev) => [...prev, payload]);
-      return;
-    }
-
-    const simpleItem = payload as foodItem;
-    const simplePrice = parseInt(simpleItem.price.replace(",", ""));
-
-    const simplePayload = {
-      cartId: crypto.randomUUID(),
-      name: simpleItem.itemName,
-      originalPrice: simpleItem.price,
-      price: simplePrice * (quantity || 1),
-      image: simpleItem.image,
-      quantity: quantity || 1,
-      selectedModifiers: [],
-    };
-
-    console.log("Adding Simple Item to Cart:", simplePayload);
-    setCart((prev) => [...prev, simplePayload]);
+    setCart((prev) => [...prev, cartItem]);
   };
 
   useEffect(() => {
@@ -354,130 +261,6 @@ const Order = () => {
               .map((item, i) => (
                 <Item key={i} item={item} handleItemClick={handleItemClick} />
               ))}
-            <div
-              className={`${
-                openModifierMenu ? "flex" : "hidden"
-              } fixed top-0 bottom-0 right-0 left-0`}
-              onClick={() => {
-                setOpenModifierMenu(false);
-              }}
-            >
-              <div
-                className={`flex-col rounded-2xl border border-gray-200 absolute bottom-0 right-0 m-5 bg-white p-2 z-50`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
-                  <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
-                    Extra items for {selectedItem?.itemName}
-                  </p>
-
-                  <button
-                    className="text-orange-400 cursor-pointer"
-                    onClick={() => {
-                      setOpenModifierMenu(false);
-                      setSelectedItem(null);
-                    }}
-                  >
-                    <X />
-                  </button>
-                </div>
-
-                <div className="flex w-90 max-h-95 h-90 overflow-y-auto shrink-0 gap-2 flex-col">
-                  {selectedItem?.modifiers.map((items, i) => (
-                    <div
-                      className="border border-gray-100 rounded-xl p-2 flex gap-2 items-end"
-                      key={i}
-                    >
-                      <div className="w-20 h-20 overflow-hidden rounded-lg">
-                        <Image
-                          src={items.img}
-                          alt="modifier for a particular category"
-                          className="min-w-full h-full object-cover object-center"
-                        />
-                      </div>
-
-                      <div>
-                        <p className="text-lg font-semibold leading-4 text-orange-500">
-                          {items.name}
-                        </p>
-                        <p className="font-semibold text-gray-800">
-                          ₦{items.price}
-                        </p>
-                        <div className="flex gap-3 items-center">
-                          <button
-                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
-                            onClick={() =>
-                              setSelectedItem((selectedItem) => {
-                                if (selectedItem) {
-                                  return {
-                                    ...selectedItem,
-                                    modifiers: selectedItem.modifiers.map(
-                                      (mod, idx) =>
-                                        idx === i
-                                          ? {
-                                              ...mod,
-                                              count: Math.max(0, mod.count - 1),
-                                              total: Math.max(
-                                                0,
-                                                mod.total - mod.price,
-                                              ),
-                                            }
-                                          : mod,
-                                    ),
-                                  };
-                                }
-                                return selectedItem;
-                              })
-                            }
-                          >
-                            <Minus size={18} />
-                          </button>
-                          <p className="font-semibold text-lg">{items.count}</p>
-                          <button
-                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
-                            onClick={() =>
-                              setSelectedItem((selectedItem) => {
-                                if (selectedItem) {
-                                  return {
-                                    ...selectedItem,
-                                    modifiers: selectedItem.modifiers.map(
-                                      (mod, idx) =>
-                                        idx === i
-                                          ? {
-                                              ...mod,
-                                              count: Math.max(0, mod.count + 1),
-                                              total: Math.max(
-                                                0,
-                                                (mod.count + 1) * mod.price,
-                                              ),
-                                            }
-                                          : mod,
-                                    ),
-                                  };
-                                }
-                                return selectedItem;
-                              })
-                            }
-                          >
-                            <Plus size={18} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
-                  disabled={
-                    !selectedItem?.modifiers.some((item) => item.count > 0)
-                  }
-                  onClick={() => handleModifierConfirm()}
-                >
-                  Add to cart <ShoppingCart size={20} />
-                </button>
-              </div>
-            </div>
           </div>
           {/* No Results Message */}
           {menuItems.filter((item) =>
@@ -521,132 +304,6 @@ const Order = () => {
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Modifiers menu (Extra food items) */}
-            <div
-              className={`${
-                openModifierMenu ? "flex" : "hidden"
-              } fixed top-0 bottom-0 right-0 left-0`}
-              onClick={() => {
-                setOpenModifierMenu(false);
-              }}
-            >
-              <div
-                className={`flex-col rounded-2xl border border-gray-200 absolute bottom-0 right-0 m-5 bg-white p-2 z-50`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex justify-between items-center sticky top-2 bg-white rounded-b-xl">
-                  <p className="my-1 font-semibold text-gray-800 mb-2 w-60">
-                    Extra items for {selectedItem?.itemName}
-                  </p>
-
-                  <button
-                    className="text-orange-400 cursor-pointer"
-                    onClick={() => {
-                      setOpenModifierMenu(false);
-                      setSelectedItem(null);
-                    }}
-                  >
-                    <X />
-                  </button>
-                </div>
-
-                <div className="flex w-90 max-h-95 h-90 overflow-y-auto shrink-0 gap-2 flex-col">
-                  {selectedItem?.modifiers.map((items, i) => (
-                    <div
-                      className="border border-gray-100 rounded-xl p-2 flex gap-2 items-end"
-                      key={i}
-                    >
-                      <div className="w-20 h-20 overflow-hidden rounded-lg">
-                        <Image
-                          src={items.img}
-                          alt="modifier for a particular category"
-                          className="min-w-full h-full object-cover object-center"
-                        />
-                      </div>
-
-                      <div>
-                        <p className="text-lg font-semibold leading-4 text-orange-500">
-                          {items.name}
-                        </p>
-                        <p className="font-semibold text-gray-800">
-                          ₦{items.price}
-                        </p>
-                        <div className="flex gap-3 items-center">
-                          <button
-                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
-                            onClick={() =>
-                              setSelectedItem((selectedItem) => {
-                                if (selectedItem) {
-                                  return {
-                                    ...selectedItem,
-                                    modifiers: selectedItem.modifiers.map(
-                                      (mod, idx) =>
-                                        idx === i
-                                          ? {
-                                              ...mod,
-                                              count: Math.max(0, mod.count - 1),
-                                              total: Math.max(
-                                                0,
-                                                (mod.count - 1) * mod.price,
-                                              ),
-                                            }
-                                          : mod,
-                                    ),
-                                  };
-                                }
-                                return selectedItem;
-                              })
-                            }
-                          >
-                            <Minus size={18} />
-                          </button>
-                          <p className="font-semibold text-lg">{items.count}</p>
-                          <button
-                            className="size-6 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
-                            onClick={() =>
-                              setSelectedItem((selectedItem) => {
-                                if (selectedItem) {
-                                  return {
-                                    ...selectedItem,
-                                    modifiers: selectedItem.modifiers.map(
-                                      (mod, idx) =>
-                                        idx === i
-                                          ? {
-                                              ...mod,
-                                              count: Math.max(0, mod.count + 1),
-                                              total: Math.max(
-                                                0,
-                                                (mod.count + 1) * mod.price,
-                                              ),
-                                            }
-                                          : mod,
-                                    ),
-                                  };
-                                }
-                                return selectedItem;
-                              })
-                            }
-                          >
-                            <Plus size={18} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  className="bg-orange-400 w-full flex items-center justify-center text-white py-3 rounded-full font-semibold gap-2 mt-2 cursor-pointer hover:bg-orange-400/90 transition-colors disabled:bg-orange-300 disabled:cursor-default"
-                  disabled={
-                    !selectedItem?.modifiers.some((item) => item.count > 0)
-                  }
-                  onClick={() => handleModifierConfirm()}
-                >
-                  Add to cart <ShoppingCart size={20} />
-                </button>
-              </div>
             </div>
           </div>
 
@@ -741,20 +398,6 @@ const Order = () => {
                         <Trash2 size={22} />
                       </button>
                     </div>
-
-                    {/* Modifiers section */}
-                    {item.selectedModifiers.length > 0 && (
-                      <div className="mt-2 hide-scrollbar max-w-full overflow-x-auto flex gap-2">
-                        {item.selectedModifiers.map((modifiers, i) => (
-                          <p
-                            className="border border-orange-300 rounded-full px-2.5 py-px text-xs font-semibold text-gray-700 w-fit shrink-0 flex items-center"
-                            key={i}
-                          >
-                            {modifiers.count + "x"} {modifiers.name}
-                          </p>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ))
               ) : (

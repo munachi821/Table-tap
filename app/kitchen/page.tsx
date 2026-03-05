@@ -83,15 +83,15 @@ const Kitchen = () => {
                 <p className="list-none text-orange-400 font-semibold">
                   extra:{" "}
                 </p>
-                <ul className="list-disc pl-2 font-semibold">
+                <ul className="font-semibold">
                   <li>2 extra beef</li>
                   <li>2 extra beef</li>
                   <li>2 extra beef</li>
                 </ul>
               </div>
 
-              <div className="mt-2">
-                <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-slate-600 bg-slate-700 text-white shadow-base cursor-pointer">
+              <div className="mt-3">
+                <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-orange-400/90 bg-orange-400 text-white shadow-base cursor-pointer">
                   Order Completed
                 </button>
               </div>

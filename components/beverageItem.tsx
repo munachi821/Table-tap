@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Plus, Minus, ShoppingCart } from "lucide-react";
-import { foodItem } from "@/app/page";
+import { foodItem } from "@/app/order/page";
 import { useState } from "react";
 
 interface itemProps {

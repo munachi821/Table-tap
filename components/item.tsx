@@ -1,7 +1,7 @@
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { foodItem } from "@/app/page";
+import { foodItem } from "@/app/order/page";
 
 interface itemProps {
   item: foodItem;
