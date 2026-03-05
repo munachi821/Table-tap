@@ -20,6 +20,7 @@ import drink3 from "@/public/menu-items/drink3.jpg";
 import drink6 from "@/public/menu-items/drink6.jpg";
 import Beverage from "@/components/beverageItem";
 import Item from "@/components/item";
+import item from "@/components/item";
 
 export interface foodItem {
   tag: string[];
@@ -147,16 +148,34 @@ const Order = () => {
   };
 
   const addToCart = (item: foodItem, quantity: number = 1) => {
-    const price = parseInt(item.price.replace(",", ""));
-    const cartItem: CartItem = {
-      cartId: crypto.randomUUID(),
-      name: item.itemName,
-      originalPrice: item.price,
-      price: price * quantity,
-      image: item.image,
-      quantity: quantity,
-    };
-    setCart((prev) => [...prev, cartItem]);
+    const unitPrice = parseInt(item.price.replace(",", ""));
+
+    setCart((prev) => {
+      const existingItemIndex = prev.findIndex((c) => c.name === item.itemName);
+
+      if (existingItemIndex !== -1) {
+        const updatedCart = [...prev];
+        const existingItem = updatedCart[existingItemIndex];
+
+        updatedCart[existingItemIndex] = {
+          ...existingItem,
+          quantity: existingItem.quantity + quantity,
+          price: existingItem.price + unitPrice * quantity,
+        };
+
+        return updatedCart;
+      } else {
+        const newCartItem: CartItem = {
+          cartId: crypto.randomUUID(),
+          name: item.itemName,
+          originalPrice: item.price,
+          price: unitPrice * quantity,
+          image: item.image,
+          quantity: quantity,
+        };
+        return [...prev, newCartItem];
+      }
+    });
   };
 
   useEffect(() => {
@@ -214,14 +233,17 @@ const Order = () => {
         `}
               />
             </div>
-            <div className="relative text-orange-400 bg-orange-50 rounded-full p-2 hover:bg-orange-100 transition-colors">
+            <button
+              onClick={() => setCartOpen(!cartOpen)}
+              className="relative text-orange-400 bg-orange-50 rounded-full p-2 hover:bg-orange-100 transition-colors"
+            >
               {cart.length > 0 && (
-                <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
-                  {cart.length}
+                <div className="absolute text-[10px] size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
+                  <p className="leading-0">{cart.length}</p>
                 </div>
               )}
               <ShoppingBasketIcon size={25} />
-            </div>
+            </button>
           </div>
         </nav>
       </header>
