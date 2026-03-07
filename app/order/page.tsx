@@ -20,7 +20,6 @@ import drink3 from "@/public/menu-items/drink3.jpg";
 import drink6 from "@/public/menu-items/drink6.jpg";
 import Beverage from "@/components/beverageItem";
 import Item from "@/components/item";
-import item from "@/components/item";
 
 export interface foodItem {
   tag: string[];
