@@ -1,20 +1,22 @@
-import { Clock } from "lucide-react";
 import TimeElapsed from "./timeElapsed";
+import { useState } from "react";
 
-export interface Orderitem {
+interface Orderitem {
   id: string;
   itemIndex: number;
   name: string;
   quantity: number;
   isCompleted: boolean;
 }
-export interface kitchenOrder {
+interface kitchenOrder {
   orderId: string;
   tableNumber: string;
   status: "pending" | "completed";
   placedAt: Date;
   items: Orderitem[];
 }
+
+type filterType = "all" | "pending" | "completed";
 
 export const mockOrders: kitchenOrder[] = [
   {
@@ -82,7 +84,7 @@ export const mockOrders: kitchenOrder[] = [
   {
     orderId: "#8",
     tableNumber: "Table 8",
-    status: "completed",
+    status: "pending",
     // Simulating an order placed 45 minutes ago
     placedAt: new Date(Date.now() - 45 * 60000),
     items: [
@@ -105,27 +107,37 @@ export const mockOrders: kitchenOrder[] = [
 ];
 
 const Order = () => {
+  const [activeTab, setActiveTab] = useState<filterType>("pending");
+  const [orders, setOrders] = useState<kitchenOrder[]>(mockOrders);
+
+  const filterOrders = orders.filter((order) => {
+    return order.status === activeTab;
+  });
+
   return (
     <div className="relative">
       {/* Filter Section */}
       <div className="flex gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-fit shadow-md shadow-slate-200 absolute right-0 mt-2 mr-4">
-        <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-all bg-slate-600 text-white shadow-base">
-          All Orders
-        </button>
-        <button className="px-4 py-1.5 rounded-full text-base font-semibold capitalize transition-all text-slate-500 hover:bg-slate-100">
-          Pending Orders
-        </button>
-        <button className="px-4 py-1.5 rounded-full text-base font-semibold capitalize transition-all text-slate-500 hover:bg-slate-100">
-          Completed Orders
-        </button>
+        {(["pending", "completed"] as filterType[]).map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveTab(filter)}
+            className={`px-4 py-1.5 rounded-full text-base font-semibold capitalize transition-all ${
+              activeTab === filter
+                ? "bg-slate-600 text-white shadow-base px-6"
+                : "text-slate-500 hover:bg-slate-100"
+            }`}
+          >
+            {filter} Orders
+          </button>
+        ))}
       </div>
 
       {/* Main Body */}
       <div className="p-4">
-        {mockOrders.map((orders) => (
+        {filterOrders.map((orders) => (
           <div key={orders.tableNumber} className="mb-6">
             <div className="flex items-end gap-3 mb-4">
-              {/* Left Side: Table & Item Count */}
               <h2 className="font-semibold text-2xl text-gray-700">
                 {orders.tableNumber}
               </h2>
@@ -140,7 +152,6 @@ const Order = () => {
                 -
               </span>
 
-              {/* Right Side: The Ticking Timer Pill */}
               <div className="text-orange-600 text-lg font-medium">
                 <TimeElapsed placedAt={orders.placedAt} />
               </div>
@@ -169,7 +180,7 @@ const Order = () => {
                   </div>
 
                   <div className="mt-3">
-                    <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-[#fd9319]/90 bg-[#fd9319] text-white shadow-base cursor-pointer">
+                    <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-[#fd9319]/90 bg-[#fd9319] text-white shadow-base cursor-pointer" onClick={() => setOrders((prev) => prev.map((order) => order.orderId === orders.orderId ? {...order, status: "completed"} : order))}>
                       Ready
                     </button>
                   </div>
