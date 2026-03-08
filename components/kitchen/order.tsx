@@ -1,3 +1,6 @@
+import { Clock } from "lucide-react";
+import TimeElapsed from "./timeElapsed";
+
 export interface Orderitem {
   id: string;
   itemIndex: number;
@@ -120,24 +123,38 @@ const Order = () => {
       {/* Main Body */}
       <div className="p-4">
         {mockOrders.map((orders) => (
-          <div key={orders.tableNumber}>
-            <h2 className="font-semibold text-2xl text-gray-700 mb-2">
-              {orders.tableNumber} -{" "}
-              <span className="text-xl">#{orders.items.length}</span>
-            </h2>
+          <div key={orders.tableNumber} className="mb-6">
+            <div className="flex items-end gap-3 mb-4">
+              {/* Left Side: Table & Item Count */}
+              <h2 className="font-semibold text-2xl text-gray-700">
+                {orders.tableNumber}
+              </h2>
+              <span className="text-lg font-medium text-slate-500 mb-px">
+                -
+              </span>
+              <span className="text-lg font-medium text-slate-500">
+                #{orders.items.length}
+              </span>
+
+              <span className="text-lg font-medium text-slate-500 mb-px">
+                -
+              </span>
+
+              {/* Right Side: The Ticking Timer Pill */}
+              <div className="text-orange-600 text-lg font-medium">
+                <TimeElapsed placedAt={orders.placedAt} />
+              </div>
+            </div>
 
             <div className="grid grid-cols-4 gap-4">
               {orders.items.map((items) => (
                 <div
-                  className="rounded-xl border-2 border-gray-700 p-2 bg-white/50 backdrop-blur-xl"
+                  className="rounded-xl border-2 border-gray-700 p-2 bg-white/50 backdrop-blur-xl flex flex-col justify-between"
                   key={items.id}
                 >
                   <header className="flex items-center justify-between border-b pb-2 mb-2 border-gray-300">
                     <div className="size-8 flex items-center justify-center text-white bg-orange-400/95 text-lg font-bold rounded-full">
                       {items.itemIndex}
-                    </div>
-                    <div className="py-4 text-white bg-orange-400/80 text-base leading-0 font-semibold rounded-full w-fit px-3">
-                      1 min ago
                     </div>
                   </header>
 

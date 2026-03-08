@@ -40,7 +40,7 @@ const Kitchen = () => {
     <main className="bg-slate-50">
       <div className="w-full min-h-screen">
         {/* Navbar */}
-        <header className="flex justify-between bg-white px-4 py-3.5 items-center">
+        <header className="flex justify-between bg-white px-4 py-3.5 items-center fixed w-full z-50">
           <div className="flex items-center gap-3">
             <div className="flex items-end gap-2">
               <div className="size-11 rounded-full border border-orange-100"></div>
@@ -84,7 +84,7 @@ const Kitchen = () => {
           </div>
         </header>
 
-        <div>{changeTab()}</div>
+        <div className="pt-20">{changeTab()}</div>
       </div>
     </main>
   );
