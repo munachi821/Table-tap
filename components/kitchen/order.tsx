@@ -156,16 +156,15 @@ const Order = () => {
                     <div className="size-8 flex items-center justify-center text-white bg-orange-400/95 text-lg font-bold rounded-full">
                       {items.itemIndex}
                     </div>
+
+                    <p className="text-orange-400 shrink-0 font-semibold mr-2">
+                      Qty: {items.quantity}
+                    </p>
                   </header>
 
                   <div className="px-2">
-                    <div className="font-semibold flex justify-between">
-                      <div className="text-gray-700 w-50">
-                        <p>{items.name}</p>
-                      </div>
-                      <p className="text-orange-400 shrink-0">
-                        Qty: {items.quantity}
-                      </p>
+                    <div className="text-gray-700 font-semibold">
+                      <p>{items.name}</p>
                     </div>
                   </div>
 
