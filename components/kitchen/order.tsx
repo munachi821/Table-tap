@@ -40,6 +40,27 @@ export const mockOrders: kitchenOrder[] = [
         quantity: 2,
         isCompleted: false,
       },
+      {
+        id: "item-003",
+        itemIndex: 3,
+        name: "Fried rice with chicken and salad",
+        quantity: 2,
+        isCompleted: false,
+      },
+      {
+        id: "item-004",
+        itemIndex: 4,
+        name: "Fried rice with chicken and salad",
+        quantity: 2,
+        isCompleted: false,
+      },
+      {
+        id: "item-005",
+        itemIndex: 5,
+        name: "Fried rice with chicken and salad",
+        quantity: 2,
+        isCompleted: false,
+      },
     ],
   },
   {
@@ -117,7 +138,7 @@ const Order = () => {
   return (
     <div className="relative">
       {/* Filter Section */}
-      <div className="flex gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-fit shadow-md shadow-slate-200 absolute right-0 mt-2 mr-4">
+      <div className="flex gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-fit shadow-md shadow-slate-200 absolute right-0 mt-1 mr-4">
         {(["pending", "completed"] as filterType[]).map((filter) => (
           <button
             key={filter}
@@ -164,7 +185,9 @@ const Order = () => {
                   key={items.id}
                 >
                   <header className="flex items-center justify-between border-b pb-2 mb-2 border-gray-300">
-                    <div className="size-8 flex items-center justify-center text-white bg-orange-400/95 text-lg font-bold rounded-full">
+                    <div
+                      className={`size-8 flex items-center justify-center text-white ${orders.status === "completed" ? "bg-orange-300" : "bg-orange-400/95"} text-lg font-bold rounded-full`}
+                    >
                       {items.itemIndex}
                     </div>
 
@@ -179,14 +202,25 @@ const Order = () => {
                     </div>
                   </div>
 
-                  <div className="mt-3">
-                    <button className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-[#fd9319]/90 bg-[#fd9319] text-white shadow-base cursor-pointer" onClick={() => setOrders((prev) => prev.map((order) => order.orderId === orders.orderId ? {...order, status: "completed"} : order))}>
-                      Ready
-                    </button>
-                  </div>
+                  <div className="mt-3"></div>
                 </div>
               ))}
             </div>
+            <button
+              className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-[#fd9319]/90 bg-[#fd9319] text-white shadow-base cursor-pointer disabled:bg-orange-300 disabled:cursor-default mt-3"
+              disabled={orders.status === "completed"}
+              onClick={() =>
+                setOrders((prev) =>
+                  prev.map((order) =>
+                    order.orderId === orders.orderId
+                      ? { ...order, status: "completed" }
+                      : order,
+                  ),
+                )
+              }
+            >
+              {orders.status === "completed" ? "Order completed" : "Ready"}
+            </button>
           </div>
         ))}
       </div>
