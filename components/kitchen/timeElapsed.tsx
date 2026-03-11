@@ -10,10 +10,10 @@ const TimeElapsed = ({ placedAt }: { placedAt: Date }) => {
       );
       if (diffInMinutes < 1) {
         setTimeText("just now");
-      } else if (diffInMinutes > 1) {
+      } else if (diffInMinutes < 60) {
         setTimeText(`${diffInMinutes} min ago`);
-      } else if (diffInMinutes > 60) {
-        setTimeText(`${diffInMinutes} hrs ago`);
+      } else {
+        setTimeText(`${Math.floor(diffInMinutes / 60)} hrs ago`);
       }
     };
 

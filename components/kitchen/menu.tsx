@@ -1,5 +1,5 @@
 "use client";
-import { Search } from "lucide-react";
+import { Hand, Search } from "lucide-react";
 import Image, { StaticImageData } from "next/image";
 import food1 from "@/public/menu-items/food1.png";
 import food2 from "@/public/menu-items/food2.jpg";
@@ -15,7 +15,7 @@ interface mealOrder {
 }
 
 const Menu = () => {
-  //const [isAvailable, setIsAvailable] = useState(true);
+  const [searchText, setSearchText] = useState("");
 
   const mealOrder = [
     {
@@ -46,16 +46,28 @@ const Menu = () => {
 
   const [mealData, setMealData] = useState<mealOrder[]>(mealOrder);
 
+  const HandleSearch = (text: string) => {
+    return mealData.filter((meals) =>
+      meals.foodName.toLowerCase().includes(text.toLowerCase()),
+    );
+  };
+  const filteredItems = HandleSearch(searchText);
+
   return (
     <div>
       <div className="flex items-center justify-between m-3">
         <h1 className="text-2xl text-gray-700 font-semibold">
-          Toggle meal availability
+          {filteredItems.length === 0
+            ? "No meals Available"
+            : "Toggle meal availability"}
         </h1>
+
         <div className="flex items-center gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-fit ">
           <input
             type="text"
             className="w-80 h-8 outline-0 border-orange-100 border pl-1"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
           />
           <button className="text-orange-500 bg-orange-100/50 p-1.5 rounded-full">
             <Search />
@@ -64,7 +76,7 @@ const Menu = () => {
       </div>
 
       <div className="px-4 grid grid-cols-5 gap-x-5 gap-y-6">
-        {mealData.map((meals) => (
+        {filteredItems.map((meals) => (
           <div
             className="bg-white border border-gray-200 rounded-lg p-2 w-fit"
             key={meals.id}
