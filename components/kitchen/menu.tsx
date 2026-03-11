@@ -112,7 +112,7 @@ const Menu = () => {
               </div>
 
               <h3
-                className={`font-semibold my-1 transition-colors ${
+                className={`font-semibold my-1 transition-colors truncate block w-60 ${
                   meals.isAvailable
                     ? "text-gray-800"
                     : "text-gray-400 line-through decoration-gray-300"
