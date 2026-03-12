@@ -131,6 +131,11 @@ const Order = () => {
   const [activeTab, setActiveTab] = useState<filterType>("pending");
   const [orders, setOrders] = useState<kitchenOrder[]>(mockOrders);
 
+  /* Getting pending count */
+  const pendingCount = orders.filter(
+    (ordercount) => ordercount.status === "pending",
+  ).length;
+
   const filterOrders = orders.filter((order) => {
     return order.status === activeTab;
   });
