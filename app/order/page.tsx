@@ -184,13 +184,16 @@ const Order = () => {
 
   const onCheckout = () => {
     setCart([]);
-    if (chefNotes === "") {
-      return;
-    } else {
-      console.log(chefNotes);
-    }
     setChefNotes("");
-    console.log("Checkout complete!");
+    const finalOrder = {
+      orderId: crypto.randomUUID(),
+      tableNumber: "Table 1" /* This should be gotten automatically */,
+      items: cart,
+      note: chefNotes,
+      status: "pending",
+      placedAt: new Date(),
+    };
+    console.log("Checkout complete!", finalOrder);
   };
   return (
     <main className="pb-10">
