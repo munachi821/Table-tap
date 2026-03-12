@@ -1,5 +1,5 @@
 import TimeElapsed from "./timeElapsed";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Orderitem {
   id: string;
@@ -140,6 +140,20 @@ const Order = () => {
     return order.status === activeTab;
   });
 
+  /* playing a ding sound whenerver a new order is placed */
+  const orderLength = useRef(orders.length);
+  useEffect(() => {
+    if (orders.length > orderLength.current) {
+      const audio = new Audio("/order-arrival.wav").play();
+
+      audio.catch((err) => {
+        console.warn("Audio blocked by browser: ", err);
+      });
+    }
+
+    orderLength.current = orders.length;
+  }, [orders.length]);
+
   return (
     <div className="relative">
       {/* Filter Section */}
@@ -162,7 +176,7 @@ const Order = () => {
       {/* Main Body */}
       <div className="p-4">
         {filterOrders.map((orders) => (
-          <div key={orders.tableNumber} className="mb-6">
+          <div key={orders.orderId} className="mb-6">
             <div className="flex items-end gap-3 mb-4">
               <h2 className="font-semibold text-2xl text-gray-700">
                 {orders.tableNumber}
