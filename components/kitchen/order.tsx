@@ -1,3 +1,4 @@
+import { title } from "process";
 import TimeElapsed from "./timeElapsed";
 import { useEffect, useRef, useState } from "react";
 
@@ -14,6 +15,7 @@ interface kitchenOrder {
   status: "pending" | "completed";
   placedAt: Date;
   items: Orderitem[];
+  note?: string;
 }
 
 type filterType = "all" | "pending" | "completed";
@@ -62,6 +64,7 @@ export const mockOrders: kitchenOrder[] = [
         isCompleted: false,
       },
     ],
+    note: "Don't add abacha",
   },
   {
     orderId: "#6",
@@ -108,6 +111,7 @@ export const mockOrders: kitchenOrder[] = [
     status: "pending",
     // Simulating an order placed 45 minutes ago
     placedAt: new Date(Date.now() - 45 * 60000),
+    note: "what if i say, i know",
     items: [
       {
         id: "item-006",
@@ -195,6 +199,12 @@ const Order = () => {
               <div className="text-orange-600 text-lg font-medium">
                 <TimeElapsed placedAt={orders.placedAt} />
               </div>
+
+              {orders.note && (
+                <p className="ml-4 text-red-500 font-semibold max-w-50 truncate">
+                  {orders.note}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-4 gap-4">

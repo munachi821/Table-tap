@@ -44,6 +44,7 @@ const Order = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
+  const [chefNotes, setChefNotes] = useState("");
 
   const categories = [
     "all",
@@ -183,6 +184,12 @@ const Order = () => {
 
   const onCheckout = () => {
     setCart([]);
+    if (chefNotes === "") {
+      return;
+    } else {
+      console.log(chefNotes);
+    }
+    setChefNotes("");
     console.log("Checkout complete!");
   };
   return (
@@ -428,7 +435,19 @@ const Order = () => {
               )}
             </div>
 
-            <div>
+            <div
+              className="pt-1.5
+            "
+            >
+              <div className="w-full">
+                <textarea
+                  placeholder="Notes for the Kitchen?"
+                  value={chefNotes}
+                  onChange={(e) => setChefNotes(e.target.value)}
+                  className="w-full outline-0 border border-gray-300 p-1 text-sm rounded-lg"
+                ></textarea>
+              </div>
+
               <button
                 className="bg-orange-400 hover:bg-orange-400/90 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full disabled:bg-orange-300"
                 disabled={cart.length === 0}
