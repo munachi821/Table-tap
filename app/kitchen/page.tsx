@@ -1,5 +1,10 @@
 "use client";
-import { Bell, Pizza, Settings, Utensils } from "lucide-react";
+import {
+  Bell,
+  Pizza,
+  Gear as Settings,
+  ForkKnife as Utensils,
+} from "@phosphor-icons/react";
 import { useState } from "react";
 import Menu from "@/components/kitchen/menu";
 import Order from "@/components/kitchen/order";

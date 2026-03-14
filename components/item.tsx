@@ -1,4 +1,4 @@
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useState } from "react";
 import { foodItem } from "@/app/order/page";

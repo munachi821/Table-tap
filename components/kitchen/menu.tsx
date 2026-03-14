@@ -1,5 +1,5 @@
 "use client";
-import { Hand, Search } from "lucide-react";
+import { MagnifyingGlass as Search } from "@phosphor-icons/react";
 import Image, { StaticImageData } from "next/image";
 import food1 from "@/public/menu-items/food1.png";
 import food2 from "@/public/menu-items/food2.jpg";

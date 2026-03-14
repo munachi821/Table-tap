@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Plus, Minus, ShoppingCart } from "lucide-react";
+import { Plus, Minus, ShoppingCart } from "@phosphor-icons/react";
 import { foodItem } from "@/app/order/page";
 import { useState } from "react";
 
@@ -61,7 +61,7 @@ const Beverage = ({ item, handleItemClick }: itemProps) => {
             setCount(1);
           }}
         >
-          Add to Cart <ShoppingCart size={18} fill="#fff" strokeWidth={2.5} />
+          Add to Cart <ShoppingCart size={18} color="#fff" weight="fill" />
         </button>
       </div>
     </div>

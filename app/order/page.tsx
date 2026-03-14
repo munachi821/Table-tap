@@ -2,11 +2,11 @@
 import {
   MapPin,
   Plus,
-  SearchIcon,
-  ShoppingBasketIcon,
-  Trash2,
+  MagnifyingGlass as SearchIcon,
+  Basket as ShoppingBasketIcon,
+  Trash as Trash2,
   X,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import Image, { StaticImageData } from "next/image";
 import { useEffect, useRef, useState } from "react";
 import food1 from "@/public/menu-items/food1.png";
