@@ -1,20 +1,71 @@
 "use client";
 import {
-  SquaresFour as LayoutDashboard,
-  ForkKnife as Utensils,
-  Desk,
+  PicnicTableIcon,
+  SquaresFourIcon,
+  ForkKnifeIcon,
+  ClockCounterClockwiseIcon,
+  GearIcon,
+  WalletIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState("Overview");
   const admintabs = [
-    { name: "Overview", icon: <LayoutDashboard /> },
-    { name: "Menu", icon: <Utensils /> },
-    { name: "Tables", icon: <Desk /> },
-    { name: "History", icon: <LayoutDashboard /> },
-    { name: "Finance", icon: <LayoutDashboard /> },
-    { name: "Settings", icon: <LayoutDashboard /> },
+    {
+      name: "Overview",
+      icon: (
+        <SquaresFourIcon
+          size={24}
+          weight={activeTab === "Overview" ? "fill" : "regular"}
+        />
+      ),
+    },
+    {
+      name: "Menu",
+      icon: (
+        <ForkKnifeIcon
+          size={24}
+          weight={activeTab === "Menu" ? "fill" : "regular"}
+        />
+      ),
+    },
+    {
+      name: "Tables",
+      icon: (
+        <PicnicTableIcon
+          size={24}
+          weight={activeTab === "Tables" ? "fill" : "regular"}
+        />
+      ),
+    },
+    {
+      name: "History",
+      icon: (
+        <ClockCounterClockwiseIcon
+          size={24}
+          weight={activeTab === "History" ? "fill" : "regular"}
+        />
+      ),
+    },
+    {
+      name: "Finance",
+      icon: (
+        <WalletIcon
+          size={24}
+          weight={activeTab === "Finance" ? "fill" : "regular"}
+        />
+      ),
+    },
+    {
+      name: "Settings",
+      icon: (
+        <GearIcon
+          size={24}
+          weight={activeTab === "Settings" ? "fill" : "regular"}
+        />
+      ),
+    },
   ];
   return (
     <main className="flex h-screen">
@@ -28,7 +79,7 @@ const Page = () => {
           <ul className="flex flex-col gap-2">
             {admintabs.map((tab) => (
               <li
-                className={`flex items-center gap-2 text-lg ${activeTab === tab.name ? "font-semibold text-orange-800 bg-[#FEF3C7]" : "text-[#64748B]"} p-2.5 rounded-md`}
+                className={`flex items-center gap-2 text-lg ${activeTab === tab.name ? "font-semibold text-orange-800 bg-[#FEF3C7]" : "text-[#64748B] hover:bg-gray-100/50"} p-2.5 rounded-md cursor-pointer transition-all`}
                 key={tab.name}
                 onClick={() => setActiveTab(tab.name)}
               >
