@@ -9,6 +9,7 @@ import {
   BellIcon,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
+import Overview from "./(tabs)/overview";
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState("Overview");
@@ -127,7 +128,8 @@ const Page = () => {
           </ul>
         </div>
       </div>
-      <div className="w-full h-full bg-orange-400">
+      <div className="w-full h-full bg-[#F1F5F9]">
+        {/* Navbar */}
         <header>
           <nav className="bg-white p-3.5 flex justify-between items-center">
             <div>
@@ -135,7 +137,7 @@ const Page = () => {
                 Welcome Back, Nana&apos;s Kitchen!
               </h2>
               <p className="text-xs text-gray-400">
-                Here&apos;s how your business snapshot for today.
+                Here&apos;s your business snapshot for today.
               </p>
             </div>
 
@@ -159,6 +161,9 @@ const Page = () => {
             </div>
           </nav>
         </header>
+
+        {/* Tab Area */}
+        <div className="p-3">{<Overview />}</div>
       </div>
     </main>
   );
