@@ -105,9 +105,9 @@ const Page = () => {
   }, []);
 
   return (
-    <main className="flex h-screen">
+    <main className="flex h-screen overflow-hidden">
       <div className="w-68 h-full shrink-0 border-r border-gray-100 bg-orange-400">
-        <div className="p-4 flex gap-2.5 items-end border-b border-gray-100">
+        <div className="p-4 flex gap-2.5 items-end border-b border-gray-100/50">
           <div className="size-10 rounded-full border border-orange-200 bg-white"></div>
           <p className="text-xl text-white font-semibold">
             Nana&apos;s Kitchen
@@ -128,9 +128,9 @@ const Page = () => {
           </ul>
         </div>
       </div>
-      <div className="w-full h-full bg-[#F1F5F9]">
+      <div className="w-full h-full bg-[#F1F5F9] overflow-auto relative">
         {/* Navbar */}
-        <header>
+        <header className="sticky top-0">
           <nav className="bg-white p-3.5 flex justify-between items-center">
             <div>
               <h2 className="text-xl font-medium text-gray-700">
