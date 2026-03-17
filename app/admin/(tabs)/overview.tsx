@@ -21,10 +21,10 @@ const Overview = () => {
           <p className="text-sm text-gray-400">66% Capacity</p>
         </div>
 
-        <div className="bg-red-100 p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-red-200">
-          <p className="text-[#DC2626] font-semibold">KITCHEN LOAD</p>
+        <div className="bg-white p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-gray-200">
+          <p className="text-[#64748B] font-semibold">KITCHEN LOAD</p>
           <p className="text-2xl font-bold ml-2 text-[#B91C1C]">15 Tickets</p>
-          <p className="text-[#DC2626]/70">High volume warning</p>
+          <p className="text-[#DC2626]/70 text-sm">High volume warning</p>
         </div>
 
         <div className="bg-white p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-gray-200">
@@ -36,7 +36,7 @@ const Overview = () => {
 
       <div className="grid grid-cols-2 gap-5 mt-8">
         <div className="bg-white rounded-xl pb-7">
-          <header className="flex justify-between p-4">
+          <header className="flex justify-between items-center p-4">
             <p className="font-bold text-lg">Top Selling Items Today</p>
             <a
               href="#"
@@ -95,8 +95,8 @@ const Overview = () => {
             <p className="font-bold text-lg">Live Table Feed</p>
           </header>
 
-          <div className="flex flex-col p-4.5">
-            <div className="flex gap-2 py-2 w-full">
+          <div className="flex flex-col p-4.5 border-t border-gray-100">
+            <div className="flex gap-2 w-full">
               <div className="h-16 w-1 bg-[#10B981]"></div>
               <div className="flex items-center justify-between flex-1">
                 <div className="flex items-center gap-2">
@@ -132,6 +132,26 @@ const Overview = () => {
                   <p className="text-[#C2410C]">45 min elapsed</p>
                   <p className="font-semibold bg-[#FFEDD5] text-[#C2410C] px-3 rounded-full py-0.5 text-center">
                     in Service
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 py-2 w-full">
+              <div className="h-16 w-1 bg-[#FB923C]"></div>
+              <div className="flex items-center justify-between flex-1">
+                <div className="flex items-center gap-2">
+                  <div className="size-3 bg-[#FB923C] text-white rounded-full"></div>
+                  <div>
+                    <p className="font-semibold text-lg">Table 2</p>
+                    <p className="text-sm text-[#64748B]">Order #345 pending</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[#475569]">12 min elapsed</p>
+                  <p className="font-semibold bg-[#E2E8F0] text-[#334155] px-3 rounded-full py-0.5 text-center">
+                    Dining
                   </p>
                 </div>
               </div>
