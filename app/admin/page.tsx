@@ -149,13 +149,9 @@ const Page = () => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-4 border-l pl-3 border-gray-200">
-                <div>
+              <div className="border-l pl-3 border-gray-200">
+                <div className="border border-gray-100 p-2 rounded-full">
                   <BellIcon size={24} />
-                </div>
-
-                <div className="size-10 rounded-full border flex items-center justify-center font-semibold bg-orange-400 text-white">
-                  NK
                 </div>
               </div>
             </div>
