@@ -1,9 +1,9 @@
 "use client";
 import {
-  Bell,
-  Pizza,
-  Gear as Settings,
-  ForkKnife as Utensils,
+  BellIcon,
+  PizzaIcon,
+  GearIcon,
+  ForkKnifeIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
 import Menu from "@/components/kitchen/menu";
@@ -66,24 +66,24 @@ const Kitchen = () => {
                 className={`py-0.5 rounded-full px-2 ${activeTab === "orders" ? "text-orange-400" : "text-gray-500 hover:text-orange-400"} flex gap-2 items-center cursor-pointer`}
                 onClick={() => setActiveTab("orders")}
               >
-                <Utensils size={22} className="shrink-0" />
+                <ForkKnifeIcon size={22} className="shrink-0" />
                 Orders
               </button>
               <button
                 className={`py-0.5 rounded-full px-2 ${activeTab === "menu" ? "text-orange-400" : "text-gray-500 hover:text-orange-400"} flex gap-2 items-center cursor-pointer`}
                 onClick={() => setActiveTab("menu")}
               >
-                <Pizza size={22} className="shrink-0" />
+                <PizzaIcon size={22} className="shrink-0" />
                 Menu
               </button>
             </div>
 
             <div className="flex gap-2 items-center">
               <div className="p-2 bg-white rounded-full border border-gray-200 text-gray-600">
-                <Settings />
+                <GearIcon size={20} />
               </div>
               <div className="p-2 bg-white rounded-full border border-gray-200 text-gray-600">
-                <Bell />
+                <BellIcon size={20} />
               </div>
             </div>
           </div>

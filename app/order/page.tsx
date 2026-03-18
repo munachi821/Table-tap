@@ -196,63 +196,65 @@ const Order = () => {
     console.log("Checkout complete!", finalOrder);
   };
   return (
-    <main className="pb-10">
-      <header className="py-5 px-4">
-        <nav className="bg-white text-black flex items-center justify-between rounded-lg px-2">
-          <div className="flex gap-2 items-center">
-            <div className="size-13 rounded-full border border-orange-200"></div>
-            <div>
-              <p className="text-lg leading-5">Chicken Republic</p>
-              <p className="text-base font-medium flex items-center gap-1 text-gray-600">
-                <MapPinIcon size={15} /> New haven, Enugu State
+    <main className="pb-10 relative">
+      <header className="py-2 -top-2 sticky">
+        <nav className="bg-white px-6 py-3 rounded-b-lg">
+          <div className="text-black flex items-center justify-between">
+            <div className="flex gap-2 items-center">
+              <div className="size-13 rounded-full border border-orange-200"></div>
+              <div>
+                <p className="text-lg leading-5">Chicken Republic</p>
+                <p className="text-base font-medium flex items-center gap-1 text-gray-600">
+                  <MapPinIcon size={15} /> New haven, Enugu State
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <p className="text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4 font-semibold">
+                Table 1
               </p>
-            </div>
-          </div>
+              <div
+                className={`flex flex-row-reverse gap-2 text-gray-600 p-2 rounded-full ${
+                  searchOpen && "bg-gray-100"
+                } hover:bg-gray-100 transition-colors relative`}
+                onClick={() => setSearchOpen(true)}
+              >
+                <button>
+                  <MagnifyingGlassIcon size={25} />
+                </button>
 
-          <div className="flex items-center gap-3">
-            <p className="text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4 font-semibold">
-              Table 1
-            </p>
-            <div
-              className={`flex flex-row-reverse gap-2 text-gray-600 p-2 rounded-full ${
-                searchOpen && "bg-gray-100"
-              } hover:bg-gray-100 transition-colors relative`}
-              onClick={() => setSearchOpen(true)}
-            >
-              <button>
-                <MagnifyingGlassIcon size={25} />
-              </button>
-
-              <input
-                ref={searchRef}
-                type="search"
-                placeholder="Search Food"
-                onBlur={() => {
-                  if (search === "") setSearchOpen(false);
-                }}
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                }}
-                className={`bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400 transition-all duration-300 ease-in-out ${
-                  searchOpen
-                    ? "w-60 opacity-100 pl-2"
-                    : "w-0 opacity-0 p-0 sr-only"
-                }
+                <input
+                  ref={searchRef}
+                  type="search"
+                  placeholder="Search Food"
+                  onBlur={() => {
+                    if (search === "") setSearchOpen(false);
+                  }}
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                  }}
+                  className={`bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400 transition-all duration-300 ease-in-out ${
+                    searchOpen
+                      ? "w-60 opacity-100 pl-2"
+                      : "w-0 opacity-0 p-0 sr-only"
+                  }
         `}
-              />
+                />
+              </div>
+              <button
+                onClick={() => setCartOpen(!cartOpen)}
+                className="relative text-orange-400 bg-orange-50 rounded-full p-2 hover:bg-orange-100 transition-colors"
+              >
+                {cart.length > 0 && (
+                  <div className="absolute text-[10px] size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
+                    <p className="leading-0">{cart.length}</p>
+                  </div>
+                )}
+                <BasketIcon size={25} />
+              </button>
             </div>
-            <button
-              onClick={() => setCartOpen(!cartOpen)}
-              className="relative text-orange-400 bg-orange-50 rounded-full p-2 hover:bg-orange-100 transition-colors"
-            >
-              {cart.length > 0 && (
-                <div className="absolute text-[10px] size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
-                  <p className="leading-0">{cart.length}</p>
-                </div>
-              )}
-              <BasketIcon size={25} />
-            </button>
           </div>
         </nav>
       </header>
