@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Plus, Minus, ShoppingCart } from "@phosphor-icons/react";
+import { PlusIcon, MinusIcon, ShoppingCartIcon } from "@phosphor-icons/react";
 import { foodItem } from "@/app/order/page";
 import { useState } from "react";
 
@@ -42,7 +42,7 @@ const Beverage = ({ item, handleItemClick }: itemProps) => {
               onClick={() => incrementCount()}
             >
               {" "}
-              <Plus size={22} />{" "}
+              <PlusIcon size={22} />{" "}
             </button>
             <p className="font-semibold text-lg">{count}</p>
             <button
@@ -50,18 +50,18 @@ const Beverage = ({ item, handleItemClick }: itemProps) => {
               onClick={() => decrementCount()}
             >
               {" "}
-              <Minus size={22} />{" "}
+              <MinusIcon size={22} />{" "}
             </button>
           </div>
         </div>
         <button
-          className="py-2 rounded-lg text-white font-semibold bg-orange-400 hover:bg-orange-400/80 transition-colors cursor-pointer flex items-center justify-center gap-1 m-0.5"
+          className="py-2 rounded-lg text-white font-semibold bg-orange-400 hover:bg-orange-400/80 transition-colors cursor-pointer flex items-center justify-center gap-2 m-0.5"
           onClick={() => {
             handleItemClick(item, count);
             setCount(1);
           }}
         >
-          Add to Cart <ShoppingCart size={18} color="#fff" weight="fill" />
+          Add to Cart <ShoppingCartIcon size={18} color="#fff" weight="fill" />
         </button>
       </div>
     </div>

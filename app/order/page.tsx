@@ -1,11 +1,11 @@
 "use client";
 import {
-  MapPin,
-  Plus,
-  MagnifyingGlass as SearchIcon,
-  Basket as ShoppingBasketIcon,
-  Trash as Trash2,
-  X,
+  MapPinIcon,
+  PlusIcon,
+  MagnifyingGlassIcon,
+  BasketIcon,
+  TrashIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import Image, { StaticImageData } from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -204,7 +204,7 @@ const Order = () => {
             <div>
               <p className="text-lg leading-5">Chicken Republic</p>
               <p className="text-base font-medium flex items-center gap-1 text-gray-600">
-                <MapPin size={15} /> New haven, Enugu State
+                <MapPinIcon size={15} /> New haven, Enugu State
               </p>
             </div>
           </div>
@@ -220,7 +220,7 @@ const Order = () => {
               onClick={() => setSearchOpen(true)}
             >
               <button>
-                <SearchIcon size={25} />
+                <MagnifyingGlassIcon size={25} />
               </button>
 
               <input
@@ -251,7 +251,7 @@ const Order = () => {
                   <p className="leading-0">{cart.length}</p>
                 </div>
               )}
-              <ShoppingBasketIcon size={25} />
+              <BasketIcon size={25} />
             </button>
           </div>
         </nav>
@@ -330,7 +330,7 @@ const Order = () => {
                       className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-2xl py-3 px-4.5"
                       onClick={() => handleItemClick(mostOrdered, 1)}
                     >
-                      <Plus size={25} />
+                      <PlusIcon weight="bold" size={25} />
                     </button>
                   </div>
                 </div>
@@ -382,7 +382,7 @@ const Order = () => {
                 className="text-orange-400 cursor-pointer"
                 onClick={() => setCartOpen(false)}
               >
-                <X />
+                <XIcon />
               </button>
             </div>
 
@@ -426,7 +426,7 @@ const Order = () => {
                           )
                         }
                       >
-                        <Trash2 size={22} />
+                        <TrashIcon size={22} />
                       </button>
                     </div>
                   </div>
@@ -474,7 +474,7 @@ const Order = () => {
                 {cart.length}
               </div>
             )}
-            <ShoppingBasketIcon size={30} />
+            <BasketIcon size={30} />
           </button>
         </div>
       </div>

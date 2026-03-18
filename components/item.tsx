@@ -1,4 +1,4 @@
-import { Minus, Plus } from "@phosphor-icons/react";
+import { MinusIcon, PlusIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useState } from "react";
 import { foodItem } from "@/app/order/page";
@@ -37,14 +37,14 @@ const Item = ({ item, handleItemClick }: itemProps) => {
                 className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1"
                 onClick={() => incrementCount()}
               >
-                <Plus size={20} />
+                <PlusIcon weight="bold" size={19} />
               </button>
               <p className="text-lg font-semibold">{count}</p>
               <button
                 className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1"
                 onClick={() => decrementCount()}
               >
-                <Minus size={20} />
+                <MinusIcon weight="bold" size={19} />
               </button>
             </div>
           </div>
