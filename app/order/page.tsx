@@ -97,14 +97,14 @@ const Order = () => {
     },
     {
       tag: ["beverage", "all"],
-      itemName: "Canned sprite",
+      itemName: "Can sprite",
       price: "1,200",
       image: drink2,
       isAvailable: true,
     },
     {
       tag: ["beverage", "all"],
-      itemName: "Canned coke",
+      itemName: "Can coke",
       price: "1,200",
       image: drink1,
       isAvailable: true,
@@ -118,7 +118,7 @@ const Order = () => {
     },
     {
       tag: ["beverage", "item", "all"],
-      itemName: "Canned pepsi",
+      itemName: "Can pepsi",
       price: "1,200",
       image: drink6,
       isAvailable: true,
@@ -376,13 +376,13 @@ const Order = () => {
           <div
             className={`p-2 w-fit bg-white border border-gray-300 rounded-xl ${cartOpen ? "block" : "hidden"}`}
           >
-            <div className="flex justify-between items-center sticky top-2 rounded-b-xl">
-              <p className="my-1 font-semibold text-gray-800 mb-2">Checkout</p>
+            <div className="flex justify-between items-center sticky top-2 rounded-b-xl mb-2 my-1">
+              <p className="font-semibold text-gray-800">Checkout</p>
               <button
                 className="text-orange-400 cursor-pointer"
                 onClick={() => setCartOpen(false)}
               >
-                <XIcon />
+                <XIcon size={20} weight="bold" />
               </button>
             </div>
 
@@ -432,7 +432,7 @@ const Order = () => {
                   </div>
                 ))
               ) : (
-                <div className="mx-auto mt-2 font-semibold text-gray-800">
+                <div className="mx-auto mt-5 mt-2 font-semibold text-gray-800">
                   <p>There are no items in your cart</p>
                 </div>
               )}

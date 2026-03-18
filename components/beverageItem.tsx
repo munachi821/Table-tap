@@ -26,7 +26,7 @@ const Beverage = ({ item, handleItemClick }: itemProps) => {
         <Image
           src={item.image}
           alt="drink 5"
-          className="w-fit h-full object-center object-contain"
+          className="w-30 h-full object-center object-cover"
         />
       </div>
 
@@ -41,7 +41,6 @@ const Beverage = ({ item, handleItemClick }: itemProps) => {
               className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
               onClick={() => incrementCount()}
             >
-              {" "}
               <PlusIcon size={22} />{" "}
             </button>
             <p className="font-semibold text-lg">{count}</p>
@@ -49,7 +48,6 @@ const Beverage = ({ item, handleItemClick }: itemProps) => {
               className="size-7.5 rounded-md flex items-center justify-center cursor-pointer bg-orange-100 text-orange-400"
               onClick={() => decrementCount()}
             >
-              {" "}
               <MinusIcon size={22} />{" "}
             </button>
           </div>
