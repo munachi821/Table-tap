@@ -434,7 +434,7 @@ const Order = () => {
                   </div>
                 ))
               ) : (
-                <div className="mx-auto mt-5 mt-2 font-semibold text-gray-800">
+                <div className="mx-auto mt-5 font-semibold text-gray-800">
                   <p>There are no items in your cart</p>
                 </div>
               )}
