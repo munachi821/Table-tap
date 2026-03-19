@@ -131,38 +131,8 @@ const Page = () => {
           </ul>
         </div>
       </div>
-      <div className="w-full h-full bg-[#F1F5F9] overflow-auto relative">
-        {/* Navbar */}
-        <header className="sticky top-0">
-          <nav className="bg-white p-3.5 flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-medium text-gray-700">
-                Welcome Back, Nana&apos;s Kitchen!
-              </h2>
-              <p className="text-xs text-gray-400">
-                Here&apos;s your business snapshot for today.
-              </p>
-            </div>
-
-            <div className="flex gap-4">
-              <div>
-                <p className="text-sm font-bold text-gray-600">{fullDate()}</p>
-                <p className="text-xs text-right font-semibold text-gray-500">
-                  {time}
-                </p>
-              </div>
-
-              <div className="border-l pl-3 border-gray-200">
-                <div className="border border-gray-100 p-2 rounded-full">
-                  <BellIcon size={24} />
-                </div>
-              </div>
-            </div>
-          </nav>
-        </header>
-
-        {/* Tab Area */}
-        <div className="p-3">{<Overview />}</div>
+      <div className="w-full h-full bg-[#F8FAFC] overflow-auto relative">
+        <Overview />
       </div>
     </main>
   );

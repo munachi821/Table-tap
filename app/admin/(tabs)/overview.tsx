@@ -1,8 +1,33 @@
-import { TrendUpIcon } from "@phosphor-icons/react";
+import { BellIcon, CalendarDotsIcon, TrendUpIcon } from "@phosphor-icons/react";
 
 const Overview = () => {
+  const fullDate = () => {
+    const date = new Date();
+    return date.toLocaleString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
   return (
-    <div>
+    <div className="pt-4 pr-4">
+      <header className="sticky top-0">
+        <nav className="p-3.5 flex justify-between items-end">
+          <div>
+            <p className="text-xs font-medium text-[#584237] tracking-wide">
+              DASHBOARD OVERVIEW
+            </p>
+            <h2 className="text-2xl text-[#191C1E] font-bold font-manrope">
+              Today at Nana&apos;s Kitchen
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2 font-semibold shadow-sm py-1.5 px-4 text-[#191C1E] rounded-full bg-white">
+            <CalendarDotsIcon size={19} className="text-[#9D4300]" />
+            <p>{fullDate()}</p>
+          </div>
+        </nav>
+      </header>
       <div className="grid grid-cols-4 gap-x-4">
         <div className="bg-white p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-gray-200">
           <p className="text-[#64748B] font-semibold">GROSS REVENUE (TODAY)</p>
