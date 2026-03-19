@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import "../globals.css";
 
 const inter = Inter({
@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   description: "Admin dashboard for Nana's kitchen",
 };
 
+const manRope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+});
 export default function layout({
   children,
 }: Readonly<{
@@ -19,7 +23,9 @@ export default function layout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${manRope.variable} antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }

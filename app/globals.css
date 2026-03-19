@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-manrope: var(--font-manrope);
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none !important;
 }
