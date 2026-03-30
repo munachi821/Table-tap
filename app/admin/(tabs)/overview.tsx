@@ -1,4 +1,11 @@
-import { BellIcon, CalendarDotsIcon, TrendUpIcon } from "@phosphor-icons/react";
+import KitchenTable from "@/components/svg/KitchenTable";
+import {
+  ArrowUpIcon,
+  CalendarDotsIcon,
+  CookingPotIcon,
+  MoneyIcon,
+  ReceiptIcon,
+} from "@phosphor-icons/react";
 
 const Overview = () => {
   const fullDate = () => {
@@ -29,158 +36,310 @@ const Overview = () => {
         </nav>
       </header>
       <div className="grid grid-cols-4 gap-x-4">
-        <div className="bg-white p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-gray-200">
-          <p className="text-[#64748B] font-semibold">GROSS REVENUE (TODAY)</p>
-          <p className="text-2xl font-bold ml-2">₦142,500</p>
-          <p className="flex gap-2 text-[#059669] font-semibold items-center">
-            <TrendUpIcon size={22} /> 12% vs yesterday
-          </p>
-        </div>
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+          <header className="flex justify-between items-start">
+            <div className="p-2 bg-[#F9EEE4] w-fit rounded-[14px]">
+              <MoneyIcon size={26} color="#A4551F" weight="regular" />
+            </div>
 
-        <div className="bg-white p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-gray-200">
-          <p className="text-[#64748B] font-semibold">ACTIVE TABLES</p>
-          <p className="text-2xl font-bold ml-2">8 / 12</p>
-          <div className="w-full h-2 bg-gray-300 rounded-full overflow-hidden">
-            <div className="h-full w-[66%] bg-amber-400"></div>
+            <div className="bg-[#E6F9F0] text-[#059669] flex items-center gap-1 px-2 py-1 w-fit text-[11px] rounded-full font-bold font-inter tracking-wide">
+              <ArrowUpIcon size={12} color="#059669" weight="bold" />
+              12%
+            </div>
+          </header>
+
+          <div className="flex flex-col">
+            <p className="text-[#584237] font-medium text-[15px] font-inter">
+              Gross Revenue (Today)
+            </p>
+            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
+              ₦142,500
+            </p>
+            <p className="text-[11px] text-[#64748B] font-inter mt-3">
+              vs yesterday
+            </p>
           </div>
-          <p className="text-sm text-gray-400">66% Capacity</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-gray-200">
-          <p className="text-[#64748B] font-semibold">KITCHEN LOAD</p>
-          <p className="text-2xl font-bold ml-2 text-[#B91C1C]">15 Tickets</p>
-          <p className="text-[#DC2626]/70 text-sm">High volume warning</p>
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+          <header className="flex justify-between items-start">
+            <div className="p-2 bg-[#E6EDFF] w-fit rounded-[14px]">
+              <KitchenTable />
+            </div>
+          </header>
+
+          <div className="flex flex-col">
+            <p className="text-[#584237] font-medium text-[15px] font-inter">
+              Active Tables
+            </p>
+            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
+              8{" "}
+              <span className="text-[17px] text-[#64748B] font-medium">
+                / 12
+              </span>
+            </p>
+            <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden mt-3">
+              <div className="h-full w-[66%] bg-[#B45309] rounded-full"></div>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl flex justify-between flex-col gap-1.5 border-2 border-gray-200">
-          <p className="text-[#64748B] font-semibold">ORDERS TODAY</p>
-          <p className="text-2xl font-bold ml-2">53</p>
-          <p className="text-sm text-gray-400">Across all categories</p>
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+          <header className="flex justify-between items-start">
+            <div className="p-2.5 bg-[#FDE8E8] w-fit rounded-[14px]">
+              <CookingPotIcon size={22} color="#9B1C1C" weight="bold" />
+            </div>
+
+            <div className="bg-[#FDE8E8] text-[#9B1C1C] flex items-center px-2 py-1 w-fit text-[10px] rounded-md font-bold font-inter tracking-wider">
+              HIGH VOLUME
+            </div>
+          </header>
+
+          <div className="flex flex-col">
+            <p className="text-[#584237] font-medium text-[15px] font-inter">
+              Kitchen Load
+            </p>
+            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
+              15 Tickets
+            </p>
+            <p className="text-[11px] text-[#B91C1C] font-semibold mt-3">
+              Avg. prep time: 24 mins
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+          <header className="flex justify-between items-start">
+            <div className="p-2.5 bg-[#E6F4FF] w-fit rounded-[14px]">
+              <ReceiptIcon size={22} color="#2B72B9" weight="bold" />
+            </div>
+          </header>
+
+          <div className="flex flex-col">
+            <p className="text-[#584237] font-medium text-[15px] font-inter">
+              Orders Today
+            </p>
+            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
+              53
+            </p>
+            <p className="text-[11px] text-[#64748B] font-inter mt-3">
+              Across all categories
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-5 mt-8">
-        <div className="bg-white rounded-xl pb-7">
-          <header className="flex justify-between items-center p-4">
-            <p className="font-bold text-lg">Top Selling Items Today</p>
+      <div className="grid grid-cols-7 gap-5 mt-8 max-w-full">
+        <div className="col-span-4 bg-white rounded-xl pb-7 border shadow-xs border-gray-200">
+          <header className="flex justify-between items-center p-6 pb-4">
+            <p className="font-bold text-lg font-manrope text-[#191C1E]">
+              Top Selling Items Today
+            </p>
             <a
               href="#"
-              className="text-[#F59E0B] text-sm font-semibold hover:underline underline-[#F59E0B]"
+              className="text-[#9D4300] text-[13px] font-bold hover:underline"
             >
-              View All
+              View Full Menu
             </a>
           </header>
 
-          <div className="border-t border-gray-100">
-            <div className="p-4 flex gap-2 flex-col">
-              <div className="bg-[#F8FAFC] flex items-center justify-between gap-2 p-2 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className="size-10 flex items-center justify-center bg-[#F59E0B] text-white rounded-full">
-                    1
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg">Catfish Pepper Soup</p>
-                    <p className="text-sm text-gray-500 -mt-0.5">45 Orders</p>
-                  </div>
+          <div className="flex flex-col gap-7 px-6 pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="size-11.5 flex items-center justify-center bg-[#AC4D00] text-white font-bold text-lg rounded-[10px]">
+                  1
                 </div>
-                <p className="font-semibold">₦202,500</p>
+                <div>
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    Catfish Pepper Soup
+                  </p>
+                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                    Best Seller • Signature Dish
+                  </p>
+                </div>
               </div>
-
-              <div className="border-[#F8FAFC] border flex items-center justify-between gap-2 p-2 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className="size-10 flex items-center justify-center bg-[#E2E8F0] text-[#475569] font-semibold rounded-full">
-                    2
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg">Catfish Pepper Soup</p>
-                    <p className="text-sm text-gray-500 -mt-0.5">45 Orders</p>
-                  </div>
-                </div>
-                <p className="font-semibold">₦202,500</p>
+              <div className="text-right">
+                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                  ₦202,500
+                </p>
+                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                  45 orders
+                </p>
               </div>
+            </div>
 
-              <div className="border-[#F8FAFC] border flex items-center justify-between gap-2 p-2 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className="size-10 flex items-center justify-center bg-[#E2E8F0] text-[#475569] font-semibold rounded-full">
-                    3
-                  </div>
-                  <div>
-                    <p className="font-semibold text-lg">Catfish Pepper Soup</p>
-                    <p className="text-sm text-gray-500 -mt-0.5">45 Orders</p>
-                  </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="size-[46px] flex items-center justify-center bg-[#FFC2A8] text-[#713100] font-bold text-lg rounded-[10px]">
+                  2
                 </div>
-                <p className="font-semibold">₦202,500</p>
+                <div>
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    Jollof Rice
+                  </p>
+                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                    Popular • Daily Special
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                  ₦133,000
+                </p>
+                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                  38 orders
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="size-11.5 flex items-center justify-center bg-[#E2E8F0] text-[#334155] font-bold text-lg rounded-[10px]">
+                  3
+                </div>
+                <div>
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    Chilled Coke
+                  </p>
+                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                    Beverage • Standard
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                  ₦25,000
+                </p>
+                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                  25 orders
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl pb-7">
-          <header className="p-4">
-            <p className="font-bold text-lg">Live Table Feed</p>
+        <div className="bg-white col-span-3 rounded-xl pb-6 border shadow-xs border-gray-200">
+          <header className="flex justify-between items-center p-6 pb-4">
+            <p className="font-bold text-lg font-manrope text-[#191C1E]">
+              Live Table Feed
+            </p>
+            <div className="size-2 bg-[#10B981] rounded-full"></div>
           </header>
 
-          <div className="flex flex-col p-4.5 border-t border-gray-100">
-            <div className="flex gap-2 w-full">
-              <div className="h-16 w-1 bg-[#10B981]"></div>
-              <div className="flex items-center justify-between flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="size-3 bg-[#10B981] text-white rounded-full"></div>
-                  <div>
-                    <p className="font-semibold text-lg">Table 1</p>
-                    <p className="text-sm text-[#059669] -mt-0.5">
-                      Ready for Guests
-                    </p>
-                  </div>
-                </div>
-
+          <div className="flex flex-col gap-4 px-6 pt-2">
+            <div className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#10B981]"></div>
+              <div className="flex items-center justify-between w-full pl-2">
                 <div>
-                  <p className="font-semibold bg-[#D1FAE5] text-[#047857] px-3 rounded-full py-0.5">
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    Table 1
+                  </p>
+                  <p className="text-[10px] font-bold font-inter text-[#10B981] mt-1.5 uppercase tracking-wide">
+                    Ready to Seat
+                  </p>
+                </div>
+                <div className="text-right flex flex-col justify-between items-end h-full">
+                  <p className="text-[13px] font-semibold text-[#191C1E] mb-1.5">
+                    0 min
+                  </p>
+                  <p className="text-[9.5px] font-bold bg-[#D1FAE5] text-[#047857] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                     Empty
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-2 py-2 w-full">
-              <div className="h-16 w-1 bg-[#F97316]"></div>
-              <div className="flex items-center justify-between flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="size-3 bg-[#F97316] text-white rounded-full"></div>
-                  <div>
-                    <p className="font-semibold text-lg">Table 2</p>
-                    <p className="text-sm text-[#64748B]">Order #345 pending</p>
-                  </div>
-                </div>
-
+            <div className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#D97706]"></div>
+              <div className="flex items-center justify-between w-full pl-2">
                 <div>
-                  <p className="text-[#C2410C]">45 min elapsed</p>
-                  <p className="font-semibold bg-[#FFEDD5] text-[#C2410C] px-3 rounded-full py-0.5 text-center">
-                    in Service
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    Table 2
+                  </p>
+                  <p className="text-[10px] font-bold font-inter text-[#D97706] mt-1.5 uppercase tracking-wide">
+                    Awaiting Check
+                  </p>
+                </div>
+                <div className="text-right flex flex-col justify-between items-end h-full">
+                  <p className="text-[13px] font-semibold text-[#191C1E] mb-1.5">
+                    45 min
+                  </p>
+                  <p className="text-[9.5px] font-bold bg-[#FFEDD5] text-[#C2410C] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    In Service
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-2 py-2 w-full">
-              <div className="h-16 w-1 bg-[#FB923C]"></div>
-              <div className="flex items-center justify-between flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="size-3 bg-[#FB923C] text-white rounded-full"></div>
-                  <div>
-                    <p className="font-semibold text-lg">Table 2</p>
-                    <p className="text-sm text-[#64748B]">Order #345 pending</p>
-                  </div>
-                </div>
-
+            <div className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#64748B]"></div>
+              <div className="flex items-center justify-between w-full pl-2">
                 <div>
-                  <p className="text-[#475569]">12 min elapsed</p>
-                  <p className="font-semibold bg-[#E2E8F0] text-[#334155] px-3 rounded-full py-0.5 text-center">
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    VIP Lounge
+                  </p>
+                  <p className="text-[10px] font-bold font-inter text-[#64748B] mt-1.5 uppercase tracking-wide">
+                    Main Course
+                  </p>
+                </div>
+                <div className="text-right flex flex-col justify-between items-end h-full">
+                  <p className="text-[13px] font-semibold text-[#191C1E] mb-1.5">
+                    12 min
+                  </p>
+                  <p className="text-[9.5px] font-bold bg-[#E0E7FF] text-[#4338CA] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                     Dining
                   </p>
                 </div>
               </div>
             </div>
+
+            <button className="mt-2 w-full flex items-center justify-center gap-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors py-3.5 rounded-xl font-bold font-manrope text-[#191C1E] text-sm md:text-[15px]">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="3"
+                  y="3"
+                  width="7"
+                  height="7"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  rx="1.5"
+                />
+                <rect
+                  x="14"
+                  y="3"
+                  width="7"
+                  height="7"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  rx="1.5"
+                />
+                <rect
+                  x="3"
+                  y="14"
+                  width="7"
+                  height="7"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  rx="1.5"
+                />
+                <rect
+                  x="14"
+                  y="14"
+                  width="7"
+                  height="7"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  rx="1.5"
+                />
+              </svg>
+              Full Floor Plan
+            </button>
           </div>
         </div>
       </div>

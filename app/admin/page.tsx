@@ -106,7 +106,7 @@ const Page = () => {
 
   return (
     <main className="flex h-screen overflow-hidden">
-      <div className="w-68 h-full shrink-0 bg-[#F8FAFC]">
+      <div className="w-60 h-full shrink-0 bg-[#F8FAFC]">
         <div className="p-6">
           {/* <div className="size-10 rounded-full border border-orange-200 bg-[#9D4300]"></div> */}
           <h2 className="text-2xl w-25 whitespace-wrap text-[#0F172A] font-bold font-manrope leading-8">
