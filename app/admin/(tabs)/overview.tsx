@@ -17,7 +17,7 @@ const Overview = () => {
     });
   };
   return (
-    <div className="pt-4 pr-4">
+    <div className="py-4 pr-4">
       <header className="sticky top-0">
         <nav className="p-3.5 flex justify-between items-end">
           <div>
@@ -135,7 +135,7 @@ const Overview = () => {
             </p>
             <a
               href="#"
-              className="text-[#9D4300] text-[13px] font-bold hover:underline"
+              className="text-[#9D4300] text-[13px] font-inter font-semibold hover:underline"
             >
               View Full Menu
             </a>
@@ -152,7 +152,7 @@ const Overview = () => {
                     Catfish Pepper Soup
                   </p>
                   <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Best Seller • Signature Dish
+                    Best Seller
                   </p>
                 </div>
               </div>
@@ -176,7 +176,7 @@ const Overview = () => {
                     Jollof Rice
                   </p>
                   <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Popular • Daily Special
+                    Popular
                   </p>
                 </div>
               </div>
@@ -200,7 +200,53 @@ const Overview = () => {
                     Chilled Coke
                   </p>
                   <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Beverage • Standard
+                    Beverage
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                  ₦25,000
+                </p>
+                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                  25 orders
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="size-11.5 flex items-center justify-center bg-[#3488f5] text-[#334155] font-bold text-lg rounded-[10px]">
+                  4
+                </div>
+                <div>
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    Chilled Coke
+                  </p>
+                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                    Beverage
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                  ₦25,000
+                </p>
+                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                  25 orders
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="size-11.5 flex items-center justify-center bg-[#a9caf5] text-[#334155] font-bold text-lg rounded-[10px]">
+                  5
+                </div>
+                <div>
+                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                    Chilled Coke
+                  </p>
+                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                    Beverage
                   </p>
                 </div>
               </div>
