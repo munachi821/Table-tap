@@ -36,7 +36,7 @@ const Overview = () => {
         </nav>
       </header>
       <div className="grid grid-cols-4 gap-x-4">
-        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-4 border shadow-xs border-gray-200">
           <header className="flex justify-between items-start">
             <div className="p-2 bg-[#F9EEE4] w-fit rounded-[14px]">
               <MoneyIcon size={26} color="#A4551F" weight="regular" />
@@ -48,43 +48,43 @@ const Overview = () => {
             </div>
           </header>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <p className="text-[#584237] font-medium text-[15px] font-inter">
               Gross Revenue (Today)
             </p>
-            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
+            <p className="text-2xl font-bold font-manrope text-[#191C1E]">
               ₦142,500
             </p>
-            <p className="text-[11px] text-[#64748B] font-inter mt-3">
+            <p className="text-[11px] text-[#64748B] font-inter">
               vs yesterday
             </p>
           </div>
         </div>
 
-        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-4 border shadow-xs border-gray-200">
           <header className="flex justify-between items-start">
             <div className="p-2 bg-[#E6EDFF] w-fit rounded-[14px]">
               <KitchenTable />
             </div>
           </header>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <p className="text-[#584237] font-medium text-[15px] font-inter">
               Active Tables
             </p>
-            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
+            <p className="text-2xl font-bold font-manrope text-[#191C1E]">
               8{" "}
               <span className="text-[17px] text-[#64748B] font-medium">
                 / 12
               </span>
             </p>
-            <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden mt-3">
+            <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden mt-2">
               <div className="h-full w-[66%] bg-[#B45309] rounded-full"></div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-4 border shadow-xs border-gray-200">
           <header className="flex justify-between items-start">
             <div className="p-2.5 bg-[#FDE8E8] w-fit rounded-[14px]">
               <CookingPotIcon size={22} color="#9B1C1C" weight="bold" />
@@ -95,34 +95,32 @@ const Overview = () => {
             </div>
           </header>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <p className="text-[#584237] font-medium text-[15px] font-inter">
               Kitchen Load
             </p>
-            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
+            <p className="text-2xl font-bold font-manrope text-[#191C1E]">
               15 Tickets
             </p>
-            <p className="text-[11px] text-[#B91C1C] font-semibold mt-3">
+            <p className="text-[11px] text-[#B91C1C] font-semibold">
               Avg. prep time: 24 mins
             </p>
           </div>
         </div>
 
-        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-6 border shadow-xs border-gray-200">
+        <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-4 border shadow-xs border-gray-200">
           <header className="flex justify-between items-start">
             <div className="p-2.5 bg-[#E6F4FF] w-fit rounded-[14px]">
               <ReceiptIcon size={22} color="#2B72B9" weight="bold" />
             </div>
           </header>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             <p className="text-[#584237] font-medium text-[15px] font-inter">
               Orders Today
             </p>
-            <p className="text-2xl font-bold font-manrope text-[#191C1E] mt-0.5">
-              53
-            </p>
-            <p className="text-[11px] text-[#64748B] font-inter mt-3">
+            <p className="text-2xl font-bold font-manrope text-[#191C1E]">53</p>
+            <p className="text-[11px] text-[#64748B] font-inter">
               Across all categories
             </p>
           </div>
@@ -170,7 +168,7 @@ const Overview = () => {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="size-[46px] flex items-center justify-center bg-[#FFC2A8] text-[#713100] font-bold text-lg rounded-[10px]">
+                <div className="size-11.5 flex items-center justify-center bg-[#FFC2A8] text-[#713100] font-bold text-lg rounded-[10px]">
                   2
                 </div>
                 <div>
