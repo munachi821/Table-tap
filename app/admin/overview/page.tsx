@@ -1,3 +1,4 @@
+"use client";
 import KitchenTable from "@/components/svg/KitchenTable";
 import {
   ArrowUpIcon,
