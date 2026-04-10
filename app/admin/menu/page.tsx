@@ -247,8 +247,8 @@ const Page = () => {
       </div>
 
       <div className="fixed top-0 bottom-0 right-0 left-0 bg-black/50">
-        <div className="bg-[#F7F9FB] max-w-xl w-full h-full float-right">
-          <header className="flex items-center justify-between bg-white p-5">
+        <div className="bg-[#F7F9FB] max-w-xl w-full h-full float-right flex flex-col">
+          <header className="flex items-center justify-between bg-white p-5 shrink-0 relative z-10">
             <div>
               <h3 className="font-bold text-lg text-[#0F172A] font-manrope">
                 Add New Item
@@ -263,8 +263,8 @@ const Page = () => {
             </button>
           </header>
 
-          <div className="p-5">
-            <form action="" className="space-y-3">
+          <div className="p-5 overflow-auto flex-1">
+            <form id="add-item-form" action="" className="space-y-4">
               <div>
                 <label
                   htmlFor="menu-image"
@@ -314,39 +314,78 @@ const Page = () => {
               </div>
 
               <div className="flex gap-2">
-                <div className="w-full">
+                <div className="w-full relative">
                   <label
-                    htmlFor="item-name"
+                    htmlFor="item-price"
                     className="font-bold text-[#584237] font-manrope uppercase text-sm tracking-wider mb-2 block"
                   >
                     PRICE (₦)
                   </label>
                   <input
-                    type="text"
-                    name="item-name"
-                    id="item-name"
+                    type="number"
+                    name="item-price"
+                    id="item-price"
                     placeholder="e.g. Jollof Rice"
-                    className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
+                    className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-3 pl-7 font-semibold"
                   />
+                  <span className="absolute left-3 top-10.5 font-manrope font-bold text-[#A9A4A0]">
+                    ₦
+                  </span>
                 </div>
 
                 <div className="w-full">
                   <label
-                    htmlFor="item-name"
+                    htmlFor="item-category"
                     className="font-bold text-[#584237] font-manrope uppercase text-sm tracking-wider mb-2 block"
                   >
                     CATEGORY
                   </label>
                   <input
                     type="text"
-                    name="item-name"
-                    id="item-name"
+                    name="item-category"
+                    id="item-category"
                     placeholder="e.g. Jollof Rice"
                     className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
                   />
                 </div>
               </div>
+
+              <div>
+                <label
+                  htmlFor="item-description"
+                  className="font-bold text-[#584237] font-manrope uppercase text-sm tracking-wider mb-2 block"
+                >
+                  DESCRIPTION
+                </label>
+
+                <textarea
+                  name="item-description"
+                  id="item-description"
+                  cols={5}
+                  rows={5}
+                  placeholder="Briefly describe the food"
+                  className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
+                ></textarea>
+              </div>
             </form>
+          </div>
+
+          <div className="bg-white p-5 border-t border-[#F1F5F9] shrink-0">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                className="flex-1 py-3.5 rounded-full border border-[#E8D9D3] text-[#584237] font-bold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="add-item-form"
+                className="flex-1 py-3.5 rounded-full bg-linear-to-r from-[#D76000] to-[#E86700] text-white font-bold shadow-[0_8px_16px_rgba(232,103,0,0.2)] hover:opacity-90 transition-opacity"
+              >
+                Add Item
+              </button>
+            </div>
           </div>
         </div>
       </div>
