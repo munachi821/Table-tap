@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+
 import {
   PicnicTableIcon,
   SquaresFourIcon,
@@ -9,69 +9,22 @@ import {
   WalletIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 const AdminSidebar = () => {
-  const [activeTab, setActiveTab] = useState("Overview");
+  const pathname = usePathname();
+
   const admintabs = [
-    {
-      name: "Overview",
-      icon: (
-        <SquaresFourIcon
-          size={24}
-          weight={activeTab === "Overview" ? "fill" : "regular"}
-        />
-      ),
-      link: "/admin/overview",
-    },
-    {
-      name: "Menu",
-      icon: (
-        <ForkKnifeIcon
-          size={24}
-          weight={activeTab === "Menu" ? "fill" : "regular"}
-        />
-      ),
-      link: "/admin/menu",
-    },
-    {
-      name: "Tables",
-      icon: (
-        <PicnicTableIcon
-          size={24}
-          weight={activeTab === "Tables" ? "duotone" : "regular"}
-        />
-      ),
-      link: "/admin/tables",
-    },
+    { name: "Overview", Icon: SquaresFourIcon, link: "/admin/overview" },
+    { name: "Menu", Icon: ForkKnifeIcon, link: "/admin/menu" },
+    { name: "Tables", Icon: PicnicTableIcon, link: "/admin/tables" },
     {
       name: "History",
-      icon: (
-        <ClockCounterClockwiseIcon
-          size={24}
-          weight={activeTab === "History" ? "fill" : "regular"}
-        />
-      ),
+      Icon: ClockCounterClockwiseIcon,
       link: "/admin/history",
     },
-    {
-      name: "Finance",
-      icon: (
-        <WalletIcon
-          size={24}
-          weight={activeTab === "Finance" ? "fill" : "regular"}
-        />
-      ),
-      link: "/admin/finance",
-    },
-    {
-      name: "Settings",
-      icon: (
-        <GearIcon
-          size={24}
-          weight={activeTab === "Settings" ? "fill" : "regular"}
-        />
-      ),
-      link: "/admin/settings",
-    },
+    { name: "Finance", Icon: WalletIcon, link: "/admin/finance" },
+    { name: "Settings", Icon: GearIcon, link: "/admin/settings" },
   ];
 
   return (
@@ -87,19 +40,30 @@ const AdminSidebar = () => {
 
       <div className="px-4 pb-4">
         <ul className="flex flex-col gap-2">
-          {admintabs.map((tab) => (
-            <Link
-              href={tab.link}
-              className={`flex items-center gap-2 text-lg ${activeTab === tab.name ? "text-[#7C2D12] bg-white" : "text-[#475569]/80 hover:bg-gray-100/30"} p-2 rounded-lg cursor-pointer font-medium transition-all`}
-              key={tab.name}
-              onClick={() => setActiveTab(tab.name)}
-            >
-              {tab.icon} {tab.name}
-            </Link>
-          ))}
+          {admintabs.map((tab) => {
+            // This is the check that makes the "active" style work
+            const isActive = pathname === tab.link;
+
+            return (
+              <li key={tab.name}>
+                <Link
+                  href={tab.link}
+                  className={`flex items-center gap-2 text-lg ${
+                    isActive
+                      ? "text-[#7C2D12] bg-white"
+                      : "text-[#475569]/80 hover:bg-gray-100/30"
+                  } p-2 rounded-lg cursor-pointer font-medium transition-all`}
+                >
+                  <tab.Icon size={24} weight={isActive ? "fill" : "regular"} />
+                  {tab.name}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
   );
 };
+
 export default AdminSidebar;

@@ -6,11 +6,13 @@ import {
   TrashIcon,
   CaretRightIcon,
   CaretLeftIcon,
+  XIcon,
+  UploadIcon,
 } from "@phosphor-icons/react";
 
 const Page = () => {
   return (
-    <div className="p-4 py-6 ">
+    <div className="p-4 py-6 relative">
       <nav className="font-manrope">
         <h2 className="font-bold text-[#0F172A] text-3xl">Menu Inventory</h2>
         <p className="text-lg text-[#64748B]">
@@ -240,6 +242,111 @@ const Page = () => {
             <button className="cursor-pointer text-[#94A3B8] hover:text-[#9D4300] transition-colors">
               <CaretRightIcon size={20} weight="bold" />
             </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="fixed top-0 bottom-0 right-0 left-0 bg-black/50">
+        <div className="bg-[#F7F9FB] max-w-xl w-full h-full float-right">
+          <header className="flex items-center justify-between bg-white p-5">
+            <div>
+              <h3 className="font-bold text-lg text-[#0F172A] font-manrope">
+                Add New Item
+              </h3>
+              <p className="text-[13.5px] font-medium text-[#584237] font-inter">
+                Create a new culinary experience
+              </p>
+            </div>
+
+            <button>
+              <XIcon size={20} weight="bold" />
+            </button>
+          </header>
+
+          <div className="p-5">
+            <form action="" className="space-y-3">
+              <div>
+                <label
+                  htmlFor="menu-image"
+                  className="font-bold text-[#584237] font-manrope uppercase text-sm tracking-wider mb-2 block"
+                >
+                  Item Image
+                </label>
+                <div className="w-full border-dashed border-2 border-[#E8D9D3] bg-[#F2F4F6] rounded-xl p-2 h-45 flex items-center justify-center">
+                  <input
+                    type="file"
+                    id="menu-image"
+                    className="w-full border border-[#CBD5E1] rounded-lg p-2 sr-only"
+                  />
+
+                  <div className="flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-2 h-fit">
+                      <div className="bg-white p-4 rounded-full shadow-sm text-[#9D4300]">
+                        <UploadIcon size={25} weight="bold" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-[#0F172A] font-manrope">
+                          Click to upload or drag & drop
+                        </p>
+                        <p className="text-[13.5px] text-[#64748B] font-inter">
+                          PNG, JPG, GIF up to 1MB
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="item-name"
+                  className="font-bold text-[#584237] font-manrope uppercase text-sm tracking-wider mb-2 block"
+                >
+                  ITEM NAME
+                </label>
+                <input
+                  type="text"
+                  name="item-name"
+                  id="item-name"
+                  placeholder="e.g. Jollof Rice"
+                  className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <div className="w-full">
+                  <label
+                    htmlFor="item-name"
+                    className="font-bold text-[#584237] font-manrope uppercase text-sm tracking-wider mb-2 block"
+                  >
+                    PRICE (₦)
+                  </label>
+                  <input
+                    type="text"
+                    name="item-name"
+                    id="item-name"
+                    placeholder="e.g. Jollof Rice"
+                    className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
+                  />
+                </div>
+
+                <div className="w-full">
+                  <label
+                    htmlFor="item-name"
+                    className="font-bold text-[#584237] font-manrope uppercase text-sm tracking-wider mb-2 block"
+                  >
+                    CATEGORY
+                  </label>
+                  <input
+                    type="text"
+                    name="item-name"
+                    id="item-name"
+                    placeholder="e.g. Jollof Rice"
+                    className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
+                  />
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
