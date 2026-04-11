@@ -9,8 +9,10 @@ import {
   XIcon,
   UploadIcon,
 } from "@phosphor-icons/react";
+import { useState } from "react";
 
 const Page = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="p-4 py-6 relative">
       <nav className="font-manrope">
@@ -30,7 +32,10 @@ const Page = () => {
           />
         </div>
 
-        <button className="rounded-full px-5 h-10 text-[14.5px] font-bold bg-[#A4551F] hover:bg-[#8F4818] transition-colors text-white flex items-center gap-2 font-inter">
+        <button
+          className="rounded-full px-5 h-10 text-[14.5px] font-semibold bg-orange-400 hover:bg-orange-500 transition-colors text-white flex items-center gap-2 font-inter"
+          onClick={() => setIsModalOpen(true)}
+        >
           <PlusIcon size={18} weight="bold" color="#ffffff" />
           Add New Item
         </button>
@@ -73,7 +78,7 @@ const Page = () => {
                 </p>
               </td>
               <td className="py-5 px-6">
-                <div className="inline-flex w-11 h-6 bg-[#A4551F] rounded-full p-0.5 cursor-pointer relative items-center">
+                <div className="inline-flex w-11 h-6 bg-orange-400 rounded-full p-0.5 cursor-pointer relative items-center">
                   <div className="size-5 bg-white rounded-full shadow-sm absolute right-0.5 transition-all"></div>
                 </div>
               </td>
@@ -118,7 +123,7 @@ const Page = () => {
                 </p>
               </td>
               <td className="py-5 px-6">
-                <div className="inline-flex w-11 h-6 bg-[#A4551F] rounded-full p-0.5 cursor-pointer relative items-center">
+                <div className="inline-flex w-11 h-6 bg-orange-400 rounded-full p-0.5 cursor-pointer relative items-center">
                   <div className="size-5 bg-white rounded-full shadow-sm absolute right-0.5 transition-all"></div>
                 </div>
               </td>
@@ -246,8 +251,14 @@ const Page = () => {
         </div>
       </div>
 
-      <div className="fixed top-0 bottom-0 right-0 left-0 bg-black/50">
-        <div className="bg-[#F7F9FB] max-w-xl w-full h-full float-right flex flex-col">
+      <div
+        className={`fixed top-0 bottom-0 right-0 left-0 bg-black/50 backdrop-blur-xs ${isModalOpen ? "block" : "hidden"}`}
+        onClick={() => setIsModalOpen(false)}
+      >
+        <div
+          className="bg-[#F7F9FB] max-w-xl w-full h-full float-right flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
           <header className="flex items-center justify-between bg-white p-5 shrink-0 relative z-10">
             <div>
               <h3 className="font-bold text-lg text-[#0F172A] font-manrope">
@@ -258,7 +269,10 @@ const Page = () => {
               </p>
             </div>
 
-            <button>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="cursor-pointer p-2 rounded-full hover:shadow-xs hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
+            >
               <XIcon size={20} weight="bold" />
             </button>
           </header>
@@ -374,14 +388,14 @@ const Page = () => {
             <div className="flex gap-4">
               <button
                 type="button"
-                className="flex-1 py-3.5 rounded-full border border-[#E8D9D3] text-[#584237] font-bold hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 rounded-full border border-[#E8D9D3] text-[#584237] font-semibold hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 form="add-item-form"
-                className="flex-1 py-3.5 rounded-full bg-linear-to-r from-[#D76000] to-[#E86700] text-white font-bold shadow-[0_8px_16px_rgba(232,103,0,0.2)] hover:opacity-90 transition-opacity"
+                className="flex-1 py-3 rounded-full bg-linear-to-r from-[#D76000] to-[#E86700] text-white font-semibold shadow-[0_8px_16px_rgba(232,103,0,0.2)] hover:opacity-90 transition-opacity"
               >
                 Add Item
               </button>
