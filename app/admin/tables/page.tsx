@@ -1,5 +1,10 @@
 "use client";
-import { DownloadSimpleIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
+import {
+  DownloadSimpleIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 import Image from "next/image";
 import qrCode from "@/public/qr-code/qr-code.png";
 import { useState } from "react";
@@ -9,12 +14,21 @@ const Page = () => {
 
   return (
     <div className="p-4 py-6">
-      <nav className="font-manrope flex items-center justify-between">
-        <div>
-          <h2 className="font-bold text-[#0F172A] text-3xl">Create Qr-codes</h2>
-          <p className="text-lg text-[#64748B]">
-            create and manage qrcodes for your tables
-          </p>
+      <div className="font-manrope">
+        <h2 className="font-bold text-[#0F172A] text-3xl">Create Qr-codes</h2>
+        <p className="text-lg text-[#64748B]">
+          create and manage qrcodes for your tables
+        </p>
+      </div>
+
+      <div className="mt-6 flex items-center justify-between">
+        <div className="bg-white flex items-center pl-4 pr-1 gap-3 w-fit rounded-full border border-[#E2E8F0] shadow-sm overflow-hidden h-11">
+          <MagnifyingGlassIcon size={20} className="text-[#94A3B8]" />
+          <input
+            type="text"
+            placeholder="Search table..."
+            className="w-lg h-full text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] font-inter outline-0"
+          />
         </div>
 
         <button
@@ -23,7 +37,7 @@ const Page = () => {
         >
           <PlusIcon size={18} weight="bold" color="#ffffff" /> Create qr-code
         </button>
-      </nav>
+      </div>
 
       <div className="p-2 mt-4 flex flex-wrap gap-5">
         <div className="bg-white w-fit rounded-xl p-1">
