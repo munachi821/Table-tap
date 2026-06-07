@@ -19,8 +19,8 @@ const page = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-7 mt-5 gap-6">
-        <div className="col-span-2 space-y-2">
+      <div className="grid grid-cols-11 mt-5 gap-6">
+        <div className="col-span-3 space-y-2">
           <div className="py-3.5 px-4.5 bg-[#F8EEE9] text-[#9D4300] font-semibold cursor-pointer flex items-center gap-3 rounded-2xl">
             <HouseIcon size={21} weight="bold" /> <p>Restaurant Profile</p>
           </div>
@@ -34,7 +34,8 @@ const page = () => {
             <CreditCardIcon size={21} weight="bold" /> <p>Billing & Plans</p>
           </div>
         </div>
-        <div className="col-span-5 bg-white rounded-3xl border border-[#E6E8EA]">
+
+        <div className="col-span-8 bg-white rounded-3xl border border-[#E6E8EA]">
           <div className="border-b border-[#D6C9B9] p-5">
             <p className="text-[#1B1D1E] text-2xl font-bold">
               Restaurant Profile
