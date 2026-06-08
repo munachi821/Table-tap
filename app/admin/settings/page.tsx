@@ -79,6 +79,7 @@ const page = () => {
               <p className="border-l-4 border-[#9D4300] font-semibold pl-2.5 font-inter">
                 Restaurant Details
               </p>
+
               <div className="grid grid-cols-2 gap-4 mt-5">
                 <div className="space-y-2">
                   <label
@@ -90,7 +91,7 @@ const page = () => {
                   <input
                     type="text"
                     id="name"
-                    className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#FAFAFA] font-inter font-medium text-base focus:outline-[#9D4300]"
+                    className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
                     placeholder="e.g. The Italian Place"
                   />
                 </div>
@@ -105,11 +106,69 @@ const page = () => {
                   <input
                     type="number"
                     id="number"
-                    className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#FAFAFA] font-inter font-medium text-base focus:outline-[#9D4300]"
+                    className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
                     placeholder="08011223345"
                   />
                 </div>
               </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="support"
+                  className="text-[#584237] text-sm font-semibold mb-2 block"
+                >
+                  SUPPORT EMAIL
+                </label>
+                <input
+                  type="text"
+                  id="support"
+                  className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+                  placeholder="hello@restaurant.com"
+                />
+              </div>
+
+              <div className="mt-5">
+                <label
+                  htmlFor="address"
+                  className="text-[#584237] text-sm font-semibold mb-2 block"
+                >
+                  PHYSICAL ADDRESS
+                </label>
+                <textarea
+                  id="support"
+                  className="w-full h-18 p-4! rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+                  rows={10}
+                  placeholder="12 hero road, apapa lagos street, jigawa"
+                />
+              </div>
+            </div>
+
+            <p className="border-l-4 border-[#9D4300] font-semibold pl-2.5 font-inter mt-6">
+              Legal Information
+            </p>
+
+            <div className="mt-5">
+              <label
+                htmlFor="tax-no"
+                className="text-[#584237] text-sm font-semibold mb-2 block"
+              >
+                Tax Identification Number (TIN) / VAT
+              </label>
+              <input
+                type="text"
+                id="tax-no"
+                className="w-1/2 h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+                placeholder="1122-3348221"
+              />
+            </div>
+
+            <div className="mt-6 border-t border-[#F2F4F6] pt-5 flex justify-end gap-4">
+              <button className="px-4 py-2 rounded-full text-[#9D4300] hover:text-gray-700 hover:bg-[#C6C9CF] text-[14px] font-semibold cursor-pointer">
+                Discard
+              </button>
+              <button className="bg-[#9D4300] px-4 py-2 rounded-full text-white text-[14px] font-semibold cursor-pointer">
+                Save Changes
+              </button>
             </div>
           </form>
         </div>
