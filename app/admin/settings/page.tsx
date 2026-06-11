@@ -7,6 +7,9 @@ import {
   HouseIcon,
   ImageIcon,
   PersonIcon,
+  ReceiptIcon,
+  DownloadSimpleIcon,
+  ArrowRightIcon,
 } from "@phosphor-icons/react";
 import { SealCheckIcon } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
@@ -254,11 +257,97 @@ const Page = () => {
                       </div>
                     </div>
 
-                    <button className="border border-[#974800] hover:bg-[#974800] transition-colors hover:text-white px-3 py-1.5 text-[#974800] cursor-pointer font-semibold rounded-lg">
+                    <button className="border border-[#974800] hover:bg-[#974800] transition-colors hover:text-white px-3 py-1.5 text-[#974800] cursor-pointer font-semibold rounded-lg text-sm">
                       Update Card
                     </button>
                   </div>
                 </div>
+
+                <div className="mt-8">
+                  <div className="flex gap-2 items-center mb-4">
+                    <ReceiptIcon size={24} />
+                    <p className="text-xl text-[#1B1D1E]">Invoice History</p>
+                  </div>
+
+                  <div className="border border-[#E4EAF1] bg-[#F8FAFC] rounded-xl overflow-hidden mt-4">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-[#E4EAF1] text-[#64748B] text-xs font-bold tracking-wider">
+                          <th className="py-4 px-6 uppercase font-inter">
+                            Date
+                          </th>
+                          <th className="py-4 px-6 uppercase font-inter">
+                            Amount
+                          </th>
+                          <th className="py-4 px-6 uppercase font-inter text-center">
+                            Status
+                          </th>
+                          <th className="py-4 px-6 uppercase font-inter text-right">
+                            Invoice
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white">
+                        {[
+                          {
+                            date: "June 8, 2026",
+                            amount: "₦80,000",
+                            status: "PAID",
+                          },
+                          {
+                            date: "May 8, 2026",
+                            amount: "₦80,000",
+                            status: "PAID",
+                          },
+                          {
+                            date: "April 8, 2026",
+                            amount: "₦80,000",
+                            status: "PAID",
+                          },
+                        ].map((invoice, index) => (
+                          <tr
+                            key={index}
+                            className="border-b border-[#E4EAF1] last:border-b-0"
+                          >
+                            <td className="py-4 px-6 font-medium text-[#475569] text-sm">
+                              {invoice.date}
+                            </td>
+                            <td className="py-4 px-6 font-bold text-[#1B1D1E] font-inter text-sm">
+                              {invoice.amount}
+                            </td>
+                            <td className="py-4 px-6 text-center">
+                              <span className="bg-[#E6F4EA] text-[#1E7E34] text-xs font-bold px-2.5 py-1 rounded-full">
+                                {invoice.status}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <button className="flex items-center gap-1.5 ml-auto text-[#9D4300] font-bold text-sm hover:underline cursor-pointer">
+                                <DownloadSimpleIcon size={16} weight="bold" />{" "}
+                                Download PDF
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+
+                    <div className="py-4 flex justify-center bg-white border-t border-[#E4EAF1]">
+                      <button className="flex items-center gap-2 text-[#475569] hover:text-[#0F172A] font-semibold text-sm transition-colors cursor-pointer">
+                        View All History{" "}
+                        <ArrowRightIcon size={16} weight="bold" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#F8FAFC] border-t border-[#E6E8EA] p-5 flex items-center justify-between rounded-b-3xl">
+                <p className="text-[#64748B] text-sm italic font-medium">
+                  All prices exclude local tax unless stated otherwise.
+                </p>
+                <button className="bg-[#0F172A] hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer">
+                  Save Billing Preferences
+                </button>
               </div>
             </div>
           )}
