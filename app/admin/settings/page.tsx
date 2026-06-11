@@ -10,6 +10,13 @@ import {
   ReceiptIcon,
   DownloadSimpleIcon,
   ArrowRightIcon,
+  WalletIcon,
+  ListDashesIcon,
+  FloppyDiskIcon,
+  CopyIcon,
+  EyeIcon,
+  WarningIcon,
+  ShieldCheckIcon,
 } from "@phosphor-icons/react";
 import { SealCheckIcon } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
@@ -348,6 +355,205 @@ const Page = () => {
                 <button className="bg-[#0F172A] hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer">
                   Save Billing Preferences
                 </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "operations" && (
+            <div>
+              <div className="border-b border-[#D6C9B9] p-5">
+                <p className="text-[#1B1D1E] text-2xl font-bold">
+                  Operational Preferences
+                </p>
+                <p className="text-[#584237] text-base font-medium">
+                  Configure your financial rules and kitchen routing logic.
+                </p>
+              </div>
+
+              <div className="p-8">
+                {/* FINANCIAL RULES */}
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <WalletIcon
+                      size={20}
+                      className="text-[#F97316]"
+                      weight="bold"
+                    />
+                    <p className="text-[#64748B] font-bold text-sm tracking-widest uppercase">
+                      Financial Rules
+                    </p>
+                  </div>
+
+                  <div className="space-y-8">
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <p className="text-[#1B1D1E] font-bold text-base mb-1">
+                          Apply Value Added Tax (VAT)
+                        </p>
+                        <p className="text-[#64748B] text-sm">
+                          Automatically append a standard 7.5% tax to all
+                          customer checkouts.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="w-12 h-6 rounded-full flex items-center p-1 transition-colors bg-[#10B981] shrink-0 cursor-pointer"
+                      >
+                        <div className="bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform translate-x-6"></div>
+                      </button>
+                    </div>
+
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <p className="text-[#1B1D1E] font-bold text-base mb-1">
+                          Mandatory Service Charge
+                        </p>
+                        <p className="text-[#64748B] text-sm">
+                          Apply a flat 5% service charge to cover digital
+                          platform and convenience fees.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="w-12 h-6 rounded-full flex items-center p-1 transition-colors bg-[#E2E8F0] shrink-0 cursor-pointer"
+                      >
+                        <div className="bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform translate-x-0"></div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ORDER WORKFLOW */}
+                <div className="mt-12">
+                  <div className="flex items-center gap-2 mb-6">
+                    <ListDashesIcon
+                      size={20}
+                      className="text-[#F97316]"
+                      weight="bold"
+                    />
+                    <p className="text-[#64748B] font-bold text-sm tracking-widest uppercase">
+                      Order Workflow
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <p className="text-[#1B1D1E] font-bold text-base mb-1">
+                          KDS Auto-Sync (Bypass Waiter)
+                        </p>
+                        <p className="text-[#64748B] text-sm">
+                          When a customer pays digitally, instantly send the
+                          ticket to the Kitchen Display System without requiring
+                          manual waiter approval.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="w-12 h-6 rounded-full flex items-center p-1 transition-colors bg-[#10B981] shrink-0 cursor-pointer"
+                      >
+                        <div className="bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform translate-x-6"></div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#F8FAFC] border-t border-[#E6E8EA] p-5 flex items-center justify-end gap-6 rounded-b-3xl">
+                <button className="text-[#64748B] hover:text-[#0F172A] text-sm font-semibold transition-colors cursor-pointer">
+                  Cancel Changes
+                </button>
+                <button className="bg-[#F97316] hover:bg-[#EA580C] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer flex items-center gap-2">
+                  <FloppyDiskIcon size={18} weight="bold" /> Save Preferences
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "terminal" && (
+            <div>
+              <div className="border-b border-[#D6C9B9] p-5">
+                <p className="text-[#1B1D1E] text-2xl font-bold">
+                  Kitchen Display System (KDS) Access
+                </p>
+                <p className="text-[#584237] text-base font-medium mt-1">
+                  Use these credentials to log into your kitchen&apos;s iPad or
+                  tablet. Keep these details secure for back-of-house
+                  operations.
+                </p>
+              </div>
+
+              <div className="p-8">
+                <div className="bg-[#F2F4F6] rounded-2xl p-6">
+                  <div className="space-y-6">
+                    <div>
+                      <label className="text-[#64748B] text-xs font-bold tracking-widest uppercase mb-2 block">
+                        Login Email
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value="kds@nanaskitchen.ng"
+                          readOnly
+                          className="w-full h-12 px-4 pr-12 rounded-xl bg-white text-[#1B1D1E] font-medium text-base focus:outline-none"
+                        />
+                        <button className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9D4300] hover:text-[#724237] transition-colors cursor-pointer">
+                          <CopyIcon size={20} weight="bold" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[#64748B] text-xs font-bold tracking-widest uppercase mb-2 block">
+                        Current Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="password"
+                          value="password123"
+                          readOnly
+                          className="w-full h-12 px-4 pr-24 rounded-xl bg-white text-[#1B1D1E] font-medium text-xl tracking-widest focus:outline-none"
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                          <button className="text-[#64748B] hover:text-[#1B1D1E] transition-colors cursor-pointer">
+                            <EyeIcon size={20} weight="bold" />
+                          </button>
+                          <div className="w-px h-5 bg-[#E6E8EA]"></div>
+                          <button className="text-[#9D4300] hover:text-[#724237] transition-colors cursor-pointer">
+                            <CopyIcon size={20} weight="bold" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 flex flex-col items-center justify-center space-y-4">
+                  <button className="border-2 border-[#1B1D1E] hover:bg-[#F2F4F6] text-[#1B1D1E] px-6 py-3 rounded-lg text-sm font-bold transition-colors cursor-pointer">
+                    Generate New Password
+                  </button>
+                  <div className="flex items-center gap-2 text-[#BA1A1A] text-sm font-semibold">
+                    <WarningIcon size={18} weight="bold" />
+                    <p>
+                      Generating a new password will immediately log out all
+                      active KDS devices.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#F8FAFC] border-t border-[#E6E8EA] p-5 flex items-center justify-between rounded-b-3xl">
+                <div className="flex items-center gap-2 text-[#475569] text-sm font-medium">
+                  <ShieldCheckIcon size={20} />
+                  <p>
+                    End-to-end encrypted management for secure kitchen
+                    operations.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 text-[#64748B] text-xs font-bold tracking-widest uppercase">
+                  <div className="w-2 h-2 rounded-full bg-[#10B981]"></div>
+                  System Active
+                </div>
               </div>
             </div>
           )}
