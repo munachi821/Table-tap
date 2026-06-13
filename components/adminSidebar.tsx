@@ -10,9 +10,21 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
 
 const AdminSidebar = () => {
   const pathname = usePathname();
+  const supabase = createClient();
+  const [restName, setRestName] = useState("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setRestName(user?.user_metadata?.name);
+    };
+    fetchUser();
+  }, []);
 
   const admintabs = [
     { name: "Overview", Icon: SquaresFourIcon, link: "/admin/overview" },
@@ -31,7 +43,7 @@ const AdminSidebar = () => {
     <div className="w-60 h-full shrink-0 bg-[#F8FAFC]">
       <div className="p-6">
         <h2 className="text-2xl w-25 whitespace-wrap text-[#0F172A] font-bold font-manrope leading-8">
-          Nana&apos;s Kitchen
+          {restName}
         </h2>
         <p className="font-semibold text-[#94A3B8] text-sm">
           CEO&apos;S DASHBOARD

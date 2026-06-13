@@ -1,5 +1,6 @@
 "use client";
 import KitchenTable from "@/components/svg/KitchenTable";
+import { createClient } from "@/utils/supabase/client";
 import {
   ArrowUpIcon,
   CalendarDotsIcon,
@@ -7,8 +8,11 @@ import {
   MoneyIcon,
   ReceiptIcon,
 } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
 
 const Overview = () => {
+  const supabase = createClient();
+  const [restName, setRestName] = useState("");
   const fullDate = () => {
     const date = new Date();
     return date.toLocaleString("en-US", {
@@ -17,6 +21,14 @@ const Overview = () => {
       year: "numeric",
     });
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setRestName(user?.user_metadata?.name);
+    };
+    fetchUser();
+  }, []);
   return (
     <div className="py-4 pr-4">
       <header className="sticky top-0">
@@ -26,7 +38,7 @@ const Overview = () => {
               DASHBOARD OVERVIEW
             </p>
             <h2 className="text-2xl text-[#191C1E] font-bold font-manrope">
-              Today at Nana&apos;s Kitchen
+              Today at {restName}
             </h2>
           </div>
 
