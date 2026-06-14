@@ -9,9 +9,22 @@ import {
   XIcon,
   UploadIcon,
 } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
+
+interface MenuItems {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  is_available: boolean;
+  menu_categories: {
+    name: string;
+  };
+  image_url: string;
+  restaurant_id: string;
+}
 
 const Page = () => {
   const supabase = createClient();
@@ -23,6 +36,8 @@ const Page = () => {
   const [foodImage, setFoodImage] = useState<File | null>(null);
   const [foodImagePrev, setFoodImagePrev] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [menuItems, setMenuItems] = useState<MenuItems[]>([]);
+  const [isFetching, setIsFetching] = useState(true);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -120,7 +135,57 @@ const Page = () => {
     setFoodCategory("");
     setFoodImage(null);
     setFoodImagePrev("");
+    fetchMenuItems();
   };
+
+  const fetchMenuItems = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", user?.id)
+      .single();
+
+    const { data: items, error } = await supabase
+      .from("menu_items")
+      .select("*, menu_categories(name)")
+      .eq("restaurant_id", restaurant?.id);
+
+    if (error) {
+      console.error("Error fetching menu items", error);
+      alert("Error fetching menu items");
+      setIsFetching(false);
+      return;
+    }
+
+    setMenuItems(items);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    fetchMenuItems();
+  }, []);
+
+  const handleItemAvailability = async (id: string, is_available: boolean) => {
+    const { data, error } = await supabase
+      .from("menu_items")
+      .update({ is_available: !is_available })
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      console.error("Error updating menu item availability", error);
+      alert("Error updating menu item availability");
+      return;
+    }
+
+    fetchMenuItems();
+  };
+
+  console.log(menuItems);
 
   return (
     <div className="p-4 py-6 relative">
@@ -162,185 +227,70 @@ const Page = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#F1F5F9]">
-            <tr className="hover:bg-[#F8FAFC]/50 transition-colors group">
-              <td className="py-5 px-6">
-                <div className="flex items-center gap-5">
-                  <div className="size-16 rounded-[14px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative"></div>
-                  <div className="flex flex-col gap-0.5">
-                    <h3 className="font-bold text-[17px] text-[#0F172A] font-manrope">
-                      Catfish Pepper Soup
-                    </h3>
-                    <p className="text-[13.5px] text-[#64748B] font-inter">
-                      Spicy authentic Nigerian soup
-                    </p>
+            {menuItems.map((items) => (
+              <tr
+                key={items.id}
+                className="hover:bg-[#F8FAFC]/50 transition-colors group"
+              >
+                <td className="py-5 px-6">
+                  <div className="flex items-center gap-5">
+                    <div className="size-16 rounded-[14px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative">
+                      <Image
+                        src={items.image_url}
+                        alt={items.description}
+                        className="object-cover"
+                        width={100}
+                        height={100}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <h3 className="font-bold text-[17px] text-[#0F172A] font-manrope">
+                        {items.name}
+                      </h3>
+                      <p className="text-[13.5px] text-[#64748B] font-inter">
+                        {items.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <span className="bg-[#F4F7F9] text-[#475569] font-bold px-3 py-1.5 text-[10px] rounded-full uppercase tracking-widest font-inter">
-                  Soups
-                </span>
-              </td>
-              <td className="py-5 px-6">
-                <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
-                  ₦4,500
-                </p>
-              </td>
-              <td className="py-5 px-6">
-                <div className="inline-flex w-11 h-6 bg-orange-400 rounded-full p-0.5 cursor-pointer relative items-center">
-                  <div className="size-5 bg-white rounded-full shadow-sm absolute right-0.5 transition-all"></div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <div className="flex items-center justify-end gap-5 text-[#94A3B8]">
-                  <PencilSimpleIcon
-                    size={20}
-                    className="hover:text-[#64748B] cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                  <TrashIcon
-                    size={20}
-                    className="hover:text-red-500 cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <tr className="hover:bg-[#F8FAFC]/50 transition-colors group">
-              <td className="py-5 px-6">
-                <div className="flex items-center gap-5">
-                  <div className="size-16 rounded-[14px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative"></div>
-                  <div className="flex flex-col gap-0.5">
-                    <h3 className="font-bold text-[17px] text-[#0F172A] font-manrope">
-                      Jollof Rice with Chicken
-                    </h3>
-                    <p className="text-[13.5px] text-[#64748B] font-inter">
-                      Served with fried plantain
-                    </p>
+                </td>
+                <td className="py-5 px-6">
+                  <span className="bg-[#F4F7F9] text-[#475569] font-bold px-3 py-1.5 text-[10px] rounded-full uppercase tracking-widest font-inter">
+                    {items.menu_categories?.name}
+                  </span>
+                </td>
+                <td className="py-5 px-6">
+                  <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
+                    {items.price}
+                  </p>
+                </td>
+                <td className="py-5 px-6">
+                  <button
+                    onClick={() =>
+                      handleItemAvailability(items.id, items.is_available)
+                    }
+                    className={`inline-flex w-11 h-6 ${items.is_available ? "bg-orange-400" : "bg-gray-200"} rounded-full p-0.5 cursor-pointer relative items-center`}
+                  >
+                    <div
+                      className={`size-5 bg-white rounded-full shadow-sm absolute ${items.is_available ? "right-0.5" : "left-0.5"} transition-all`}
+                    ></div>
+                  </button>
+                </td>
+                <td className="py-5 px-6">
+                  <div className="flex items-center justify-end gap-5 text-[#94A3B8]">
+                    <PencilSimpleIcon
+                      size={20}
+                      className="hover:text-[#64748B] cursor-pointer transition-colors"
+                      weight="bold"
+                    />
+                    <TrashIcon
+                      size={20}
+                      className="hover:text-red-500 cursor-pointer transition-colors"
+                      weight="bold"
+                    />
                   </div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <span className="bg-[#F4F7F9] text-[#475569] font-bold px-3 py-1.5 text-[10px] rounded-full uppercase tracking-widest font-inter">
-                  Rice
-                </span>
-              </td>
-              <td className="py-5 px-6">
-                <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
-                  ₦3,500
-                </p>
-              </td>
-              <td className="py-5 px-6">
-                <div className="inline-flex w-11 h-6 bg-orange-400 rounded-full p-0.5 cursor-pointer relative items-center">
-                  <div className="size-5 bg-white rounded-full shadow-sm absolute right-0.5 transition-all"></div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <div className="flex items-center justify-end gap-5 text-[#94A3B8]">
-                  <PencilSimpleIcon
-                    size={20}
-                    className="hover:text-[#64748B] cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                  <TrashIcon
-                    size={20}
-                    className="hover:text-red-500 cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <tr className="hover:bg-[#F8FAFC]/50 transition-colors group">
-              <td className="py-5 px-6">
-                <div className="flex items-center gap-5">
-                  <div className="size-16 rounded-[14px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative"></div>
-                  <div className="flex flex-col gap-0.5">
-                    <h3 className="font-bold text-[17px] text-[#0F172A] font-manrope">
-                      Goat meat pepper soup
-                    </h3>
-                    <p className="text-[13.5px] text-[#64748B] font-inter">
-                      Spicy pepper soup with goat meat
-                    </p>
-                  </div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <span className="bg-[#F4F7F9] text-[#475569] font-bold px-3 py-1.5 text-[10px] rounded-full uppercase tracking-widest font-inter">
-                  soup
-                </span>
-              </td>
-              <td className="py-5 px-6">
-                <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
-                  ₦6,000
-                </p>
-              </td>
-              <td className="py-5 px-6">
-                <div className="inline-flex w-11 h-6 bg-[#CBD5E1] rounded-full p-0.5 cursor-pointer relative items-center border border-[#CBD5E1]">
-                  <div className="size-5 bg-white rounded-full shadow-sm absolute left-0.5 transition-all"></div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <div className="flex items-center justify-end gap-5 text-[#94A3B8]">
-                  <PencilSimpleIcon
-                    size={20}
-                    className="hover:text-[#64748B] cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                  <TrashIcon
-                    size={20}
-                    className="hover:text-red-500 cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            <tr className="hover:bg-[#F8FAFC]/50 transition-colors group">
-              <td className="py-5 px-6">
-                <div className="flex items-center gap-5">
-                  <div className="size-16 rounded-[14px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative"></div>
-                  <div className="flex flex-col gap-0.5">
-                    <h3 className="font-bold text-[17px] text-[#0F172A] font-manrope">
-                      Egusi Soup & Fufu
-                    </h3>
-                    <p className="text-[13.5px] text-[#64748B] font-inter">
-                      Melon seed soup with beef
-                    </p>
-                  </div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <span className="bg-[#F4F7F9] text-[#475569] font-bold px-3 py-1.5 text-[10px] rounded-full uppercase tracking-widest font-inter">
-                  Swallow
-                </span>
-              </td>
-              <td className="py-5 px-6">
-                <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
-                  ₦4,000
-                </p>
-              </td>
-              <td className="py-5 px-6">
-                <div className="inline-flex w-11 h-6 bg-[#CBD5E1] rounded-full p-0.5 cursor-pointer relative items-center border border-[#CBD5E1]">
-                  <div className="size-5 bg-white rounded-full shadow-sm absolute left-0.5 transition-all"></div>
-                </div>
-              </td>
-              <td className="py-5 px-6">
-                <div className="flex items-center justify-end gap-5 text-[#94A3B8]">
-                  <PencilSimpleIcon
-                    size={20}
-                    className="hover:text-[#64748B] cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                  <TrashIcon
-                    size={20}
-                    className="hover:text-red-500 cursor-pointer transition-colors"
-                    weight="bold"
-                  />
-                </div>
-              </td>
-            </tr>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className="flex items-center justify-between border-t border-gray-200 py-5 px-4">
