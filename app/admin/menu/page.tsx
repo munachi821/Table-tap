@@ -38,6 +38,8 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItems[]>([]);
   const [isFetching, setIsFetching] = useState(true);
+  const [editMode, setEditMode] = useState<string | null>(null);
+  const [searchValue, setSearchValue] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,23 +110,56 @@ const Page = () => {
       category = newCategory;
     }
 
-    const { data: item, error } = await supabase
-      .from("menu_items")
-      .insert({
-        name: foodName,
-        description: foodDescription,
-        price: foodPrice,
-        category_id: category?.id,
-        image_url: finalImagePath,
-        restaurant_id: restaurant?.id,
-      })
-      .select();
+    if (editMode) {
+      const originalItem = menuItems.find((item) => item.id === editMode);
+      const hasChanges =
+        foodName !== originalItem?.name ||
+        foodDescription !== originalItem?.description ||
+        foodPrice !== originalItem?.price ||
+        foodCategory !== originalItem?.menu_categories?.name ||
+        foodImage !== null;
 
-    if (error) {
-      console.error("Error creating menu item", error);
-      alert("Error creating menu item");
-      setIsLoading(false);
-      return;
+      if (!hasChanges) {
+        setIsLoading(false);
+        handleCancel();
+        return;
+      }
+      const { error } = await supabase
+        .from("menu_items")
+        .update({
+          name: foodName,
+          description: foodDescription,
+          price: foodPrice,
+          category_id: category?.id,
+          image_url: finalImagePath ? finalImagePath : foodImagePrev,
+        })
+        .eq("id", editMode);
+
+      if (error) {
+        console.error("Error updating menu item", error);
+        alert("Error updating menu item");
+        setIsLoading(false);
+        return;
+      }
+    } else {
+      const { error } = await supabase
+        .from("menu_items")
+        .insert({
+          name: foodName,
+          description: foodDescription,
+          price: foodPrice,
+          category_id: category?.id,
+          image_url: finalImagePath,
+          restaurant_id: restaurant?.id,
+        })
+        .select();
+
+      if (error) {
+        console.error("Error creating menu item", error);
+        alert("Error creating menu item");
+        setIsLoading(false);
+        return;
+      }
     }
 
     setIsLoading(false);
@@ -135,6 +170,7 @@ const Page = () => {
     setFoodCategory("");
     setFoodImage(null);
     setFoodImagePrev("");
+    setEditMode(null);
     fetchMenuItems();
   };
 
@@ -185,7 +221,26 @@ const Page = () => {
     fetchMenuItems();
   };
 
-  console.log(menuItems);
+  const handleCancel = () => {
+    setFoodName("");
+    setFoodDescription("");
+    setFoodPrice("");
+    setFoodCategory("");
+    setFoodImage(null);
+    setFoodImagePrev("");
+    setEditMode(null);
+    setIsModalOpen(false);
+  };
+
+  const handleEditItem = async (item: MenuItems) => {
+    setFoodName(item.name);
+    setFoodDescription(item.description);
+    setFoodPrice(item.price);
+    setFoodCategory(item.menu_categories?.name);
+    setFoodImagePrev(item.image_url);
+    setEditMode(item.id);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="p-4 py-6 relative">
@@ -202,6 +257,8 @@ const Page = () => {
           <input
             type="text"
             placeholder="Search menu items..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             className="w-lg h-full text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] font-inter outline-0"
           />
         </div>
@@ -227,70 +284,97 @@ const Page = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#F1F5F9]">
-            {menuItems.map((items) => (
-              <tr
-                key={items.id}
-                className="hover:bg-[#F8FAFC]/50 transition-colors group"
-              >
-                <td className="py-5 px-6">
-                  <div className="flex items-center gap-5">
-                    <div className="size-16 rounded-[14px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative">
-                      <Image
-                        src={items.image_url}
-                        alt={items.description}
-                        className="object-cover"
-                        width={100}
-                        height={100}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <h3 className="font-bold text-[17px] text-[#0F172A] font-manrope">
-                        {items.name}
-                      </h3>
-                      <p className="text-[13.5px] text-[#64748B] font-inter">
-                        {items.description}
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td className="py-5 px-6">
-                  <span className="bg-[#F4F7F9] text-[#475569] font-bold px-3 py-1.5 text-[10px] rounded-full uppercase tracking-widest font-inter">
-                    {items.menu_categories?.name}
-                  </span>
-                </td>
-                <td className="py-5 px-6">
-                  <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
-                    {items.price}
-                  </p>
-                </td>
-                <td className="py-5 px-6">
-                  <button
-                    onClick={() =>
-                      handleItemAvailability(items.id, items.is_available)
-                    }
-                    className={`inline-flex w-11 h-6 ${items.is_available ? "bg-orange-400" : "bg-gray-200"} rounded-full p-0.5 cursor-pointer relative items-center`}
-                  >
-                    <div
-                      className={`size-5 bg-white rounded-full shadow-sm absolute ${items.is_available ? "right-0.5" : "left-0.5"} transition-all`}
-                    ></div>
-                  </button>
-                </td>
-                <td className="py-5 px-6">
-                  <div className="flex items-center justify-end gap-5 text-[#94A3B8]">
-                    <PencilSimpleIcon
-                      size={20}
-                      className="hover:text-[#64748B] cursor-pointer transition-colors"
-                      weight="bold"
-                    />
-                    <TrashIcon
-                      size={20}
-                      className="hover:text-red-500 cursor-pointer transition-colors"
-                      weight="bold"
-                    />
+            {isFetching ? (
+              <tr>
+                <td colSpan={5} className="py-20 text-center">
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <div className="w-8 h-8 border-4 border-[#E2E8F0] border-t-orange-400 rounded-full animate-spin"></div>
+                    <p className="text-[#64748B] font-inter text-sm font-medium">
+                      Loading menu items...
+                    </p>
                   </div>
                 </td>
               </tr>
-            ))}
+            ) : menuItems.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-20 text-center">
+                  <p className="text-[#64748B] font-inter text-sm">
+                    No menu items found. Click &quot;Add New Item&quot; to get
+                    started!
+                  </p>
+                </td>
+              </tr>
+            ) : (
+              menuItems
+                .filter((item) =>
+                  item.name.toLowerCase().includes(searchValue.toLowerCase()),
+                )
+                .map((items) => (
+                  <tr
+                    key={items.id}
+                    className="hover:bg-[#F8FAFC]/50 transition-colors group"
+                  >
+                    <td className="py-5 px-6">
+                      <div className="flex items-center gap-5">
+                        <div className="size-16 rounded-[14px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm relative">
+                          <Image
+                            src={items.image_url}
+                            alt={items.description || "Food preview"}
+                            className="object-cover"
+                            width={100}
+                            height={100}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <h3 className="font-bold text-[17px] text-[#0F172A] font-manrope">
+                            {items.name}
+                          </h3>
+                          <p className="text-[13.5px] text-[#64748B] font-inter">
+                            {items.description}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-5 px-6">
+                      <span className="bg-[#F4F7F9] text-[#475569] font-bold px-3 py-1.5 text-[10px] rounded-full uppercase tracking-widest font-inter">
+                        {items.menu_categories?.name}
+                      </span>
+                    </td>
+                    <td className="py-5 px-6">
+                      <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
+                        {items.price}
+                      </p>
+                    </td>
+                    <td className="py-5 px-6">
+                      <button
+                        onClick={() =>
+                          handleItemAvailability(items.id, items.is_available)
+                        }
+                        className={`inline-flex w-11 h-6 ${items.is_available ? "bg-orange-400" : "bg-gray-200"} rounded-full p-0.5 cursor-pointer relative items-center`}
+                      >
+                        <div
+                          className={`size-5 bg-white rounded-full shadow-sm absolute ${items.is_available ? "right-0.5" : "left-0.5"} transition-all`}
+                        ></div>
+                      </button>
+                    </td>
+                    <td className="py-5 px-6">
+                      <div className="flex items-center justify-end gap-5 text-[#94A3B8]">
+                        <PencilSimpleIcon
+                          size={20}
+                          className="hover:text-[#64748B] cursor-pointer transition-colors"
+                          weight="bold"
+                          onClick={() => handleEditItem(items)}
+                        />
+                        <TrashIcon
+                          size={20}
+                          className="hover:text-red-500 cursor-pointer transition-colors"
+                          weight="bold"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+            )}
           </tbody>
         </table>
         <div className="flex items-center justify-between border-t border-gray-200 py-5 px-4">
@@ -321,10 +405,12 @@ const Page = () => {
           <header className="flex items-center justify-between bg-white p-5 shrink-0 relative z-10">
             <div>
               <h3 className="font-bold text-lg text-[#0F172A] font-manrope">
-                Add New Item
+                {editMode ? "Edit Menu Item" : "Add New Item"}
               </h3>
               <p className="text-[13.5px] font-medium text-[#584237] font-inter">
-                Create a new culinary experience
+                {editMode
+                  ? "Update your menu item"
+                  : "Create a new culinary experience"}
               </p>
             </div>
 
@@ -353,14 +439,24 @@ const Page = () => {
                   htmlFor="menu-image"
                   className="w-full border-dashed border-2 border-[#E8D9D3] bg-[#F2F4F6] rounded-xl p-2 h-45 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors overflow-hidden"
                 >
-                  <input
-                    type="file"
-                    id="menu-image"
-                    accept="image/png, image/jpeg, image/gif"
-                    onChange={handleFileChange}
-                    required
-                    className="sr-only"
-                  />
+                  {editMode ? (
+                    <input
+                      type="file"
+                      id="menu-image"
+                      accept="image/png, image/jpeg, image/gif"
+                      onChange={handleFileChange}
+                      className="sr-only"
+                    />
+                  ) : (
+                    <input
+                      type="file"
+                      id="menu-image"
+                      accept="image/png, image/jpeg, image/gif"
+                      onChange={handleFileChange}
+                      required
+                      className="sr-only"
+                    />
+                  )}
 
                   {foodImagePrev ? (
                     <Image
@@ -477,6 +573,7 @@ const Page = () => {
                   rows={5}
                   value={foodDescription}
                   onChange={(e) => setFoodDescription(e.target.value)}
+                  required
                   placeholder="Briefly describe the food"
                   className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
                 ></textarea>
@@ -488,7 +585,8 @@ const Page = () => {
             <div className="flex gap-4">
               <button
                 type="button"
-                className="flex-1 py-3 rounded-full border border-[#E8D9D3] text-[#584237] font-semibold hover:bg-gray-50 transition-colors"
+                onClick={handleCancel}
+                className="flex-1 py-3 rounded-full border border-[#E8D9D3] text-[#584237] font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -496,9 +594,13 @@ const Page = () => {
                 type="submit"
                 form="add-item-form"
                 disabled={isLoading}
-                className="flex-1 py-3 rounded-full bg-linear-to-r from-[#D76000] to-[#E86700] text-white font-semibold shadow-[0_8px_16px_rgba(232,103,0,0.2)] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3 rounded-full bg-linear-to-r from-[#D76000] to-[#E86700] text-white font-semibold shadow-[0_8px_16px_rgba(232,103,0,0.2)] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {!isLoading ? "Add Item" : "Adding..."}
+                {isLoading
+                  ? "Adding..."
+                  : editMode
+                    ? "Update Item"
+                    : "Add Item"}
               </button>
             </div>
           </div>
