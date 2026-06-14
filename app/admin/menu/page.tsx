@@ -52,7 +52,7 @@ const Page = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitOrEdit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -141,6 +141,7 @@ const Page = () => {
         setIsLoading(false);
         return;
       }
+      alert("item updated successfully");
     } else {
       const { error } = await supabase
         .from("menu_items")
@@ -240,6 +241,19 @@ const Page = () => {
     setFoodImagePrev(item.image_url);
     setEditMode(item.id);
     setIsModalOpen(true);
+  };
+
+  const handleDeleteItem = async (id: string) => {
+    const { error } = await supabase.from("menu_items").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting menu item", error);
+      alert("Error deleting menu item");
+      return;
+    }
+    alert("item deleted sucessfully");
+
+    fetchMenuItems();
   };
 
   return (
@@ -342,7 +356,7 @@ const Page = () => {
                     </td>
                     <td className="py-5 px-6">
                       <p className="font-bold text-[16px] text-[#0F172A] font-manrope">
-                        {items.price}
+                        ₦{items.price}
                       </p>
                     </td>
                     <td className="py-5 px-6">
@@ -369,6 +383,7 @@ const Page = () => {
                           size={20}
                           className="hover:text-red-500 cursor-pointer transition-colors"
                           weight="bold"
+                          onClick={() => handleDeleteItem(items.id)}
                         />
                       </div>
                     </td>
@@ -377,21 +392,6 @@ const Page = () => {
             )}
           </tbody>
         </table>
-        <div className="flex items-center justify-between border-t border-gray-200 py-5 px-4">
-          <div>
-            <p className="text-[14px] text-[#64748B] font-inter">
-              Showing 4 to 25 of menu items
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="cursor-pointer text-[#94A3B8] hover:text-[#9D4300] transition-colors">
-              <CaretLeftIcon size={20} weight="bold" />
-            </button>
-            <button className="cursor-pointer text-[#94A3B8] hover:text-[#9D4300] transition-colors">
-              <CaretRightIcon size={20} weight="bold" />
-            </button>
-          </div>
-        </div>
       </div>
 
       <div
@@ -425,7 +425,7 @@ const Page = () => {
           <div className="p-5 overflow-auto flex-1">
             <form
               id="add-item-form"
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmitOrEdit}
               className="space-y-4"
             >
               <div>
