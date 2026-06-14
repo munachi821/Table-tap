@@ -10,9 +10,118 @@ import {
   UploadIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import Image from "next/image";
 
 const Page = () => {
+  const supabase = createClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [foodName, setFoodName] = useState("");
+  const [foodDescription, setFoodDescription] = useState("");
+  const [foodPrice, setFoodPrice] = useState("");
+  const [foodCategory, setFoodCategory] = useState("");
+  const [foodImage, setFoodImage] = useState<File | null>(null);
+  const [foodImagePrev, setFoodImagePrev] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.size <= 1024 * 1024) {
+      setFoodImage(file);
+      const prevUrl = URL.createObjectURL(file);
+      setFoodImagePrev(prevUrl);
+    } else if (file) {
+      alert("File size must be less than 1MB");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", user?.id)
+      .single();
+
+    let finalImagePath = "";
+
+    if (foodImage) {
+      const fileExt = foodImage?.name.split(".").pop();
+      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+      const filePath = `menu-items/${fileName}`;
+
+      const { data: image, error } = await supabase.storage
+        .from("items")
+        .upload(filePath, foodImage);
+
+      if (error) {
+        console.error("error uploading image", error);
+        alert("Error uploading image");
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: url } = supabase.storage
+        .from("items")
+        .getPublicUrl(filePath);
+      finalImagePath = url.publicUrl;
+    }
+
+    let { data: category } = await supabase
+      .from("menu_categories")
+      .select("id")
+      .eq("restaurant_id", restaurant?.id)
+      .ilike("name", foodCategory)
+      .maybeSingle();
+
+    if (!category) {
+      const { data: newCategory } = await supabase
+        .from("menu_categories")
+        .insert({
+          name: foodCategory,
+          restaurant_id: restaurant?.id,
+        })
+        .select("id")
+        .single();
+
+      category = newCategory;
+    }
+
+    const { data: item, error } = await supabase
+      .from("menu_items")
+      .insert({
+        name: foodName,
+        description: foodDescription,
+        price: foodPrice,
+        category_id: category?.id,
+        image_url: finalImagePath,
+        restaurant_id: restaurant?.id,
+      })
+      .select();
+
+    if (error) {
+      console.error("Error creating menu item", error);
+      alert("Error creating menu item");
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(false);
+    setIsModalOpen(false);
+    setFoodName("");
+    setFoodDescription("");
+    setFoodPrice("");
+    setFoodCategory("");
+    setFoodImage(null);
+    setFoodImagePrev("");
+  };
+
   return (
     <div className="p-4 py-6 relative">
       <nav className="font-manrope">
@@ -278,7 +387,11 @@ const Page = () => {
           </header>
 
           <div className="p-5 overflow-auto flex-1">
-            <form id="add-item-form" action="" className="space-y-4">
+            <form
+              id="add-item-form"
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
               <div>
                 <label
                   htmlFor="menu-image"
@@ -286,29 +399,45 @@ const Page = () => {
                 >
                   Item Image
                 </label>
-                <div className="w-full border-dashed border-2 border-[#E8D9D3] bg-[#F2F4F6] rounded-xl p-2 h-45 flex items-center justify-center">
+                <label
+                  htmlFor="menu-image"
+                  className="w-full border-dashed border-2 border-[#E8D9D3] bg-[#F2F4F6] rounded-xl p-2 h-45 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors overflow-hidden"
+                >
                   <input
                     type="file"
                     id="menu-image"
-                    className="w-full border border-[#CBD5E1] rounded-lg p-2 sr-only"
+                    accept="image/png, image/jpeg, image/gif"
+                    onChange={handleFileChange}
+                    required
+                    className="sr-only"
                   />
 
-                  <div className="flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-2 h-fit">
-                      <div className="bg-white p-4 rounded-full shadow-sm text-[#9D4300]">
-                        <UploadIcon size={25} weight="bold" />
-                      </div>
-                      <div className="text-center">
-                        <p className="font-bold text-[#0F172A] font-manrope">
-                          Click to upload or drag & drop
-                        </p>
-                        <p className="text-[13.5px] text-[#64748B] font-inter">
-                          PNG, JPG, GIF up to 1MB
-                        </p>
+                  {foodImagePrev ? (
+                    <Image
+                      src={foodImagePrev}
+                      alt="Food preview"
+                      className="w-full h-full object-cover rounded-lg"
+                      width={200}
+                      height={200}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <div className="flex flex-col items-center gap-2 h-fit">
+                        <div className="bg-white p-4 rounded-full shadow-sm text-[#9D4300]">
+                          <UploadIcon size={25} weight="bold" />
+                        </div>
+                        <div className="text-center">
+                          <p className="font-bold text-[#0F172A] font-manrope">
+                            Click to upload or drag & drop
+                          </p>
+                          <p className="text-[13.5px] text-[#64748B] font-inter">
+                            PNG, JPG, GIF up to 1MB
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  )}
+                </label>
               </div>
 
               <div>
@@ -322,6 +451,9 @@ const Page = () => {
                   type="text"
                   name="item-name"
                   id="item-name"
+                  required
+                  value={foodName}
+                  onChange={(e) => setFoodName(e.target.value)}
                   placeholder="e.g. Jollof Rice"
                   className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
                 />
@@ -339,7 +471,10 @@ const Page = () => {
                     type="number"
                     name="item-price"
                     id="item-price"
-                    placeholder="e.g. Jollof Rice"
+                    required
+                    value={foodPrice}
+                    onChange={(e) => setFoodPrice(e.target.value)}
+                    placeholder="e.g. 3500"
                     className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-3 pl-7 font-semibold"
                   />
                   <span className="absolute left-3 top-10.5 font-manrope font-bold text-[#A9A4A0]">
@@ -354,13 +489,26 @@ const Page = () => {
                   >
                     CATEGORY
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="item-category"
                     id="item-category"
-                    placeholder="e.g. Jollof Rice"
-                    className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
-                  />
+                    value={foodCategory}
+                    required
+                    onChange={(e) => setFoodCategory(e.target.value)}
+                    className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-3 pl-4 font-semibold capitalize appearance-none"
+                  >
+                    <option value="" disabled>
+                      Select a category
+                    </option>
+                    <option value="rice">Rice</option>
+                    <option value="swallow">Swallow</option>
+                    <option value="beverage">Beverage</option>
+                    <option value="snacks">Snacks</option>
+                    <option value="dessert">Dessert</option>
+                    <option value="mocktails">Mocktails</option>
+                    <option value="cocktails">Cocktails</option>
+                    <option value="continental">Continental</option>
+                  </select>
                 </div>
               </div>
 
@@ -377,6 +525,8 @@ const Page = () => {
                   id="item-description"
                   cols={5}
                   rows={5}
+                  value={foodDescription}
+                  onChange={(e) => setFoodDescription(e.target.value)}
                   placeholder="Briefly describe the food"
                   className="w-full border-2 border-[#F6ECE7] outline-none bg-white rounded-xl p-2.5 pl-4 font-semibold"
                 ></textarea>
@@ -395,9 +545,10 @@ const Page = () => {
               <button
                 type="submit"
                 form="add-item-form"
-                className="flex-1 py-3 rounded-full bg-linear-to-r from-[#D76000] to-[#E86700] text-white font-semibold shadow-[0_8px_16px_rgba(232,103,0,0.2)] hover:opacity-90 transition-opacity"
+                disabled={isLoading}
+                className="flex-1 py-3 rounded-full bg-linear-to-r from-[#D76000] to-[#E86700] text-white font-semibold shadow-[0_8px_16px_rgba(232,103,0,0.2)] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add Item
+                {!isLoading ? "Add Item" : "Adding..."}
               </button>
             </div>
           </div>

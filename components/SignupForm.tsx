@@ -18,6 +18,7 @@ export default function SignupForm() {
   const [resLogo, setResLogo] = useState<File | null>(null);
   const [resLogoPrev, setResLogoPrev] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [logoUrl, setLogoUrl] = useState<string>("");
 
   const paystackConfig = {
     reference: new Date().getTime().toString(),
@@ -41,6 +42,7 @@ export default function SignupForm() {
 
   const handleSignup = async () => {
     setIsLoading(true);
+    let finalLogoUrl = "";
 
     // 1. Sign up the user first
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
@@ -80,9 +82,11 @@ export default function SignupForm() {
         .from("logos")
         .getPublicUrl(filePath);
 
+      finalLogoUrl = publicUrlData.publicUrl;
+      setLogoUrl(finalLogoUrl);
       // 4. Update the user metadata with the logo URL
       await supabase.auth.updateUser({
-        data: { logo_url: publicUrlData.publicUrl },
+        data: { logo_url: finalLogoUrl },
       });
     }
 
@@ -90,14 +94,40 @@ export default function SignupForm() {
     alert("Account created successfully! Proceeding to payment...");
 
     const onSuccess = async (response: any) => {
+      const today = new Date();
+      const thirtyDaysFromNow = new Date(today.setDate(today.getDate() + 30));
       // Payment was successful! Update user metadata
       await supabase.auth.updateUser({
         data: {
           has_active_subscription: true,
           paystack_reference: response.reference,
+          subscription_expires_at: thirtyDaysFromNow.toISOString(),
         },
       });
       alert("Payment successful! Welcome to your dashboard.");
+
+      const generatedSlug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-") // Replaces spaces and special chars with hyphens
+        .replace(/(^-|-$)+/g, ""); // Removes trailing hyphens
+
+      const { error: dbError } = await supabase
+        .from("restaurants")
+        .insert([
+          {
+            owner_id: signUpData?.user?.id,
+            name: name,
+            status: "ACTIVE",
+            slug: generatedSlug,
+            logo_url: finalLogoUrl,
+          },
+        ])
+        .select();
+
+      if (dbError) {
+        return alert("Error creating restaurant: " + dbError.message);
+      }
+
       router.push("/admin/overview");
     };
 

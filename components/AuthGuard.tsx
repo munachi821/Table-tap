@@ -33,6 +33,29 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      const metadata = session.user.user_metadata;
+      const hasFlag = metadata?.has_active_subscription;
+      const expiresAt = metadata?.subscription_expires_at;
+
+      const expiryDate = expiresAt ? new Date(expiresAt) : null;
+      const today = new Date();
+
+      if (hasFlag && expiryDate && today < expiryDate) {
+        // Subscription is valid, do nothing and let it reach setIsLoading(false)
+      } else {
+        alert(
+          "Your subscription has expired. Please renew your subscription to continue using our services.",
+        );
+        await supabase.auth.updateUser({
+          data: {
+            has_active_subscription: false,
+          },
+        });
+        await supabase.auth.signOut();
+        router.push("/login");
+        return;
+      }
+
       // 3. User is logged in AND has paid, let them through!
       setIsLoading(false);
     };

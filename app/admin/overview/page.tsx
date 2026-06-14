@@ -24,8 +24,8 @@ const Overview = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setRestName(user?.user_metadata?.name);
+      const { data: user } = await supabase.auth.getUser();
+      setRestName(user.user?.user_metadata?.name);
     };
     fetchUser();
   }, []);

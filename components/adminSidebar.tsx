@@ -7,24 +7,26 @@ import {
   ClockCounterClockwiseIcon,
   GearIcon,
   WalletIcon,
+  SignOutIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 
 const AdminSidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const supabase = createClient();
   const [restName, setRestName] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setRestName(user?.user_metadata?.name);
+      const { data: user } = await supabase.auth.getUser();
+      setRestName(user?.user?.user_metadata.name);
     };
     fetchUser();
-  }, []);
+  });
 
   const admintabs = [
     { name: "Overview", Icon: SquaresFourIcon, link: "/admin/overview" },
@@ -39,6 +41,11 @@ const AdminSidebar = () => {
     { name: "Settings", Icon: GearIcon, link: "/admin/settings" },
   ];
 
+  const logout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <div className="w-60 h-full shrink-0 bg-[#F8FAFC]">
       <div className="p-6">
@@ -50,7 +57,7 @@ const AdminSidebar = () => {
         </p>
       </div>
 
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 flex justify-between flex-col h-[calc(100vh-120px)]">
         <ul className="flex flex-col gap-2">
           {admintabs.map((tab) => {
             // This is the check that makes the "active" style work
@@ -73,6 +80,14 @@ const AdminSidebar = () => {
             );
           })}
         </ul>
+
+        <div
+          className="flex items-center gap-2 text-lg text-red-500 hover:bg-red-50 p-2 rounded-lg cursor-pointer font-medium transition-all"
+          onClick={logout}
+        >
+          <SignOutIcon size={24} />
+          Logout
+        </div>
       </div>
     </div>
   );
