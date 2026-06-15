@@ -227,7 +227,7 @@ export default function SignupForm() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             required
-            placeholder="e.g., 123 Main St, New York, NY"
+            placeholder="e.g., 123 Main St, Apapa, Lagos"
             className="w-full h-11 px-4 border border-[#E2E8F0] rounded-md focus:outline-none focus:border-[#CBD5E1] text-[#1B1D1E] text-sm font-medium placeholder:font-normal placeholder:text-[#94A3B8]"
           />
         </div>
