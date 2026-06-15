@@ -85,7 +85,6 @@ const OrderComponent = () => {
         console.error("Error fetching menu items", menuItemsError);
         return;
       }
-      console.log(menuItemsData);
       setCurrentTable(tableData);
       setMenuItems(menuItemsData);
     };
@@ -93,24 +92,24 @@ const OrderComponent = () => {
     fetchData();
   }, []);
 
-  console.log(currentTable);
-  const categories = [
-    "all",
-    "available",
-    "rice",
-    "swallow",
-    "beverage",
-    "snacks",
-    "dessert",
-    "mocktails",
-    "cocktails",
-    "continental",
-  ];
+  console.log(menuItems);
+  const uniqueCategories = Array.from(
+    new Set(
+      menuItems
+        .map((item) => item.menu_categories?.name?.toLowerCase())
+        .filter(Boolean),
+    ),
+  ) as string[];
+
+  const categories = ["all", "available", ...uniqueCategories];
 
   const categoryTags = (activeCategory: string) => {
     if (activeCategory === "all") return menuItems;
-    return menuItems.filter((items) =>
-      items.menu_categories?.name?.toLowerCase().includes(activeCategory),
+    if (activeCategory === "available")
+      return menuItems.filter((item) => item.is_available);
+
+    return menuItems.filter(
+      (item) => item.menu_categories?.name?.toLowerCase() === activeCategory,
     );
   };
 
@@ -133,7 +132,7 @@ const OrderComponent = () => {
   };
 
   const addToCart = (item: foodItem, quantity: number = 1) => {
-    const unitPrice = parseInt(item.price.replace(",", ""));
+    const unitPrice = parseInt(item.price);
 
     setCart((prev) => {
       const existingItemIndex = prev.findIndex((c) => c.name === item.name);
@@ -204,7 +203,9 @@ const OrderComponent = () => {
                 </p>
                 <p className="text-sm sm:text-base font-medium flex items-center gap-1 text-gray-600">
                   <MapPinIcon size={15} className="shrink-0" />{" "}
-                  <span className="truncate max-w-[120px] sm:max-w-none">{currentTable?.restaurants?.address || "Loading..."}</span>
+                  <span className="truncate max-w-30 sm:max-w-none">
+                    {currentTable?.restaurants?.address || "Loading..."}
+                  </span>
                 </p>
               </div>
             </div>
@@ -280,7 +281,7 @@ const OrderComponent = () => {
       </div>
 
       {search.length > 0 ? (
-        <div className="px-10">
+        <div className="px-4 md:px-10 mt-5">
           <p className="text-2xl mb-4">
             Results for{" "}
             <span className="text-orange-400">&quot;{search}&quot;</span>
@@ -294,10 +295,25 @@ const OrderComponent = () => {
                 <Item key={i} item={item} handleItemClick={handleItemClick} />
               ))}
           </div>
-          {/* No Results Message */}
           {menuItems.filter((item) =>
             item.name.toLowerCase().includes(search.toLowerCase()),
           ).length === 0 && <p className="text-gray-500">No food found.</p>}
+        </div>
+      ) : activeCategory !== "all" ? (
+        <div className="px-4 md:px-10 mt-5">
+          <p className="text-2xl mb-4 capitalize">{activeCategory}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {categoryTags(activeCategory).map((item) => (
+              <Item
+                key={item.id}
+                item={item}
+                handleItemClick={handleItemClick}
+              />
+            ))}
+          </div>
+          {categoryTags(activeCategory).length === 0 && (
+            <p className="text-gray-500">No items found in this category.</p>
+          )}
         </div>
       ) : (
         /* Menu Items */
@@ -383,11 +399,11 @@ const OrderComponent = () => {
       )}
 
       <div
-        className={`fixed ${cartOpen ? "top-0 right-0 left-0 bottom-0" : "right-0 bottom-0"}`}
+        className={`fixed ${cartOpen ? "top-0 right-0 left-0 bottom-0" : "right-0 bottom-0"} z-50`}
         onClick={() => setCartOpen(false)}
       >
         <div
-          className="fixed bottom-0 right-0 m-4 z-20 flex items-end flex-col gap-3"
+          className="fixed bottom-0 right-0 m-4 flex items-end flex-col gap-3"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Cart */}
