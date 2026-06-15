@@ -13,6 +13,7 @@ export default function SignupForm() {
   const router = useRouter();
 
   const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [resLogo, setResLogo] = useState<File | null>(null);
@@ -117,6 +118,7 @@ export default function SignupForm() {
           {
             owner_id: signUpData?.user?.id,
             name: name,
+            address: address,
             status: "ACTIVE",
             slug: generatedSlug,
             logo_url: finalLogoUrl,
@@ -141,6 +143,7 @@ export default function SignupForm() {
     initializePayment({ onSuccess, onClose });
 
     setName("");
+    setAddress("");
     setEmail("");
     setPassword("");
     setResLogo(null);
@@ -211,6 +214,20 @@ export default function SignupForm() {
             onChange={(e) => setName(e.target.value)}
             required
             placeholder="e.g., Nana's Kitchen"
+            className="w-full h-11 px-4 border border-[#E2E8F0] rounded-md focus:outline-none focus:border-[#CBD5E1] text-[#1B1D1E] text-sm font-medium placeholder:font-normal placeholder:text-[#94A3B8]"
+          />
+        </div>
+
+        <div>
+          <label className="text-[#64748B] text-[11px] font-semibold tracking-widest uppercase block mb-3">
+            Restaurant Address
+          </label>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            required
+            placeholder="e.g., 123 Main St, New York, NY"
             className="w-full h-11 px-4 border border-[#E2E8F0] rounded-md focus:outline-none focus:border-[#CBD5E1] text-[#1B1D1E] text-sm font-medium placeholder:font-normal placeholder:text-[#94A3B8]"
           />
         </div>

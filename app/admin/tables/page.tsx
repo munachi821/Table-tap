@@ -7,10 +7,67 @@ import {
 } from "@phosphor-icons/react";
 import Image from "next/image";
 import qrCode from "@/public/qr-code/qr-code.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import QRCode from "react-qr-code";
 
+interface Table {
+  table_name: string;
+  id: string;
+}
 const Page = () => {
+  const supabase = createClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tableName, setTableName] = useState("");
+  const [tables, setTables] = useState<Table[]>([]);
+
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { data } = await supabase.auth.getUser();
+
+    const { data: restaurant, error: gettingRestErr } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", data?.user?.id)
+      .single();
+    if (gettingRestErr) {
+      console.error("Error getting restaurant", gettingRestErr);
+      return;
+    }
+
+    const { error: tablesErr } = await supabase
+      .from("tables")
+      .insert({
+        restaurant_id: restaurant?.id,
+        table_name: tableName,
+      })
+      .select();
+
+    if (tablesErr) {
+      console.error("Error creating table", tablesErr);
+      return;
+    }
+    setTableName("");
+    setIsModalOpen(false);
+    fetchTables();
+  };
+
+  const fetchTables = async () => {
+    const { data: tables, error: tablesErr } = await supabase
+      .from("tables")
+      .select("*");
+    if (tablesErr) {
+      console.error("Error fetching tables", tablesErr);
+      return;
+    }
+    setTables(tables);
+  };
+
+  useEffect(() => {
+    fetchTables();
+  }, []);
 
   return (
     <div className="p-4 py-6">
@@ -40,22 +97,32 @@ const Page = () => {
       </div>
 
       <div className="p-2 mt-4 flex flex-wrap gap-5">
-        <div className="bg-white w-fit rounded-xl p-1">
-          <div className="w-60 overflow-hidden">
-            <Image src={qrCode} alt="qr-code 1" className="w-full" />
-          </div>
-          <div className="mt-2 p-2 flex justify-between items-end">
-            <div>
-              <p className="text-lg font-medium text-gray-700">Table 1</p>
-              <p className="text-sm text-gray-500 font-medium leading-2">
-                #847384
-              </p>
+        {tables.map((table) => (
+          <div className="bg-white w-fit rounded-xl p-1" key={table.id}>
+            <div className="w-full object-cover">
+              <QRCode
+                value={`${baseUrl}/order?table_id=${table.id}`}
+                size={128}
+                bgColor="#FFFFFF"
+                fgColor="#0F172A"
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+              />
             </div>
-            <button className="border-2 border-orange-400 text-orange-400 hover:text-orange-300 hover:border-orange-300 transition-colors rounded-lg p-1 cursor-pointer">
-              <DownloadSimpleIcon size={20} weight="bold" />
-            </button>
+            <div className="mt-2 p-2 flex justify-between items-end">
+              <div>
+                <p className="text-lg font-medium text-gray-700">
+                  {table.table_name}
+                </p>
+                <p className="text-sm text-gray-500 font-medium leading-3 truncate w-40 overflow-hidden">
+                  #{table.id}
+                </p>
+              </div>
+              <button className="border-2 border-orange-400 text-orange-400 hover:text-orange-300 hover:border-orange-300 transition-colors rounded-lg p-1 cursor-pointer">
+                <DownloadSimpleIcon size={20} weight="bold" />
+              </button>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
       {isModalOpen && (
         <div
@@ -81,10 +148,13 @@ const Page = () => {
                 <XIcon size={18} weight="bold" />
               </button>
             </div>
-            <form action="" className="flex flex-col mt-6 gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col mt-6 gap-4">
               <input
                 type="text"
                 placeholder="e.g. Table 05 or Lounge Booth"
+                value={tableName}
+                onChange={(e) => setTableName(e.target.value)}
+                required
                 className="border-2 border-gray-200 rounded-xl p-2 focus:border-orange-400 outline-none transition-colors"
               />
               <button className="bg-orange-400 py-2 text-white font-medium rounded-full hover:bg-orange-500 transition-colors">

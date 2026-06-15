@@ -20,6 +20,9 @@ import drink3 from "@/public/menu-items/drink3.jpg";
 import drink6 from "@/public/menu-items/drink6.jpg";
 import Beverage from "@/components/beverageItem";
 import Item from "@/components/item";
+import { createClient } from "@/utils/supabase/client";
+import { useSearchParams } from "next/navigation";
+import { table } from "console";
 
 export interface foodItem {
   tag: string[];
@@ -37,7 +40,23 @@ interface CartItem {
   image: StaticImageData;
   quantity: number;
 }
+
+interface Table {
+  id: string;
+  table_name: string;
+  status: string;
+  restaurants: {
+    address: string;
+    logo_url: string;
+    name: string;
+  };
+}
+
 const Order = () => {
+  const supabase = createClient();
+  const searchParams = useSearchParams();
+  const tableId = searchParams.get("table_id");
+  const [currentTable, setCurrentTable] = useState<Table | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -46,6 +65,26 @@ const Order = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [chefNotes, setChefNotes] = useState("");
 
+  useEffect(() => {
+    const fetchTable = async () => {
+      if (!tableId) {
+        return;
+      }
+      const { data, error } = await supabase
+        .from("tables")
+        .select("*, restaurants(name, address, logo_url)")
+        .eq("id", tableId)
+        .single();
+      if (error) {
+        console.error("Error fetching table", error);
+        return;
+      }
+      setCurrentTable(data);
+    };
+    fetchTable();
+  }, []);
+
+  console.log(currentTable);
   const categories = [
     "all",
     "available",
@@ -201,18 +240,32 @@ const Order = () => {
         <nav className="bg-white px-6 py-3 rounded-b-lg">
           <div className="text-black flex items-center justify-between">
             <div className="flex gap-2 items-center">
-              <div className="size-13 rounded-full border border-orange-200"></div>
+              <div className="size-13 rounded-full border border-orange-200 overflow-hidden relative">
+                {currentTable?.restaurants?.logo_url ? (
+                  <Image
+                    src={currentTable.restaurants.logo_url}
+                    alt="Restaurant Logo"
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-100" />
+                )}
+              </div>
               <div>
-                <p className="text-lg leading-5">Chicken Republic</p>
+                <p className="text-lg leading-5">
+                  {currentTable?.restaurants?.name || "Loading..."}
+                </p>
                 <p className="text-base font-medium flex items-center gap-1 text-gray-600">
-                  <MapPinIcon size={15} /> New haven, Enugu State
+                  <MapPinIcon size={15} />{" "}
+                  {currentTable?.restaurants?.address || "Loading..."}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <p className="text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4 font-semibold">
-                Table 1
+                {currentTable?.table_name || "Loading..."}
               </p>
               <div
                 className={`flex flex-row-reverse gap-2 text-gray-600 p-2 rounded-full ${
