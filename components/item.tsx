@@ -19,41 +19,64 @@ const Item = ({ item, handleItemClick }: itemProps) => {
   }
 
   return (
-    <div className="shadow-lg h-fit shrink-0 rounded-xl overflow-hidden p-3">
-      <div className="rounded-xl overflow-hidden h-62">
+    <div
+      className={`shadow-lg h-fit shrink-0 rounded-xl overflow-hidden p-3 ${!item.is_available ? "opacity-80" : ""}`}
+    >
+      <div
+        className={`rounded-xl overflow-hidden h-62 relative ${!item.is_available ? "grayscale" : ""}`}
+      >
+        {!item.is_available && (
+          <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded z-10 uppercase tracking-wide">
+            Out of Stock
+          </div>
+        )}
         <Image
-          src={item.image}
+          src={item.image_url}
           alt="other food"
-          className="w-full h-full object-cover object-center"
+          fill={true}
+          className="object-cover object-center"
         />
       </div>
       <div className="mt-3">
         <div>
           <div className="flex justify-between items-center mb-1">
-            <p className="text-xl font-bold text-orange-500">₦{item.price}</p>
+            <p
+              className={`text-xl font-bold ${item.is_available ? "text-orange-500" : "text-gray-400"}`}
+            >
+              ₦{item.price}
+            </p>
 
             <div className="flex gap-2.5">
               <button
-                className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1"
+                disabled={!item.is_available}
+                className={`${item.is_available ? "bg-orange-400 hover:bg-orange-300 cursor-pointer text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"} transition-colors rounded-xl py-1 px-1`}
                 onClick={() => incrementCount()}
               >
                 <PlusIcon weight="bold" size={19} />
               </button>
-              <p className="text-lg font-semibold">{count}</p>
+              <p
+                className={`text-lg font-semibold ${!item.is_available ? "text-gray-400" : ""}`}
+              >
+                {count}
+              </p>
               <button
-                className="bg-orange-400 hover:bg-orange-300 transition-colors cursor-pointer text-white rounded-xl py-1 px-1"
+                disabled={!item.is_available}
+                className={`${item.is_available ? "bg-orange-400 hover:bg-orange-300 cursor-pointer text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"} transition-colors rounded-xl py-1 px-1`}
                 onClick={() => decrementCount()}
               >
                 <MinusIcon weight="bold" size={19} />
               </button>
             </div>
           </div>
-          <p className="text-base font-semibold text-gray-800 truncate w-full overflow-y-auto">
-            {item.itemName}
+          <p
+            className={`text-base font-semibold truncate w-full overflow-y-auto ${item.is_available ? "text-gray-800" : "text-gray-400"}`}
+          >
+            {item.name}
           </p>
         </div>
         <button
-          className="w-full py-2.5 rounded-full text-sm mt-2 bg-orange-400 text-white font-semibold hover:bg-orange-400/90 transition-colors cursor-pointer"
+          disabled={!item.is_available}
+          className={`w-full py-2.5 rounded-full text-sm mt-2 font-semibold transition-colors ${item.is_available ? "bg-orange-400 text-white hover:bg-orange-400/90 cursor-pointer" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
           onClick={() => {
             handleItemClick(item, count);
             setCount(1);

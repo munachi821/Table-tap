@@ -54,6 +54,12 @@ const Page = () => {
 
   const handleSubmitOrEdit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!editMode && !foodImage) {
+      alert("Please upload an image for your new menu item.");
+      return;
+    }
+
     setIsLoading(true);
 
     const {
