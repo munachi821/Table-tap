@@ -1,7 +1,7 @@
 import { MinusIcon, PlusIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useState } from "react";
-import { foodItem } from "@/app/order/page";
+import { foodItem } from "@/components/orderComponent";
 
 interface itemProps {
   item: foodItem;

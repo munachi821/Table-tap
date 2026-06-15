@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { PlusIcon, MinusIcon, ShoppingCartIcon } from "@phosphor-icons/react";
-import { foodItem } from "@/app/order/page";
+import { foodItem } from "@/components/orderComponent";
 import { useState } from "react";
 
 interface itemProps {
