@@ -183,7 +183,7 @@ const OrderComponent = () => {
   return (
     <main className="pb-10 relative">
       <header className="py-2 -top-2 sticky z-50">
-        <nav className="bg-white px-6 py-3 rounded-b-lg">
+        <nav className="bg-white px-3 sm:px-6 py-3 rounded-b-lg">
           <div className="text-black flex items-center justify-between">
             <div className="flex gap-2 items-center">
               <div className="size-13 rounded-full border border-orange-200 overflow-hidden relative">
@@ -202,15 +202,15 @@ const OrderComponent = () => {
                 <p className="text-lg leading-5">
                   {currentTable?.restaurants?.name || "Loading..."}
                 </p>
-                <p className="text-base font-medium flex items-center gap-1 text-gray-600">
-                  <MapPinIcon size={15} />{" "}
-                  {currentTable?.restaurants?.address || "Loading..."}
+                <p className="text-sm sm:text-base font-medium flex items-center gap-1 text-gray-600">
+                  <MapPinIcon size={15} className="shrink-0" />{" "}
+                  <span className="truncate max-w-[120px] sm:max-w-none">{currentTable?.restaurants?.address || "Loading..."}</span>
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <p className="text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4 font-semibold">
+            <div className="flex items-center gap-1 sm:gap-3">
+              <p className="hidden sm:block text-lg text-gray-500 p-1 bg-gray-100 rounded-full px-4 font-semibold">
                 {currentTable?.table_name || "Loading..."}
               </p>
               <div
@@ -236,7 +236,7 @@ const OrderComponent = () => {
                   }}
                   className={`bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400 transition-all duration-300 ease-in-out ${
                     searchOpen
-                      ? "w-60 opacity-100 pl-2"
+                      ? "w-32 sm:w-60 opacity-100 pl-2"
                       : "w-0 opacity-0 p-0 sr-only"
                   }
             `}
@@ -301,7 +301,7 @@ const OrderComponent = () => {
         </div>
       ) : (
         /* Menu Items */
-        <div className="pl-10 mt-5">
+        <div className="px-4 md:px-10 mt-5">
           <div>
             <p className="text-2xl mb-2.5">Most Ordered</p>
             <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
@@ -367,9 +367,9 @@ const OrderComponent = () => {
           </div>
 
           {/* Other tags */}
-          <div className="pr-10">
+          <div className="mt-8">
             <p className="text-2xl my-2.5">Other Meals</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {menuItems.map((item) => (
                 <Item
                   key={item.id}
