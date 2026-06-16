@@ -224,7 +224,7 @@ const OrderComponent = () => {
         order_id: newOrder?.id,
         menu_item_id: cartItem.menu_item_id,
         quantity: cartItem.quantity,
-        unit_price: cartItem.price,
+        unit_price: parseInt(cartItem.originalPrice),
       }));
 
       const { error: orderItemsError } = await supabase
