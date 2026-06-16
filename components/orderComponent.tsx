@@ -30,6 +30,7 @@ export interface foodItem {
 
 interface CartItem {
   cartId: string;
+  menu_item_id: string;
   name: string;
   originalPrice: string;
   price: number;
@@ -157,6 +158,7 @@ const OrderComponent = () => {
       } else {
         const newCartItem: CartItem = {
           cartId: crypto.randomUUID(),
+          menu_item_id: item.id,
           name: item.name,
           originalPrice: item.price,
           price: unitPrice * quantity,
@@ -192,7 +194,7 @@ const OrderComponent = () => {
       placedAt: new Date(),
     };
 
-    const onSuccess = () => {
+    const onSuccess = async () => {
       setReciptData(finalOrder);
       setCart([]);
       setChefNotes("");
@@ -200,6 +202,39 @@ const OrderComponent = () => {
       setCartOpen(false);
 
       console.log("Checkout complete!", finalOrder);
+
+      const { data: newOrder, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          restaurant_id: currentTable?.restaurants?.id,
+          table_id: tableId,
+          total_amount: cart.reduce((total, item) => total + item.price, 0),
+          status: "paid",
+          notes: chefNotes,
+        })
+        .select("id")
+        .single();
+
+      if (orderError) {
+        console.error("Error inserting order", orderError);
+        return;
+      }
+
+      const itemsToinsert = cart.map((cartItem) => ({
+        order_id: newOrder?.id,
+        menu_item_id: cartItem.menu_item_id,
+        quantity: cartItem.quantity,
+        unit_price: cartItem.price,
+      }));
+
+      const { error: orderItemsError } = await supabase
+        .from("order_items")
+        .insert(itemsToinsert);
+
+      if (orderItemsError) {
+        console.error("Error inserting order items", orderItemsError);
+        return;
+      }
     };
     const onClose = () => {
       console.log("Payment cancelled!");
@@ -564,94 +599,96 @@ const OrderComponent = () => {
       {/* Digital Receipt Modal */}
       {reciptData && (
         <div
-          className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto"
           onClick={() => setReciptData(null)}
         >
-          <div
-            className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"
-            onClick={(e) => e.stopPropagation()}
-            ref={reciptRef}
-          >
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-50">
-              <span className="text-3xl text-green-500 font-bold">✓</span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-1">
-              Payment Successful!
-            </h2>
-            <p className="text-gray-500 mb-6 text-sm">
-              Your order has been sent to the kitchen.
-            </p>
-
-            <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 text-left border border-gray-100">
-              <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 text-center">
-                Digital Receipt
+          <div className="min-h-screen flex items-center justify-center py-10">
+            <div
+              className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"
+              onClick={(e) => e.stopPropagation()}
+              ref={reciptRef}
+            >
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-50">
+                <span className="text-3xl text-green-500 font-bold">✓</span>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-1">
+                Payment Successful!
+              </h2>
+              <p className="text-gray-500 mb-6 text-sm">
+                Your order has been sent to the kitchen.
               </p>
 
-              <div className="flex justify-between text-sm mb-1.5">
-                <span className="text-gray-500">Order ID</span>
-                <span className="font-mono text-gray-800 font-medium">
-                  #{reciptData.orderId?.split("-")[0]}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm mb-1.5">
-                <span className="text-gray-500">Table</span>
-                <span className="text-gray-800 font-medium">
-                  {reciptData.tableNumber}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm mb-4">
-                <span className="text-gray-500">Time</span>
-                <span className="text-gray-800 font-medium">
-                  {new Date(reciptData.placedAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+              <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 text-left border border-gray-100">
+                <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 text-center">
+                  Digital Receipt
+                </p>
+
+                <div className="flex justify-between text-sm mb-1.5">
+                  <span className="text-gray-500">Order ID</span>
+                  <span className="font-mono text-gray-800 font-medium">
+                    #{reciptData.orderId?.split("-")[0]}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm mb-1.5">
+                  <span className="text-gray-500">Table</span>
+                  <span className="text-gray-800 font-medium">
+                    {reciptData.tableNumber}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm mb-4">
+                  <span className="text-gray-500">Time</span>
+                  <span className="text-gray-800 font-medium">
+                    {new Date(reciptData.placedAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+
+                <div className="border-t border-dashed border-gray-300 py-3 my-3">
+                  {reciptData.items?.map((item: any, i: number) => (
+                    <div key={i} className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-800">
+                        <span className="text-orange-500 font-bold">
+                          {item.quantity}x
+                        </span>{" "}
+                        {item.name}
+                      </span>
+                      <span className="font-bold text-gray-800">
+                        ₦{item.price.toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-between items-center border-t border-gray-300 pt-3">
+                  <span className="font-bold text-gray-600">Total Paid</span>
+                  <span className="text-orange-500 font-bold text-xl">
+                    ₦
+                    {reciptData.items
+                      ?.reduce(
+                        (total: number, item: any) => total + item.price,
+                        0,
+                      )
+                      .toLocaleString()}
+                  </span>
+                </div>
               </div>
 
-              <div className="border-t border-dashed border-gray-300 py-3 my-3">
-                {reciptData.items?.map((item: any, i: number) => (
-                  <div key={i} className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-800">
-                      <span className="text-orange-500 font-bold">
-                        {item.quantity}x
-                      </span>{" "}
-                      {item.name}
-                    </span>
-                    <span className="font-bold text-gray-800">
-                      ₦{item.price.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <button
+                  className="w-full bg-orange-400 text-white font-semibold py-3.5 rounded-full hover:bg-orange-400/80 transition-colors shadow-lg shadow-orange-200 font-manrope cursor-pointer"
+                  onClick={() => setReciptData(null)}
+                >
+                  Close Receipt
+                </button>
 
-              <div className="flex justify-between items-center border-t border-gray-300 pt-3">
-                <span className="font-bold text-gray-600">Total Paid</span>
-                <span className="text-orange-500 font-bold text-xl">
-                  ₦
-                  {reciptData.items
-                    ?.reduce(
-                      (total: number, item: any) => total + item.price,
-                      0,
-                    )
-                    .toLocaleString()}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 justify-center">
-              <button
-                className="w-full bg-orange-400 text-white font-semibold py-3.5 rounded-full hover:bg-orange-400/80 transition-colors shadow-lg shadow-orange-200 font-manrope cursor-pointer"
-                onClick={() => setReciptData(null)}
-              >
-                Close Receipt
-              </button>
-
-              <div
-                className="flex items-center justify-center p-3.5 w-16 h-12 rounded-full bg-orange-400 hover:bg-orange-400/80 text-white transition-colors cursor-pointer"
-                onClick={downloadRecipt}
-              >
-                <DownloadSimpleIcon size={24} weight="bold" />
+                <div
+                  className="flex items-center justify-center p-3.5 w-16 h-12 rounded-full bg-orange-400 hover:bg-orange-400/80 text-white transition-colors cursor-pointer"
+                  onClick={downloadRecipt}
+                >
+                  <DownloadSimpleIcon size={24} weight="bold" />
+                </div>
               </div>
             </div>
           </div>
