@@ -6,6 +6,7 @@ import {
   BasketIcon,
   TrashIcon,
   XIcon,
+  DownloadSimpleIcon,
 } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +14,8 @@ import Beverage from "@/components/beverageItem";
 import Item from "@/components/item";
 import { createClient } from "@/utils/supabase/client";
 import { useSearchParams } from "next/navigation";
+import { usePaystackPayment } from "react-paystack";
+import { toPng } from "html-to-image";
 
 export interface foodItem {
   id: string;
@@ -58,6 +61,9 @@ const OrderComponent = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [chefNotes, setChefNotes] = useState("");
   const [menuItems, setMenuItems] = useState<foodItem[]>([]);
+  const [reciptData, setReciptData] = useState<any>(null);
+
+  const reciptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -166,19 +172,60 @@ const OrderComponent = () => {
     console.log("Current Cart:", cart);
   }, [cart]);
 
+  const paystackConfig = {
+    reference: new Date().getTime().toString(),
+    email:
+      "guest@" + currentTable?.restaurants?.name.replace(/\s+/g, "") + ".com",
+    amount: cart.reduce((total, item) => total + item.price, 0) * 100,
+    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY as string,
+  };
+
+  const initializePayment = usePaystackPayment(paystackConfig);
+
   const onCheckout = () => {
-    setCart([]);
-    setChefNotes("");
     const finalOrder = {
       orderId: crypto.randomUUID(),
-      tableNumber: "Table 1" /* This should be gotten automatically */,
+      tableNumber: currentTable?.table_name,
       items: cart,
       note: chefNotes,
       status: "pending",
       placedAt: new Date(),
     };
-    console.log("Checkout complete!", finalOrder);
+
+    const onSuccess = () => {
+      setReciptData(finalOrder);
+      setCart([]);
+      setChefNotes("");
+      setSearchOpen(false);
+      setCartOpen(false);
+
+      console.log("Checkout complete!", finalOrder);
+    };
+    const onClose = () => {
+      console.log("Payment cancelled!");
+    };
+
+    initializePayment({ onSuccess, onClose });
   };
+
+  const downloadRecipt = async () => {
+    if (!reciptRef.current) return;
+
+    try {
+      const dataUrl = await toPng(reciptRef.current, {
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+      });
+
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `Recipt_${reciptData.orderId?.split("_")[0]}.png`;
+      link.click();
+    } catch (err) {
+      console.error("Failed to download recipt", err);
+    }
+  };
+
   return (
     <main className="pb-10 relative">
       <header className="py-2 -top-2 sticky z-50">
@@ -513,6 +560,103 @@ const OrderComponent = () => {
           </button>
         </div>
       </div>
+
+      {/* Digital Receipt Modal */}
+      {reciptData && (
+        <div
+          className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setReciptData(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"
+            onClick={(e) => e.stopPropagation()}
+            ref={reciptRef}
+          >
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-50">
+              <span className="text-3xl text-green-500 font-bold">✓</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">
+              Payment Successful!
+            </h2>
+            <p className="text-gray-500 mb-6 text-sm">
+              Your order has been sent to the kitchen.
+            </p>
+
+            <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 text-left border border-gray-100">
+              <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 text-center">
+                Digital Receipt
+              </p>
+
+              <div className="flex justify-between text-sm mb-1.5">
+                <span className="text-gray-500">Order ID</span>
+                <span className="font-mono text-gray-800 font-medium">
+                  #{reciptData.orderId?.split("-")[0]}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm mb-1.5">
+                <span className="text-gray-500">Table</span>
+                <span className="text-gray-800 font-medium">
+                  {reciptData.tableNumber}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm mb-4">
+                <span className="text-gray-500">Time</span>
+                <span className="text-gray-800 font-medium">
+                  {new Date(reciptData.placedAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+
+              <div className="border-t border-dashed border-gray-300 py-3 my-3">
+                {reciptData.items?.map((item: any, i: number) => (
+                  <div key={i} className="flex justify-between text-sm mb-2">
+                    <span className="text-gray-800">
+                      <span className="text-orange-500 font-bold">
+                        {item.quantity}x
+                      </span>{" "}
+                      {item.name}
+                    </span>
+                    <span className="font-bold text-gray-800">
+                      ₦{item.price.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-between items-center border-t border-gray-300 pt-3">
+                <span className="font-bold text-gray-600">Total Paid</span>
+                <span className="text-orange-500 font-bold text-xl">
+                  ₦
+                  {reciptData.items
+                    ?.reduce(
+                      (total: number, item: any) => total + item.price,
+                      0,
+                    )
+                    .toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 justify-center">
+              <button
+                className="w-full bg-orange-400 text-white font-semibold py-3.5 rounded-full hover:bg-orange-400/80 transition-colors shadow-lg shadow-orange-200 font-manrope cursor-pointer"
+                onClick={() => setReciptData(null)}
+              >
+                Close Receipt
+              </button>
+
+              <div
+                className="flex items-center justify-center p-3.5 w-16 h-12 rounded-full bg-orange-400 hover:bg-orange-400/80 text-white transition-colors cursor-pointer"
+                onClick={downloadRecipt}
+              >
+                <DownloadSimpleIcon size={24} weight="bold" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
