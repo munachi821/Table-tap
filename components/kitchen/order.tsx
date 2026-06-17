@@ -1,10 +1,9 @@
-import { title } from "process";
+import { createClient } from "@/utils/supabase/client";
 import TimeElapsed from "./timeElapsed";
 import { useEffect, useRef, useState } from "react";
 
 interface Orderitem {
   id: string;
-  itemIndex: number;
   name: string;
   quantity: number;
   isCompleted: boolean;
@@ -18,9 +17,9 @@ interface kitchenOrder {
   note?: string;
 }
 
-type filterType = "all" | "pending" | "completed";
+type filterType = "all" | "paid" | "completed";
 
-export const mockOrders: kitchenOrder[] = [
+/* export const mockOrders: kitchenOrder[] = [
   {
     orderId: "#5",
     tableNumber: "Table 1",
@@ -129,16 +128,17 @@ export const mockOrders: kitchenOrder[] = [
       },
     ],
   },
-];
+]; */
 
 const Order = () => {
-  const [activeTab, setActiveTab] = useState<filterType>("pending");
-  const [orders, setOrders] = useState<kitchenOrder[]>(mockOrders);
+  const supabase = createClient();
+  const [activeTab, setActiveTab] = useState<filterType>("paid");
+  const [orders, setOrders] = useState<kitchenOrder[]>([]);
 
   /* Getting pending count */
-  const pendingCount = orders.filter(
+  /* const pendingCount = orders.filter(
     (ordercount) => ordercount.status === "pending",
-  ).length;
+  ).length; */
 
   const filterOrders = orders.filter((order) => {
     return order.status === activeTab;
@@ -158,11 +158,66 @@ const Order = () => {
     orderLength.current = orders.length;
   }, [orders.length]);
 
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select(
+          `id, created_at, status, notes, tables(table_name), order_items(id, quantity, menu_items(name))`,
+        )
+        .in("status", ["paid", "completed"]);
+
+      if (data) {
+        const orders = data.map((items) => {
+          return {
+            orderId: items.id,
+            tableNumber: items.tables?.table_name,
+            status: items.status,
+            placedAt: new Date(items.created_at),
+            items: items.order_items.map((item) => {
+              return {
+                id: item.id,
+                name: item.menu_items?.name,
+                quantity: item.quantity,
+                isCompleted: item.is_completed || false,
+              };
+            }),
+            note: items.notes,
+          };
+        });
+
+        setOrders(orders);
+      }
+
+      if (error) {
+        console.error("Error fetching orders: ", error);
+      }
+    };
+    fetchOrders();
+
+    const channel = supabase
+      .channel("kitchen-orders-listeners")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "orders" },
+        (payload) => {
+          console.log("DING! supabase just recived a new order", payload);
+
+          fetchOrders();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   return (
     <div className="relative">
       {/* Filter Section */}
       <div className="flex gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-fit shadow-md shadow-slate-200 absolute right-0 mt-1 mr-4">
-        {(["pending", "completed"] as filterType[]).map((filter) => (
+        {(["paid", "completed"] as filterType[]).map((filter) => (
           <button
             key={filter}
             onClick={() => setActiveTab(filter)}
@@ -172,7 +227,7 @@ const Order = () => {
                 : "text-slate-500 hover:bg-slate-100"
             }`}
           >
-            {filter} Orders
+            {filter === "paid" ? "pending" : filter} Orders
           </button>
         ))}
       </div>
@@ -208,7 +263,7 @@ const Order = () => {
             </div>
 
             <div className="grid grid-cols-4 gap-4">
-              {orders.items.map((items) => (
+              {orders.items.map((items, index) => (
                 <div
                   className="rounded-xl border-2 border-gray-700 p-2 bg-white/50 backdrop-blur-xl flex flex-col justify-between"
                   key={items.id}
@@ -217,7 +272,7 @@ const Order = () => {
                     <div
                       className={`size-8 flex items-center justify-center text-white ${orders.status === "completed" ? "bg-orange-300" : "bg-orange-400/95"} text-lg font-bold rounded-full`}
                     >
-                      {items.itemIndex}
+                      {index + 1}
                     </div>
 
                     <p className="text-orange-400 shrink-0 font-semibold mr-2">
