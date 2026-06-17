@@ -165,7 +165,8 @@ const Order = () => {
         .select(
           `id, created_at, status, notes, tables(table_name), order_items(id, quantity, menu_items(name))`,
         )
-        .in("status", ["paid", "completed"]);
+        .in("status", ["paid", "completed"])
+        .order("created_at", { ascending: false });
 
       if (data) {
         const orders = data.map((items) => {
@@ -203,7 +204,9 @@ const Order = () => {
         (payload) => {
           console.log("DING! supabase just recived a new order", payload);
 
-          fetchOrders();
+          setTimeout(() => {
+            fetchOrders();
+          }, 500);
         },
       )
       .subscribe();
