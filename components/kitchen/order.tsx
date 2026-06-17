@@ -19,126 +19,10 @@ interface kitchenOrder {
 
 type filterType = "all" | "paid" | "completed";
 
-/* export const mockOrders: kitchenOrder[] = [
-  {
-    orderId: "#5",
-    tableNumber: "Table 1",
-    status: "pending",
-    // Simulating an order placed 2 minutes ago
-    placedAt: new Date(Date.now() - 2 * 60000),
-    items: [
-      {
-        id: "item-001",
-        itemIndex: 1,
-        name: "Catfish pepper Soup with scented leaves",
-        quantity: 2,
-        isCompleted: false,
-      },
-      {
-        id: "item-002",
-        itemIndex: 2,
-        name: "Fried rice with chicken and salad",
-        quantity: 2,
-        isCompleted: false,
-      },
-      {
-        id: "item-003",
-        itemIndex: 3,
-        name: "Fried rice with chicken and salad",
-        quantity: 2,
-        isCompleted: false,
-      },
-      {
-        id: "item-004",
-        itemIndex: 4,
-        name: "Fried rice with chicken and salad",
-        quantity: 2,
-        isCompleted: false,
-      },
-      {
-        id: "item-005",
-        itemIndex: 5,
-        name: "Fried rice with chicken and salad",
-        quantity: 2,
-        isCompleted: false,
-      },
-    ],
-    note: "Don't add abacha",
-  },
-  {
-    orderId: "#6",
-    tableNumber: "Table 4",
-    status: "pending",
-    // Simulating an order placed 12 minutes ago
-    placedAt: new Date(Date.now() - 12 * 60000),
-    items: [
-      {
-        id: "item-003",
-        itemIndex: 1,
-        name: "Egusi soup with 2 wraps of fufu",
-        quantity: 3,
-        isCompleted: false,
-      },
-      {
-        id: "item-004",
-        itemIndex: 2,
-        name: "Monster Energy",
-        quantity: 3,
-        isCompleted: false,
-      },
-    ],
-  },
-  {
-    orderId: "#7",
-    tableNumber: "Table 2",
-    status: "pending",
-    // Simulating an order placed 1 minute ago
-    placedAt: new Date(Date.now() - 1 * 60000),
-    items: [
-      {
-        id: "item-005",
-        itemIndex: 1,
-        name: "Goat meat pepper Soup",
-        quantity: 1,
-        isCompleted: false,
-      },
-    ],
-  },
-  {
-    orderId: "#8",
-    tableNumber: "Table 8",
-    status: "pending",
-    // Simulating an order placed 45 minutes ago
-    placedAt: new Date(Date.now() - 45 * 60000),
-    note: "what if i say, i know",
-    items: [
-      {
-        id: "item-006",
-        itemIndex: 1,
-        name: "Strawberry Flavoured Hollandia Yoghurt",
-        quantity: 4,
-        isCompleted: true,
-      },
-      {
-        id: "item-007",
-        itemIndex: 2,
-        name: "Fried rice with chicken and salad",
-        quantity: 4,
-        isCompleted: true,
-      },
-    ],
-  },
-]; */
-
 const Order = () => {
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<filterType>("paid");
   const [orders, setOrders] = useState<kitchenOrder[]>([]);
-
-  /* Getting pending count */
-  /* const pendingCount = orders.filter(
-    (ordercount) => ordercount.status === "pending",
-  ).length; */
 
   const filterOrders = orders.filter((order) => {
     return order.status === activeTab;
@@ -180,7 +64,7 @@ const Order = () => {
                 id: item.id,
                 name: item.menu_items?.name,
                 quantity: item.quantity,
-                isCompleted: item.is_completed || false,
+                isCompleted: false,
               };
             }),
             note: items.notes,
@@ -201,9 +85,7 @@ const Order = () => {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "orders" },
-        (payload) => {
-          console.log("DING! supabase just recived a new order", payload);
-
+        () => {
           setTimeout(() => {
             fetchOrders();
           }, 500);
@@ -215,6 +97,23 @@ const Order = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const markCompleted = async (orderId: string) => {
+    setOrders((prev) => {
+      return prev.map((order) =>
+        order.orderId === orderId ? { ...order, status: "completed" } : order,
+      );
+    });
+
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: "completed" })
+      .eq("id", orderId);
+
+    if (error) {
+      console.error("Error marking order as completed: ", error);
+    }
+  };
 
   return (
     <div className="relative">
@@ -296,15 +195,7 @@ const Order = () => {
             <button
               className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-[#fd9319]/90 bg-[#fd9319] text-white shadow-base cursor-pointer disabled:bg-orange-300 disabled:cursor-default mt-3"
               disabled={orders.status === "completed"}
-              onClick={() =>
-                setOrders((prev) =>
-                  prev.map((order) =>
-                    order.orderId === orders.orderId
-                      ? { ...order, status: "completed" }
-                      : order,
-                  ),
-                )
-              }
+              onClick={() => markCompleted(orders.orderId)}
             >
               {orders.status === "completed" ? "Order completed" : "Ready"}
             </button>

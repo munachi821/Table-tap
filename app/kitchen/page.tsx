@@ -5,27 +5,92 @@ import {
   GearIcon,
   ForkKnifeIcon,
 } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Menu from "@/components/kitchen/menu";
 import Order from "@/components/kitchen/order";
+import { createClient } from "@/utils/supabase/client";
 
 const Kitchen = () => {
+  const supabase = createClient();
   const [activeTab, setActiveTab] = useState("orders");
+  const [pendingCount, setPendingCount] = useState(0);
 
-  const changeTab = () => {
-    if (activeTab === "orders") {
-      return <Order />;
-    } else if (activeTab === "menu") {
-      return <Menu />;
-    }
-  };
+  /* Getting pending count */
+  /* const pendingCount = orders.filter(
+    (ordercount) => ordercount.status === "pending",
+  ).length; */
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select(
+          `id, created_at, status, notes, tables(table_name), order_items(id, quantity, menu_items(name))`,
+        )
+        .in("status", ["paid", "completed"])
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setPendingCount(
+          data.filter((order) => order.status === "paid").length || 0,
+        );
+      } else if (error) {
+        console.error("error fetching pending count", error);
+      }
+    };
+
+    fetchOrders();
+
+    const channel = supabase
+      .channel("kitchen-page-listeners")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "orders" },
+        () => {
+          setTimeout(() => {
+            fetchOrders();
+          }, 500);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const [restName, setRestName] = useState("Loading...");
+  const [restImage, setRestImage] = useState("");
+
+  useEffect(() => {
+    const fetchRestaurantInfo = async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (user?.user) {
+        // Fallback to metadata just in case
+        setRestName(user.user.user_metadata?.name || "Kitchen Dashboard");
+        
+        // Fetch the official name and logo from the database
+        const { data: restData } = await supabase
+          .from("restaurants")
+          .select("name, logo_url")
+          .eq("owner_id", user.user.id)
+          .single();
+
+        if (restData) {
+          if (restData.name) setRestName(restData.name);
+          if (restData.logo_url) setRestImage(restData.logo_url);
+        }
+      }
+    };
+    fetchRestaurantInfo();
+  }, []);
 
   const changeOverview = () => {
     if (activeTab === "orders") {
       return (
         <div className="flex gap-3 items-center">
           <p className="bg-orange-400/90 px-3 font-semibold py-1 rounded-full text-white">
-            3 Pending
+            {pendingCount} Pending
           </p>
           <h2 className="text-lg font-semibold">Orders</h2>
         </div>
@@ -48,10 +113,14 @@ const Kitchen = () => {
         <header className="flex justify-between bg-white px-4 py-3.5 items-center fixed w-full z-50">
           <div className="flex items-center gap-3">
             <div className="flex items-end gap-2">
-              <div className="size-11 rounded-full border border-orange-100"></div>
+              {restImage ? (
+                <img src={restImage} alt="Restaurant Logo" className="size-11 rounded-full border border-orange-100 object-cover" />
+              ) : (
+                <div className="size-11 rounded-full border border-orange-100 bg-gray-100 animate-pulse"></div>
+              )}
               <div>
                 <p className="font-semibold text-lg leading-4 text-orange-500">
-                  Nene&apos;s Pastries
+                  {restName}
                 </p>
                 <p className="text-xs font-semibold text-gray-500">
                   Kitchen Dashboard
@@ -89,7 +158,15 @@ const Kitchen = () => {
           </div>
         </header>
 
-        <div className="pt-20">{changeTab()}</div>
+        <div className="pt-20">
+          <div className={activeTab === "orders" ? "block" : "hidden"}>
+            <Order />
+          </div>
+
+          <div className={activeTab === "menu" ? "block" : "hidden"}>
+            <Menu />
+          </div>
+        </div>
       </div>
     </main>
   );

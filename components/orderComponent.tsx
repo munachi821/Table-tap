@@ -99,7 +99,6 @@ const OrderComponent = () => {
     fetchData();
   }, []);
 
-  console.log(menuItems);
   const uniqueCategories = Array.from(
     new Set(
       menuItems
@@ -170,10 +169,6 @@ const OrderComponent = () => {
     });
   };
 
-  useEffect(() => {
-    console.log("Current Cart:", cart);
-  }, [cart]);
-
   const paystackConfig = {
     reference: new Date().getTime().toString(),
     email:
@@ -237,7 +232,7 @@ const OrderComponent = () => {
       }
     };
     const onClose = () => {
-      console.log("Payment cancelled!");
+      alert("Payment cancelled!");
     };
 
     initializePayment({ onSuccess, onClose });
