@@ -64,22 +64,36 @@ const Kitchen = () => {
 
   useEffect(() => {
     const fetchRestaurantInfo = async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (user?.user) {
-        // Fallback to metadata just in case
-        setRestName(user.user.user_metadata?.name || "Kitchen Dashboard");
-        
-        // Fetch the official name and logo from the database
-        const { data: restData } = await supabase
-          .from("restaurants")
-          .select("name, logo_url")
-          .eq("owner_id", user.user.id)
-          .single();
-
-        if (restData) {
-          if (restData.name) setRestName(restData.name);
-          if (restData.logo_url) setRestImage(restData.logo_url);
+      try {
+        const { data: user, error: authError } = await supabase.auth.getUser();
+        if (authError) {
+          console.error("Auth error:", authError);
         }
+
+        if (user?.user) {
+          // Fallback to metadata just in case
+          setRestName(user.user.user_metadata?.name || "Kitchen Dashboard");
+          // Fetch the official name and logo from the database
+          const { data: restData, error: dbError } = await supabase
+            .from("restaurants")
+            .select("name, logo_url")
+            .eq("owner_id", user.user.id)
+            .single();
+            
+          if (dbError) {
+            console.error("DB error fetching restaurant:", dbError);
+          }
+            
+          if (restData) {
+            if (restData.name) setRestName(restData.name);
+            if (restData.logo_url) setRestImage(restData.logo_url);
+          }
+        } else {
+          setRestName("Kitchen Dashboard");
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setRestName("Kitchen Dashboard");
       }
     };
     fetchRestaurantInfo();
@@ -114,7 +128,11 @@ const Kitchen = () => {
           <div className="flex items-center gap-3">
             <div className="flex items-end gap-2">
               {restImage ? (
-                <img src={restImage} alt="Restaurant Logo" className="size-11 rounded-full border border-orange-100 object-cover" />
+                <img
+                  src={restImage}
+                  alt="Restaurant Logo"
+                  className="size-11 rounded-full border border-orange-100 object-cover"
+                />
               ) : (
                 <div className="size-11 rounded-full border border-orange-100 bg-gray-100 animate-pulse"></div>
               )}

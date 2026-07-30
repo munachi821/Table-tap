@@ -1,23 +1,23 @@
 "use client";
 import { MagnifyingGlass as Search } from "@phosphor-icons/react";
 import Image, { StaticImageData } from "next/image";
-import food1 from "@/public/menu-items/food1.png";
-import food2 from "@/public/menu-items/food2.jpg";
-import food3 from "@/public/menu-items/food3.jpg";
-import food4 from "@/public/menu-items/food4.jpg";
-import { useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
 
-interface mealOrder {
+interface MenuItems {
   id: string;
-  img: StaticImageData;
-  foodName: string;
-  isAvailable: boolean;
+  name: string;
+  image_url: string;
+  is_available: boolean;
 }
 
 const Menu = () => {
+  const supabase = createClient();
   const [searchText, setSearchText] = useState("");
+  const [menuItems, setMenuItems] = useState<MenuItems[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const mealOrder = [
+  /* const mealOrder = [
     {
       id: "1",
       img: food1,
@@ -42,16 +42,59 @@ const Menu = () => {
       foodName: "Fried rice with chicken and salad",
       isAvailable: true,
     },
-  ];
+  ]; */
 
-  const [mealData, setMealData] = useState<mealOrder[]>(mealOrder);
+  useEffect(() => {
+    const fetchMealData = async () => {
+      const { data, error } = await supabase
+        .from("menu_items")
+        .select("id, name, image_url, is_available");
+      if (data) {
+        setMenuItems(data);
+      }
+      if (error) {
+        console.error("Error fetching menu items", error);
+      }
+      setIsLoading(false);
+    };
+    fetchMealData();
+  }, []);
 
-  const HandleSearch = (text: string) => {
-    return mealData.filter((meals) =>
-      meals.foodName.toLowerCase().includes(text.toLowerCase()),
+  /* const HandleSearch = (text: string) => {
+    return menuItems.filter((meals) =>
+      meals.name.toLowerCase().includes(text.toLowerCase()),
     );
+  }; */
+  const filteredItems = menuItems.filter((item) => {
+    return item.name.toLowerCase().includes(searchText.toLowerCase());
+  });
+
+  const toggleAvailability = async (id: string, currentStatus: boolean) => {
+    // Optimistic UI update
+    setMenuItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, is_available: !currentStatus } : item,
+      ),
+    );
+
+    const { data, error } = await supabase
+      .from("menu_items")
+      .update({ is_available: !currentStatus })
+      .eq("id", id)
+      .select();
+
+    if (error || !data || data.length === 0) {
+      console.error("Error updating availability or blocked by RLS:", error);
+      alert("Unable to update availability! You may not have permission if you aren't logged in as the admin.");
+
+      // Revert the optimistic UI update
+      setMenuItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, is_available: currentStatus } : item,
+        ),
+      );
+    }
   };
-  const filteredItems = HandleSearch(searchText);
 
   return (
     <div>
@@ -83,10 +126,12 @@ const Menu = () => {
           >
             <div className="w-60 h-60 rounded-md overflow-hidden bg-gray-50">
               <Image
-                src={meals.img}
+                src={meals.image_url}
                 alt="Goat meat pepper soup"
+                width={240}
+                height={240}
                 className={`w-full h-full object-cover object-center transition-all duration-300 ${
-                  meals.isAvailable ? "" : "grayscale opacity-60"
+                  meals.is_available ? "" : "grayscale opacity-60"
                 }`}
               />
             </div>
@@ -95,29 +140,23 @@ const Menu = () => {
               <div className="flex justify-between items-center">
                 <p
                   className={`text-sm font-medium transition-colors ${
-                    meals.isAvailable ? "text-gray-600" : "text-red-500"
+                    meals.is_available ? "text-gray-600" : "text-red-500"
                   }`}
                 >
-                  {meals.isAvailable ? "Food is available" : "Out of stock"}
+                  {meals.is_available ? "Food is available" : "Out of stock"}
                 </p>
 
                 <button
                   onClick={() =>
-                    setMealData((prev) =>
-                      prev.map((menuitem) =>
-                        menuitem.id === meals.id
-                          ? { ...menuitem, isAvailable: !menuitem.isAvailable }
-                          : menuitem,
-                      ),
-                    )
+                    toggleAvailability(meals.id, meals.is_available)
                   }
                   className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 flex items-center ${
-                    meals.isAvailable ? "bg-orange-400" : "bg-gray-300"
+                    meals.is_available ? "bg-orange-400" : "bg-gray-300"
                   }`}
                 >
                   <div
                     className={`size-4 rounded-full bg-white shadow-sm transform transition-transform duration-300 ${
-                      meals.isAvailable ? "translate-x-6" : "translate-x-0"
+                      meals.is_available ? "translate-x-6" : "translate-x-0"
                     }`}
                   ></div>
                 </button>
@@ -125,12 +164,12 @@ const Menu = () => {
 
               <h3
                 className={`font-semibold my-1 transition-colors truncate block w-60 ${
-                  meals.isAvailable
+                  meals.is_available
                     ? "text-gray-800"
                     : "text-gray-400 line-through decoration-gray-300"
                 }`}
               >
-                {meals.foodName}
+                {meals.name}
               </h3>
             </div>
           </div>
