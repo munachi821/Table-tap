@@ -14,6 +14,7 @@ const Kitchen = () => {
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState("orders");
   const [pendingCount, setPendingCount] = useState(0);
+  const [availableCount, setAvailableCount] = useState(0);
 
   /* Getting pending count */
   /* const pendingCount = orders.filter(
@@ -79,11 +80,11 @@ const Kitchen = () => {
             .select("name, logo_url")
             .eq("owner_id", user.user.id)
             .single();
-            
+
           if (dbError) {
             console.error("DB error fetching restaurant:", dbError);
           }
-            
+
           if (restData) {
             if (restData.name) setRestName(restData.name);
             if (restData.logo_url) setRestImage(restData.logo_url);
@@ -97,6 +98,40 @@ const Kitchen = () => {
       }
     };
     fetchRestaurantInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      const { data, error } = await supabase
+        .from("menu_items")
+        .select("id, name, is_available")
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setAvailableCount(data.filter((item) => item.is_available).length || 0);
+      } else if (error) {
+        console.error("error fetching menu items", error);
+      }
+    };
+
+    fetchMenuItems();
+
+    const menuChannel = supabase
+      .channel("menu-items-listeners")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "menu_items" },
+        () => {
+          setTimeout(() => {
+            fetchMenuItems();
+          }, 500);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(menuChannel);
+    };
   }, []);
 
   const changeOverview = () => {
@@ -113,7 +148,7 @@ const Kitchen = () => {
       return (
         <div className="flex gap-3 items-center">
           <p className="bg-orange-400/90 px-3 font-semibold py-1 rounded-full text-white">
-            3 Available
+            {availableCount} Available
           </p>
           <h2 className="text-lg font-semibold">Menu items</h2>
         </div>
