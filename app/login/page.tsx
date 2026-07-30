@@ -20,6 +20,8 @@ export default function LoginPage() {
       } = await supabase.auth.getSession();
       if (error) return console.log(error);
       if (session) {
+        // --- DISABLED PAYMENT CHECK FOR TESTING ---
+        /*
         const hasPaid = session.user.user_metadata?.has_active_subscription;
         if (hasPaid) {
           router.push("/admin/overview");
@@ -27,6 +29,8 @@ export default function LoginPage() {
           // If they are logged in but haven't paid, we log them out so they aren't stuck in a weird state
           await supabase.auth.signOut();
         }
+        */
+        router.push("/admin/overview");
       }
     };
 
@@ -41,6 +45,8 @@ export default function LoginPage() {
     });
     if (error) return alert(error.message);
 
+    // --- DISABLED PAYMENT CHECK FOR TESTING ---
+    /*
     const hasPaid = data.user?.user_metadata?.has_active_subscription;
     if (hasPaid) {
       router.push("/admin/overview");
@@ -48,6 +54,8 @@ export default function LoginPage() {
       alert("You don't have an active subscription! Please sign up and pay to access the dashboard.");
       await supabase.auth.signOut();
     }
+    */
+    router.push("/admin/overview");
   };
 
   return (
