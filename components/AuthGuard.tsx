@@ -24,6 +24,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       }
 
       // 2. Check if the user has an active subscription in their metadata
+      // --- DISABLED PAYMENT CHECK FOR TESTING ---
+      /*
       const hasPaid = session.user.user_metadata?.has_active_subscription;
 
       if (!hasPaid) {
@@ -55,8 +57,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         router.push("/login");
         return;
       }
+      */
 
-      // 3. User is logged in AND has paid, let them through!
+      // 3. User is logged in (payment check bypassed), let them through!
       setIsLoading(false);
     };
 
