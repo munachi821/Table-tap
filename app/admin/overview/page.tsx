@@ -10,9 +10,34 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
+interface TopItem {
+  name: string;
+  category: string;
+  revenue: number;
+  orders: number;
+}
+
+interface LiveTable {
+  id: string;
+  name: string;
+  statusText: string;
+  timeText: string;
+  tagText: string;
+  colorCode: "green" | "orange" | "gray";
+}
+
 const Overview = () => {
   const supabase = createClient();
   const [restName, setRestName] = useState("");
+  const [grossRevenue, setGrossRevenue] = useState(0);
+  const [ordersToday, setOrdersToday] = useState(0);
+  const [activeTables, setActiveTables] = useState(0);
+  const [totalTables, setTotalTables] = useState(0);
+  const [kitchenLoad, setKitchenLoad] = useState(0);
+  const [topItems, setTopItems] = useState<TopItem[]>([]);
+  const [liveTables, setLiveTables] = useState<LiveTable[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const fullDate = () => {
     const date = new Date();
     return date.toLocaleString("en-US", {
@@ -23,12 +48,130 @@ const Overview = () => {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndData = async () => {
       const { data: user } = await supabase.auth.getUser();
-      setRestName(user.user?.user_metadata?.name);
+      setRestName(user.user?.user_metadata?.name || "Restaurant");
+      
+      if (!user.user) {
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: restaurant } = await supabase
+        .from("restaurants")
+        .select("id")
+        .eq("owner_id", user.user.id)
+        .single();
+        
+      if (restaurant) {
+        await fetchDashboardData(restaurant.id);
+      } else {
+        setIsLoading(false);
+      }
     };
-    fetchUser();
-  }, []);
+
+    const fetchDashboardData = async (restId: string) => {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const startISO = startOfDay.toISOString();
+
+      const { data: todayOrders } = await supabase
+        .from("orders")
+        .select("id, total_amount, status, table_id, created_at")
+        .eq("restaurant_id", restId)
+        .gte("created_at", startISO);
+
+      if (todayOrders) {
+        setOrdersToday(todayOrders.length);
+        setGrossRevenue(todayOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0));
+        
+        const activeOrders = todayOrders.filter(o => o.status === "pending" || o.status === "paid" || o.status === "in-progress");
+        setKitchenLoad(activeOrders.length);
+      }
+
+      const { data: tablesData } = await supabase
+        .from("tables")
+        .select("id, table_name")
+        .eq("restaurant_id", restId);
+
+      if (tablesData && todayOrders) {
+        setTotalTables(tablesData.length);
+        
+        const activeOrders = todayOrders.filter(o => o.status === "pending" || o.status === "paid" || o.status === "in-progress");
+        const activeTableIds = new Set(activeOrders.map(o => o.table_id));
+        setActiveTables(activeTableIds.size);
+
+        const live: LiveTable[] = tablesData.map((table) => {
+          const tableOrders = activeOrders.filter(o => o.table_id === table.id).sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          const latestOrder = tableOrders[0];
+          
+          if (latestOrder) {
+            const diffMins = Math.floor((new Date().getTime() - new Date(latestOrder.created_at).getTime()) / 60000);
+            return {
+              id: table.id,
+              name: table.table_name,
+              statusText: latestOrder.status === "paid" ? "Awaiting Kitchen" : "Dining",
+              timeText: `${diffMins} min`,
+              tagText: "In Service",
+              colorCode: "orange"
+            };
+          } else {
+            return {
+              id: table.id,
+              name: table.table_name,
+              statusText: "Ready to Seat",
+              timeText: "0 min",
+              tagText: "Empty",
+              colorCode: "green"
+            };
+          }
+        });
+        setLiveTables(live);
+      }
+
+      if (todayOrders && todayOrders.length > 0) {
+        const orderIds = todayOrders.map(o => o.id);
+        const { data: orderItems } = await supabase
+          .from("order_items")
+          .select("quantity, unit_price, menu_items(name, menu_categories(name))")
+          .in("order_id", orderIds);
+
+        if (orderItems) {
+          const itemMap = new Map<string, TopItem>();
+          
+          orderItems.forEach((oi: any) => {
+            const name = oi.menu_items?.name || "Unknown";
+            const cat = oi.menu_items?.menu_categories?.name || "Menu Item";
+            const qty = oi.quantity || 0;
+            const rev = (oi.unit_price || 0) * qty;
+
+            if (itemMap.has(name)) {
+              const existing = itemMap.get(name)!;
+              existing.orders += qty;
+              existing.revenue += rev;
+            } else {
+              itemMap.set(name, { name, category: cat, orders: qty, revenue: rev });
+            }
+          });
+
+          const sortedItems = Array.from(itemMap.values()).sort((a, b) => b.orders - a.orders).slice(0, 5);
+          setTopItems(sortedItems);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchUserAndData();
+  }, [supabase]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-full py-40">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EA580C]"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-4 pr-4">
       <header className="sticky top-0">
@@ -66,7 +209,7 @@ const Overview = () => {
               Gross Revenue (Today)
             </p>
             <p className="text-2xl font-bold font-manrope text-[#191C1E]">
-              ₦142,500
+              ₦{grossRevenue.toLocaleString()}
             </p>
             <p className="text-[11px] text-[#64748B] font-inter">
               vs yesterday
@@ -86,13 +229,16 @@ const Overview = () => {
               Active Tables
             </p>
             <p className="text-2xl font-bold font-manrope text-[#191C1E]">
-              8{" "}
+              {activeTables}{" "}
               <span className="text-[17px] text-[#64748B] font-medium">
-                / 12
+                / {totalTables}
               </span>
             </p>
             <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden mt-2">
-              <div className="h-full w-[66%] bg-[#B45309] rounded-full"></div>
+              <div 
+                className="h-full bg-[#B45309] rounded-full transition-all duration-500"
+                style={{ width: `${totalTables > 0 ? (activeTables / totalTables) * 100 : 0}%` }}
+              ></div>
             </div>
           </div>
         </div>
@@ -103,9 +249,11 @@ const Overview = () => {
               <CookingPotIcon size={22} color="#9B1C1C" weight="bold" />
             </div>
 
-            <div className="bg-[#FDE8E8] text-[#9B1C1C] flex items-center px-2 py-1 w-fit text-[10px] rounded-md font-bold font-inter tracking-wider">
-              HIGH VOLUME
-            </div>
+            {kitchenLoad > 10 && (
+              <div className="bg-[#FDE8E8] text-[#9B1C1C] flex items-center px-2 py-1 w-fit text-[10px] rounded-md font-bold font-inter tracking-wider">
+                HIGH VOLUME
+              </div>
+            )}
           </header>
 
           <div className="flex flex-col gap-1">
@@ -113,10 +261,10 @@ const Overview = () => {
               Kitchen Load
             </p>
             <p className="text-2xl font-bold font-manrope text-[#191C1E]">
-              15 Tickets
+              {kitchenLoad} Tickets
             </p>
             <p className="text-[11px] text-[#B91C1C] font-semibold">
-              Avg. prep time: 24 mins
+              Pending & Paid Orders
             </p>
           </div>
         </div>
@@ -132,7 +280,7 @@ const Overview = () => {
             <p className="text-[#584237] font-medium text-[15px] font-inter">
               Orders Today
             </p>
-            <p className="text-2xl font-bold font-manrope text-[#191C1E]">53</p>
+            <p className="text-2xl font-bold font-manrope text-[#191C1E]">{ordersToday}</p>
             <p className="text-[11px] text-[#64748B] font-inter">
               Across all categories
             </p>
@@ -154,203 +302,89 @@ const Overview = () => {
             </a>
           </header>
 
-          <div className="flex flex-col gap-7 px-6 pt-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="size-11.5 flex items-center justify-center bg-[#AC4D00] text-white font-bold text-lg rounded-[10px]">
-                  1
+          <div className="flex flex-col gap-7 px-6 pt-4 h-[350px] overflow-y-auto hide-scrollbar">
+            {topItems.length > 0 ? topItems.map((item, i) => {
+              const colors = [
+                { bg: "bg-[#AC4D00]", text: "text-white" },
+                { bg: "bg-[#FFC2A8]", text: "text-[#713100]" },
+                { bg: "bg-[#E2E8F0]", text: "text-[#334155]" },
+                { bg: "bg-[#3488f5]", text: "text-[#334155]" },
+                { bg: "bg-[#a9caf5]", text: "text-[#334155]" },
+              ];
+              const c = colors[i % colors.length];
+              return (
+                <div className="flex items-center justify-between" key={i}>
+                  <div className="flex items-center gap-4">
+                    <div className={`size-11.5 flex items-center justify-center font-bold text-lg rounded-[10px] ${c.bg} ${c.text}`}>
+                      {i + 1}
+                    </div>
+                    <div>
+                      <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                        {item.name}
+                      </p>
+                      <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                        {item.category}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                      ₦{item.revenue.toLocaleString()}
+                    </p>
+                    <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
+                      {item.orders} orders
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    Catfish Pepper Soup
-                  </p>
-                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Best Seller
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                  ₦202,500
-                </p>
-                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                  45 orders
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="size-11.5 flex items-center justify-center bg-[#FFC2A8] text-[#713100] font-bold text-lg rounded-[10px]">
-                  2
-                </div>
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    Jollof Rice
-                  </p>
-                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Popular
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                  ₦133,000
-                </p>
-                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                  38 orders
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="size-11.5 flex items-center justify-center bg-[#E2E8F0] text-[#334155] font-bold text-lg rounded-[10px]">
-                  3
-                </div>
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    Chilled Coke
-                  </p>
-                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Beverage
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                  ₦25,000
-                </p>
-                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                  25 orders
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="size-11.5 flex items-center justify-center bg-[#3488f5] text-[#334155] font-bold text-lg rounded-[10px]">
-                  4
-                </div>
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    Chilled Coke
-                  </p>
-                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Beverage
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                  ₦25,000
-                </p>
-                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                  25 orders
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="size-11.5 flex items-center justify-center bg-[#a9caf5] text-[#334155] font-bold text-lg rounded-[10px]">
-                  5
-                </div>
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    Chilled Coke
-                  </p>
-                  <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                    Beverage
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                  ₦25,000
-                </p>
-                <p className="text-[12.5px] font-inter text-[#64748B] mt-0.5">
-                  25 orders
-                </p>
-              </div>
-            </div>
+              );
+            }) : (
+              <p className="text-gray-500 text-sm italic mt-4 text-center">No items sold today yet.</p>
+            )}
           </div>
         </div>
 
-        <div className="bg-white col-span-3 rounded-xl pb-6 border shadow-xs border-gray-200">
-          <header className="flex justify-between items-center p-6 pb-4">
+        <div className="bg-white col-span-3 rounded-xl pb-6 border shadow-xs border-gray-200 flex flex-col">
+          <header className="flex justify-between items-center p-6 pb-4 shrink-0">
             <p className="font-bold text-lg font-manrope text-[#191C1E]">
               Live Table Feed
             </p>
             <div className="size-2 bg-[#10B981] rounded-full"></div>
           </header>
 
-          <div className="flex flex-col gap-4 px-6 pt-2">
-            <div className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#10B981]"></div>
-              <div className="flex items-center justify-between w-full pl-2">
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    Table 1
-                  </p>
-                  <p className="text-[10px] font-bold font-inter text-[#10B981] mt-1.5 uppercase tracking-wide">
-                    Ready to Seat
-                  </p>
+          <div className="flex flex-col gap-4 px-6 pt-2 h-[350px] overflow-y-auto hide-scrollbar">
+            {liveTables.map((table) => {
+              const theme = table.colorCode === "green" 
+                ? { line: "bg-[#10B981]", text: "text-[#10B981]", bgTag: "bg-[#D1FAE5]", textTag: "text-[#047857]" }
+                : { line: "bg-[#D97706]", text: "text-[#D97706]", bgTag: "bg-[#FFEDD5]", textTag: "text-[#C2410C]" };
+                
+              return (
+                <div className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative shrink-0" key={table.id}>
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 ${theme.line}`}></div>
+                  <div className="flex items-center justify-between w-full pl-2">
+                    <div>
+                      <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
+                        {table.name}
+                      </p>
+                      <p className={`text-[10px] font-bold font-inter mt-1.5 uppercase tracking-wide ${theme.text}`}>
+                        {table.statusText}
+                      </p>
+                    </div>
+                    <div className="text-right flex flex-col justify-between items-end h-full">
+                      <p className="text-[13px] font-semibold text-[#191C1E] mb-1.5">
+                        {table.timeText}
+                      </p>
+                      <p className={`text-[9.5px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${theme.bgTag} ${theme.textTag}`}>
+                        {table.tagText}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right flex flex-col justify-between items-end h-full">
-                  <p className="text-[13px] font-semibold text-[#191C1E] mb-1.5">
-                    0 min
-                  </p>
-                  <p className="text-[9.5px] font-bold bg-[#D1FAE5] text-[#047857] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                    Empty
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#D97706]"></div>
-              <div className="flex items-center justify-between w-full pl-2">
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    Table 2
-                  </p>
-                  <p className="text-[10px] font-bold font-inter text-[#D97706] mt-1.5 uppercase tracking-wide">
-                    Awaiting Check
-                  </p>
-                </div>
-                <div className="text-right flex flex-col justify-between items-end h-full">
-                  <p className="text-[13px] font-semibold text-[#191C1E] mb-1.5">
-                    45 min
-                  </p>
-                  <p className="text-[9.5px] font-bold bg-[#FFEDD5] text-[#C2410C] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                    In Service
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative">
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#64748B]"></div>
-              <div className="flex items-center justify-between w-full pl-2">
-                <div>
-                  <p className="font-bold text-[15px] font-manrope text-[#191C1E]">
-                    VIP Lounge
-                  </p>
-                  <p className="text-[10px] font-bold font-inter text-[#64748B] mt-1.5 uppercase tracking-wide">
-                    Main Course
-                  </p>
-                </div>
-                <div className="text-right flex flex-col justify-between items-end h-full">
-                  <p className="text-[13px] font-semibold text-[#191C1E] mb-1.5">
-                    12 min
-                  </p>
-                  <p className="text-[9.5px] font-bold bg-[#E0E7FF] text-[#4338CA] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                    Dining
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <button className="mt-2 w-full flex items-center justify-center gap-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors py-3.5 rounded-xl font-bold font-manrope text-[#191C1E] text-sm md:text-[15px]">
+              );
+            })}
+          </div>
+          
+          <div className="px-6 pt-4 shrink-0">
+            <button className="w-full flex items-center justify-center gap-2 bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors py-3.5 rounded-xl font-bold font-manrope text-[#191C1E] text-sm md:text-[15px]">
               <svg
                 width="18"
                 height="18"
@@ -358,42 +392,10 @@ const Overview = () => {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <rect
-                  x="3"
-                  y="3"
-                  width="7"
-                  height="7"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  rx="1.5"
-                />
-                <rect
-                  x="14"
-                  y="3"
-                  width="7"
-                  height="7"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  rx="1.5"
-                />
-                <rect
-                  x="3"
-                  y="14"
-                  width="7"
-                  height="7"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  rx="1.5"
-                />
-                <rect
-                  x="14"
-                  y="14"
-                  width="7"
-                  height="7"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  rx="1.5"
-                />
+                <rect x="3" y="3" width="7" height="7" stroke="currentColor" strokeWidth="2.5" rx="1.5" />
+                <rect x="14" y="3" width="7" height="7" stroke="currentColor" strokeWidth="2.5" rx="1.5" />
+                <rect x="3" y="14" width="7" height="7" stroke="currentColor" strokeWidth="2.5" rx="1.5" />
+                <rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="2.5" rx="1.5" />
               </svg>
               Full Floor Plan
             </button>
