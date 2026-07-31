@@ -10,6 +10,7 @@ import qrCode from "@/public/qr-code/qr-code.png";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import QRCode from "react-qr-code";
+import { toPng } from "html-to-image";
 
 interface Table {
   table_name: string;
@@ -69,6 +70,23 @@ const Page = () => {
     fetchTables();
   }, []);
 
+  const downloadQRCode = async (tableId: string, tableName: string) => {
+    const element = document.getElementById(`qr-${tableId}`);
+    if (!element) return;
+    try {
+      const dataUrl = await toPng(element, {
+        pixelRatio: 3, // High quality download
+        backgroundColor: "#ffffff", // Ensure it has a white background
+      });
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `${tableName.replace(/\s+/g, "_")}_QR.png`;
+      link.click();
+    } catch (err) {
+      console.error("Failed to download QR code", err);
+    }
+  };
+
   return (
     <div className="p-4 py-6">
       <div className="font-manrope">
@@ -98,7 +116,7 @@ const Page = () => {
 
       <div className="p-2 mt-4 flex flex-wrap gap-5">
         {tables.map((table) => (
-          <div className="bg-white w-fit rounded-xl p-1" key={table.id}>
+          <div className="bg-white w-fit rounded-xl p-3 shadow-sm border border-gray-100" key={table.id} id={`qr-${table.id}`}>
             <div className="w-full object-cover">
               <QRCode
                 value={`${baseUrl}/order?table_id=${table.id}`}
@@ -108,16 +126,18 @@ const Page = () => {
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
               />
             </div>
-            <div className="mt-2 p-2 flex justify-between items-end">
+            <div className="mt-2 p-2 flex justify-between items-end gap-3">
               <div>
                 <p className="text-lg font-medium text-gray-700">
                   {table.table_name}
                 </p>
-                <p className="text-sm text-gray-500 font-medium leading-3 truncate w-40 overflow-hidden">
+                <p className="text-sm text-gray-500 font-medium leading-3 truncate w-24 overflow-hidden">
                   #{table.id}
                 </p>
               </div>
-              <button className="border-2 border-orange-400 text-orange-400 hover:text-orange-300 hover:border-orange-300 transition-colors rounded-lg p-1 cursor-pointer">
+              <button 
+                onClick={() => downloadQRCode(table.id, table.table_name)}
+                className="border-2 border-orange-400 text-orange-400 hover:bg-orange-50 hover:border-orange-500 transition-colors rounded-lg p-1.5 cursor-pointer">
                 <DownloadSimpleIcon size={20} weight="bold" />
               </button>
             </div>
