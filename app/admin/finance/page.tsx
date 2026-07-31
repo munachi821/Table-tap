@@ -15,23 +15,109 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
-const page = () => {
-  const generateChartData = () => {
-    const baseData = [
-      7500, 11000, 8500, 12000, 10000, 15000, 9000, 7800, 10000, 12500, 11500,
-      14000, 11500, 13000, 10500, 10800, 16000, 14500, 18000, 9500, 13500, 8800,
-      12000, 16000, 10500, 13000, 12800, 14500, 12000, 15000, 11000, 16500,
-      14800, 18500, 9200,
-    ];
+const FinancePage = () => {
+  const supabase = createClient();
+  const [isLoading, setIsLoading] = useState(true);
+  const [grossVolume, setGrossVolume] = useState(0);
+  const [processingFees, setProcessingFees] = useState(0);
+  const [netEarnings, setNetEarnings] = useState(0);
+  const [nextPayout, setNextPayout] = useState(0);
+  const [chartData, setChartData] = useState<any[]>([]);
 
-    return baseData.slice(0, 30).map((value, index) => ({
-      day: `D${index + 1}`,
-      revenue: value,
-    }));
-  };
+  useEffect(() => {
+    const fetchFinanceData = async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        setIsLoading(false);
+        return;
+      }
 
-  const chartData = generateChartData();
+      const { data: restaurant } = await supabase
+        .from("restaurants")
+        .select("id")
+        .eq("owner_id", user.user.id)
+        .single();
+
+      if (restaurant) {
+        // get date 30 days ago
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
+        thirtyDaysAgo.setHours(0, 0, 0, 0); // start of the day
+        const dateString = thirtyDaysAgo.toISOString();
+
+        const { data: ordersData } = await supabase
+          .from("orders")
+          .select("created_at, total_amount, status")
+          .eq("restaurant_id", restaurant.id)
+          .gte("created_at", dateString)
+          .in("status", ["paid", "completed"]);
+
+        if (ordersData) {
+          // Gross volume over 30 days
+          const totalGross = ordersData.reduce(
+            (acc, order) => acc + (order.total_amount || 0),
+            0
+          );
+          
+          // Paystack 1.5% fee
+          const fees = totalGross * 0.015;
+          const net = totalGross - fees;
+
+          setGrossVolume(totalGross);
+          setProcessingFees(fees);
+          setNetEarnings(net);
+
+          // Next payout = today's net earnings (Paystack T+1 settlement)
+          const todayStr = new Date().toDateString();
+          const todayGross = ordersData
+            .filter((o) => new Date(o.created_at).toDateString() === todayStr)
+            .reduce((acc, order) => acc + (order.total_amount || 0), 0);
+          setNextPayout(todayGross * 0.985);
+
+          // Chart data mapping
+          const last30Days = [];
+          for (let i = 29; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            last30Days.push(d.toDateString());
+          }
+
+          const dataByDay = ordersData.reduce((acc: any, order) => {
+            const day = new Date(order.created_at).toDateString();
+            if (!acc[day]) acc[day] = 0;
+            acc[day] += order.total_amount || 0;
+            return acc;
+          }, {});
+
+          const formattedChartData = last30Days.map((dayStr, index) => ({
+            day: `D${index + 1}`,
+            revenue: dataByDay[dayStr] || 0,
+          }));
+
+          setChartData(formattedChartData);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchFinanceData();
+  }, [supabase]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-full py-40">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EA580C]"></div>
+      </div>
+    );
+  }
+
+  // Calculate the max value for YAxis domain scaling
+  const maxRevenue = chartData.reduce((max, d) => (d.revenue > max ? d.revenue : max), 0);
+  const yAxisMax = Math.max(20000, Math.ceil(maxRevenue / 10000) * 10000);
+
   return (
     <div className="p-4 py-6">
       <div className="font-manrope">
@@ -42,7 +128,7 @@ const page = () => {
       </div>
 
       <div className="grid grid-cols-4 mt-6 gap-4">
-        <div className="bg-white rounded-2xl p-5">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50">
           <div className="p-2 w-fit rounded-xl bg-[#F4EAE2] text-[#9E4301]">
             <WalletIcon size={25} weight="bold" />
           </div>
@@ -50,7 +136,7 @@ const page = () => {
           <div className="mt-5">
             <p className="text-sm text-[#594236] font-semibold">Gross Volume</p>
             <h2 className="text-3xl font-semibold text-[#1B1D1E] font-inter">
-              ₦1,500,000
+              ₦{grossVolume.toLocaleString()}
             </h2>
             <span className="text-[13.5px] text-[#9B8E87] font-inter">
               Total customer payments
@@ -58,7 +144,7 @@ const page = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50">
           <div className="p-2 w-fit rounded-xl bg-[#F7E1DC] text-[#BE1F19]">
             <ReceiptIcon size={25} weight="bold" />
           </div>
@@ -68,7 +154,7 @@ const page = () => {
               Processing Fees
             </p>
             <h2 className="text-3xl font-semibold text-[#BD1E1A] font-inter">
-              -₦22,500
+              -₦{processingFees.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </h2>
             <span className="text-[13.5px] text-[#9B8E87] font-inter">
               Paystack + Platform fees
@@ -76,7 +162,7 @@ const page = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50">
           <div className="p-2 w-fit rounded-xl bg-[#E5EAEB] text-[#096393]">
             <MoneyIcon size={25} weight="bold" />
           </div>
@@ -84,7 +170,7 @@ const page = () => {
           <div className="mt-5">
             <p className="text-sm text-[#594236] font-semibold">Net Earnings</p>
             <h2 className="text-3xl font-semibold text-[#016497] font-inter">
-              ₦1,477,500
+              ₦{netEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </h2>
             <span className="text-[13.5px] text-[#9B8E87] font-inter">
               Actual Revenue
@@ -92,7 +178,7 @@ const page = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50">
           <div className="p-2 w-fit rounded-xl bg-[#D5E0F8] text-[#586377]">
             <ClockIcon size={25} weight="bold" />
           </div>
@@ -100,7 +186,7 @@ const page = () => {
           <div className="mt-5">
             <p className="text-sm text-[#584237] font-semibold">Next Payout</p>
             <h2 className="text-3xl font-semibold text-[#1B1D1E] font-inter">
-              ₦340,000
+              ₦{nextPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </h2>
             <span className="text-[13.5px] text-[#9B8E87] font-inter">
               Tomorrow @ 8:00AM
@@ -109,20 +195,20 @@ const page = () => {
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-2xl mt-4">
+      <div className="bg-white p-5 rounded-2xl mt-4 shadow-sm border border-gray-50">
         <div className="flex items-end justify-between">
           <div className="font-manrope">
             <p className="font-semibold text-xl">Last 30 Days Revenue</p>
-            <p className="text-base">
+            <p className="text-base text-gray-500">
               Daily gross volume across all payment channels
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="px-4 py-1.5 text-sm font-semibold bg-[#F2F4F6] text-[#584237] rounded-full">
+            <button className="px-4 py-1.5 text-sm font-semibold bg-[#9D4300] text-white rounded-full transition-colors cursor-pointer">
               Daily
             </button>
-            <button className="px-4 py-1.5 text-sm font-semibold bg-[#9D4300] text-white rounded-full">
+            <button className="px-4 py-1.5 text-sm font-semibold bg-[#F2F4F6] hover:bg-gray-200 text-[#584237] rounded-full transition-colors cursor-pointer">
               Weekly
             </button>
           </div>
@@ -134,7 +220,7 @@ const page = () => {
               30-Day Revenue Trend
             </h2>
             <span className="text-xl font-semibold text-[#111827]">
-              ₦1,477,500
+              ₦{grossVolume.toLocaleString()}
             </span>
           </div>
 
@@ -159,8 +245,8 @@ const page = () => {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#6B7280", fontSize: 13 }}
-                  domain={[0, 20000]}
-                  ticks={[0, 5000, 10000, 15000, 20000]}
+                  domain={[0, yAxisMax]}
+                  ticks={[0, yAxisMax * 0.25, yAxisMax * 0.5, yAxisMax * 0.75, yAxisMax]}
                   tickFormatter={(value) => {
                     if (value === 0) return "0";
                     return `₦${(value / 1000).toFixed(0)}k`;
@@ -193,7 +279,7 @@ const page = () => {
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-2xl mt-4">
+      <div className="bg-white p-5 rounded-2xl mt-4 shadow-sm border border-gray-50">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-semibold text-xl text-[#1F2937]">
             Recent Bank Settlements
@@ -226,12 +312,12 @@ const page = () => {
             <tbody className="text-[13px]">
               <tr className="border-b border-gray-100">
                 <td className="py-4 font-semibold text-[#9E4301]">#ST_0092</td>
-                <td className="py-4 text-[#584237]">June 3, 2026</td>
+                <td className="py-4 text-[#584237]">Today</td>
                 <td className="py-4 text-[#1B1D1E] font-medium">
                   GTBank (**** 4829)
                 </td>
                 <td className="py-4 font-bold text-[#1B1D1E] text-sm">
-                  ₦340,000
+                  ₦{nextPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </td>
                 <td className="py-4">
                   <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#F4EAE2] text-[#9E4301]">
@@ -239,14 +325,14 @@ const page = () => {
                   </span>
                 </td>
                 <td className="py-4 text-right">
-                  <button className="text-gray-400 hover:text-gray-600">
+                  <button className="text-gray-400 hover:text-gray-600 cursor-pointer">
                     <DotsThreeIcon size={24} weight="bold" />
                   </button>
                 </td>
               </tr>
               <tr className="border-b border-gray-100">
                 <td className="py-4 font-semibold text-[#9E4301]">#ST_0091</td>
-                <td className="py-4 text-[#584237]">June 2, 2026</td>
+                <td className="py-4 text-[#584237]">Yesterday</td>
                 <td className="py-4 text-[#1B1D1E] font-medium">
                   GTBank (**** 4829)
                 </td>
@@ -259,27 +345,7 @@ const page = () => {
                   </span>
                 </td>
                 <td className="py-4 text-right">
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <DotsThreeIcon size={24} weight="bold" />
-                  </button>
-                </td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="py-4 font-semibold text-[#9E4301]">#ST_0090</td>
-                <td className="py-4 text-[#584237]">June 1, 2026</td>
-                <td className="py-4 text-[#1B1D1E] font-medium">
-                  GTBank (**** 4829)
-                </td>
-                <td className="py-4 font-bold text-[#1B1D1E] text-sm">
-                  ₦280,000
-                </td>
-                <td className="py-4">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#CDEBF8] text-[#096393]">
-                    SUCCESS
-                  </span>
-                </td>
-                <td className="py-4 text-right">
-                  <button className="text-gray-400 hover:text-gray-600">
+                  <button className="text-gray-400 hover:text-gray-600 cursor-pointer">
                     <DotsThreeIcon size={24} weight="bold" />
                   </button>
                 </td>
@@ -287,7 +353,7 @@ const page = () => {
             </tbody>
           </table>
           <div className="mt-6 mb-2 flex justify-center font-manrope">
-            <button className="text-[11px] font-bold text-[#9E4301] tracking-widest uppercase hover:underline">
+            <button className="text-[11px] font-bold text-[#9E4301] tracking-widest uppercase hover:underline cursor-pointer">
               View Full Settlement History
             </button>
           </div>
@@ -296,4 +362,5 @@ const page = () => {
     </div>
   );
 };
-export default page;
+
+export default FinancePage;
