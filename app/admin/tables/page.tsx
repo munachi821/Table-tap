@@ -116,8 +116,8 @@ const Page = () => {
 
       <div className="p-2 mt-4 flex flex-wrap gap-5">
         {tables.map((table) => (
-          <div className="bg-white w-fit rounded-xl p-3 shadow-sm border border-gray-100" key={table.id} id={`qr-${table.id}`}>
-            <div className="w-full object-cover">
+          <div className="bg-white w-fit rounded-xl p-3 shadow-sm border border-gray-100" key={table.id}>
+            <div className="w-full object-cover p-2 bg-white" id={`qr-${table.id}`}>
               <QRCode
                 value={`${baseUrl}/order?table_id=${table.id}`}
                 size={128}
