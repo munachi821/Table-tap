@@ -23,10 +23,18 @@ const AdminSidebar = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const { data: user } = await supabase.auth.getUser();
-      setRestName(user?.user?.user_metadata.name);
+      const { data: userData, error } = await supabase
+        .from("restaurants")
+        .select("name")
+        .eq("owner_id", user?.user?.id)
+        .single();
+      if (error) {
+        console.error("Error fetching user data", error);
+      }
+      setRestName(userData?.name);
     };
     fetchUser();
-  });
+  }, []);
 
   const admintabs = [
     { name: "Overview", Icon: SquaresFourIcon, link: "/admin/overview" },
