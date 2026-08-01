@@ -1,0 +1,145 @@
+"use client";
+import { CameraIcon, ImageIcon } from "@phosphor-icons/react";
+
+const ProfileTab = () => {
+  return (
+    <div>
+      <div className="border-b border-[#D6C9B9] p-5">
+        <p className="text-[#1B1D1E] text-2xl font-bold">
+          Restaurant Profile
+        </p>
+        <p className="text-[#584237] text-base font-medium">
+          Update your restaurant information and preferences.
+        </p>
+      </div>
+
+      <form className="p-5 space-y-6">
+        <div>
+          <label
+            htmlFor="brand"
+            className="mb-2 block font-inter font-semibold"
+          >
+            Brand Assets
+          </label>
+          <div className="flex items-center gap-6">
+            <div className="w-76 h-50 border-2 border-dashed border-[#E0C0B1] transition-all hover:border-[#9D4300] rounded-2xl flex flex-col items-center justify-center font-inter space-y-1.5 cursor-pointer">
+              <div className="p-4 rounded-full bg-[#F8EEE9] text-[#584237]">
+                <CameraIcon size={25} weight="bold" />
+              </div>
+              <p className="font-semibold text-sm tracking-wide">
+                UPLOAD LOGO
+              </p>
+              <p className="text-xs">PNG, JPG (max 3MB)</p>
+            </div>
+            <div className="w-full h-50 border-2 border-dashed border-[#E0C0B1] transition-all hover:border-[#9D4300] rounded-2xl flex flex-col items-center justify-center font-inter space-y-1.5 cursor-pointer">
+              <ImageIcon size={26} className="text-[#584237]" />
+              <p className="font-semibold text-sm tracking-wide">
+                MENU BANNER
+              </p>
+              <p className="text-xs tracking-wider">
+                Recommended 1200 x 400px
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="border-l-4 border-[#9D4300] font-semibold pl-2.5 font-inter">
+            Restaurant Details
+          </p>
+
+          <div className="grid grid-cols-2 gap-4 mt-5">
+            <div className="space-y-2">
+              <label
+                htmlFor="name"
+                className="text-[#584237] text-sm font-semibold mb-2 block"
+              >
+                RESTAURANT NAME
+              </label>
+              <input
+                type="text"
+                id="name"
+                className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+                placeholder="e.g. The Italian Place"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="number"
+                className="text-[#584237] text-sm font-semibold mb-2 block"
+              >
+                PHONE NUMBER
+              </label>
+              <input
+                type="number"
+                id="number"
+                className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+                placeholder="08011223345"
+              />
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <label
+              htmlFor="support"
+              className="text-[#584237] text-sm font-semibold mb-2 block"
+            >
+              SUPPORT EMAIL
+            </label>
+            <input
+              type="text"
+              id="support"
+              className="w-full h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+              placeholder="hello@restaurant.com"
+            />
+          </div>
+
+          <div className="mt-5">
+            <label
+              htmlFor="address"
+              className="text-[#584237] text-sm font-semibold mb-2 block"
+            >
+              PHYSICAL ADDRESS
+            </label>
+            <textarea
+              id="address"
+              className="w-full h-24 p-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+              rows={4}
+              placeholder="12 hero road, apapa lagos street, jigawa"
+            />
+          </div>
+        </div>
+
+        <p className="border-l-4 border-[#9D4300] font-semibold pl-2.5 font-inter mt-6">
+          Legal Information
+        </p>
+
+        <div className="mt-5">
+          <label
+            htmlFor="tax-no"
+            className="text-[#584237] text-sm font-semibold mb-2 block"
+          >
+            Tax Identification Number (TIN) / VAT
+          </label>
+          <input
+            type="text"
+            id="tax-no"
+            className="w-1/2 h-12 px-4 rounded-xl border border-[#C6C9CF] bg-[#F7F9FB] font-inter font-medium text-base focus:outline-[#9D4300]"
+            placeholder="1122-3348221"
+          />
+        </div>
+
+        <div className="mt-6 border-t border-[#F2F4F6] pt-5 flex justify-end gap-4">
+          <button type="button" className="px-4 py-2 rounded-full text-[#9D4300] hover:text-gray-700 hover:bg-[#C6C9CF] text-[14px] font-semibold cursor-pointer transition-colors">
+            Discard
+          </button>
+          <button type="button" className="bg-[#9D4300] hover:bg-[#833800] px-4 py-2 rounded-full text-white text-[14px] font-semibold cursor-pointer transition-colors">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+export default ProfileTab;
