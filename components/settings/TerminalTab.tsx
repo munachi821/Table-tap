@@ -8,9 +8,10 @@ import {
 } from "@phosphor-icons/react";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-
+import { generateKDSCredentials } from "@/app/actions/kds";
 const TerminalTab = () => {
   const supabase = createClient();
+  const [restaurantId, setRestaurantId] = useState("");
   const [slug, setSlug] = useState("");
   const [password, setPassword] = useState("••••••••");
   const [email, setEmail] = useState("Loading...");
@@ -24,7 +25,7 @@ const TerminalTab = () => {
       } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from("restaurants")
-        .select("slug, name, kds_password, kds_email")
+        .select("id, slug, name, kds_password, kds_email")
         .eq("owner_id", user?.id)
         .single();
 
@@ -38,6 +39,7 @@ const TerminalTab = () => {
                 .replace(/(^-|-$)+/g, "")
             : "");
         setSlug(fallbackSlug);
+        setRestaurantId(data.id);
 
         if (data.kds_password) {
           setPassword(data.kds_password);
@@ -56,32 +58,16 @@ const TerminalTab = () => {
 
   const handleGenerate = async () => {
     setIsGenerating(true);
-    // Generate a secure string (e.g., KDS-9X7P2A)
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let newPass = slug;
-    for (let i = 0; i < 6; i++) {
-      newPass += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const generatedEmail =
-      email === "Loading..." ? `kitchen@${slug}.tabletap.com` : email;
-
-    const { error } = await supabase
-      .from("restaurants")
-      .update({ kds_password: newPass, kds_email: generatedEmail })
-      .eq("owner_id", user?.id);
+    const result = await generateKDSCredentials(slug, restaurantId);
 
     setIsGenerating(false);
-    if (error) {
-      alert("Error generating KDS password.");
-      console.error(error);
-    } else {
-      setPassword(newPass);
-      setEmail(generatedEmail);
+    if (result.error) {
+      alert("Error generating KDS password: " + result.error);
+      console.error(result.error);
+    } else if (result.email && result.password) {
+      setPassword(result.password);
+      setEmail(result.email);
       alert("New KDS password generated successfully!");
     }
   };
