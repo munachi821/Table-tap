@@ -27,11 +27,11 @@ const AdminSidebar = () => {
         .from("restaurants")
         .select("name")
         .eq("owner_id", user?.user?.id)
-        .single();
+        .maybeSingle();
       if (error) {
         console.error("Error fetching user data", error);
       }
-      setRestName(userData?.name);
+      setRestName(userData?.name || "Admin Dashboard");
     };
     fetchUser();
   }, []);

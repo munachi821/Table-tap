@@ -84,7 +84,7 @@ const Kitchen = () => {
               .from("restaurants")
               .select("name, logo_url")
               .eq("id", restaurantId)
-              .single();
+              .maybeSingle();
 
             if (dbError) {
               console.error("DB error fetching restaurant:", dbError);

@@ -4,6 +4,7 @@ import {
   MagnifyingGlassIcon,
   PlusIcon,
   XIcon,
+  QrCode,
 } from "@phosphor-icons/react";
 import Image from "next/image";
 import qrCode from "@/public/qr-code/qr-code.png";
@@ -21,6 +22,7 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tableName, setTableName] = useState("");
   const [tables, setTables] = useState<Table[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -32,7 +34,7 @@ const Page = () => {
       .from("restaurants")
       .select("id")
       .eq("owner_id", data?.user?.id)
-      .single();
+      .maybeSingle();
     if (gettingRestErr) {
       console.error("Error getting restaurant", gettingRestErr);
       return;
@@ -56,14 +58,34 @@ const Page = () => {
   };
 
   const fetchTables = async () => {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) {
+      setIsLoading(false);
+      return;
+    }
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", user.user.id)
+      .maybeSingle();
+
+    if (!restaurant) {
+      setTables([]);
+      setIsLoading(false);
+      return;
+    }
+
     const { data: tables, error: tablesErr } = await supabase
       .from("tables")
-      .select("*");
+      .select("*")
+      .eq("restaurant_id", restaurant.id);
     if (tablesErr) {
       console.error("Error fetching tables", tablesErr);
+      setIsLoading(false);
       return;
     }
     setTables(tables);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -115,34 +137,63 @@ const Page = () => {
       </div>
 
       <div className="p-2 mt-4 flex flex-wrap gap-5">
-        {tables.map((table) => (
-          <div className="bg-white w-fit rounded-xl p-3 shadow-sm border border-gray-100" key={table.id}>
-            <div className="w-full object-cover p-2 bg-white" id={`qr-${table.id}`}>
-              <QRCode
-                value={`${baseUrl}/order?table_id=${table.id}`}
-                size={128}
-                bgColor="#FFFFFF"
-                fgColor="#0F172A"
-                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-              />
-            </div>
-            <div className="mt-2 p-2 flex justify-between items-end gap-3">
-              <div>
-                <p className="text-lg font-medium text-gray-700">
-                  {table.table_name}
-                </p>
-                <p className="text-sm text-gray-500 font-medium leading-3 truncate w-24 overflow-hidden">
-                  #{table.id}
-                </p>
+        {isLoading ? (
+          <div className="flex gap-5 flex-wrap animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white w-[160px] rounded-xl p-3 shadow-sm border border-gray-100">
+                <div className="w-full h-[135px] bg-gray-200 mb-3 rounded" />
+                <div className="flex justify-between items-end gap-3 px-1">
+                  <div>
+                    <div className="h-5 w-20 bg-gray-200 rounded mb-1" />
+                    <div className="h-3 w-12 bg-gray-200 rounded" />
+                  </div>
+                  <div className="size-8 bg-gray-200 rounded-lg" />
+                </div>
               </div>
-              <button 
-                onClick={() => downloadQRCode(table.id, table.table_name)}
-                className="border-2 border-orange-400 text-orange-400 hover:bg-orange-50 hover:border-orange-500 transition-colors rounded-lg p-1.5 cursor-pointer">
-                <DownloadSimpleIcon size={20} weight="bold" />
-              </button>
-            </div>
+            ))}
           </div>
-        ))}
+        ) : tables.length === 0 ? (
+          <div className="w-full flex flex-col items-center justify-center py-20 text-gray-400">
+            <div className="size-24 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-5 shadow-inner">
+              <QrCode size={48} weight="duotone" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-2 font-manrope">
+              No QR Codes created yet
+            </h2>
+            <p className="text-[15px] font-medium text-gray-500 text-center max-w-md font-inter">
+              Create your first QR code so customers can scan it to view your menu directly from their tables.
+            </p>
+          </div>
+        ) : (
+          tables.map((table) => (
+            <div className="bg-white w-fit rounded-xl p-3 shadow-sm border border-gray-100" key={table.id}>
+              <div className="w-full object-cover p-2 bg-white" id={`qr-${table.id}`}>
+                <QRCode
+                  value={`${baseUrl}/order?table_id=${table.id}`}
+                  size={128}
+                  bgColor="#FFFFFF"
+                  fgColor="#0F172A"
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                />
+              </div>
+              <div className="mt-2 p-2 flex justify-between items-end gap-3">
+                <div>
+                  <p className="text-lg font-medium text-gray-700">
+                    {table.table_name}
+                  </p>
+                  <p className="text-sm text-gray-500 font-medium leading-3 truncate w-24 overflow-hidden">
+                    #{table.id}
+                  </p>
+                </div>
+                <button 
+                  onClick={() => downloadQRCode(table.id, table.table_name)}
+                  className="border-2 border-orange-400 text-orange-400 hover:bg-orange-50 hover:border-orange-500 transition-colors rounded-lg p-1.5 cursor-pointer">
+                  <DownloadSimpleIcon size={20} weight="bold" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
       {isModalOpen && (
         <div

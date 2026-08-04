@@ -65,7 +65,7 @@ const HistoryPage = () => {
         .from("restaurants")
         .select("id")
         .eq("owner_id", user.user.id)
-        .single();
+        .maybeSingle();
 
       if (restaurant) {
         const { data: ordersData, error } = await supabase

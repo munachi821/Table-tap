@@ -39,7 +39,7 @@ const FinancePage = () => {
         .from("restaurants")
         .select("id")
         .eq("owner_id", user.user.id)
-        .single();
+        .maybeSingle();
 
       if (restaurant) {
         // get date 30 days ago

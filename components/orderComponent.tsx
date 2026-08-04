@@ -81,7 +81,7 @@ const OrderComponent = () => {
         .from("tables")
         .select("*, restaurants(id, name, address, logo_url)")
         .eq("id", tableId)
-        .single();
+        .maybeSingle();
       if (tablesError) {
         console.error("Error fetching table", tablesError);
         return;

@@ -33,7 +33,7 @@ const ProfileTab = () => {
         .from("restaurants")
         .select("*")
         .eq("owner_id", data?.user?.id)
-        .single();
+        .maybeSingle();
       if (userError) {
         console.error("Error fetching user data", userError);
       }

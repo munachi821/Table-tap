@@ -70,7 +70,7 @@ const Page = () => {
       .from("restaurants")
       .select("id")
       .eq("owner_id", user?.id)
-      .single();
+      .maybeSingle();
 
     let finalImagePath = "";
 
@@ -186,11 +186,22 @@ const Page = () => {
       data: { user },
     } = await supabase.auth.getUser();
 
+    if (!user) {
+      setIsFetching(false);
+      return;
+    }
+
     const { data: restaurant } = await supabase
       .from("restaurants")
       .select("id")
       .eq("owner_id", user?.id)
-      .single();
+      .maybeSingle();
+
+    if (!restaurant) {
+      setMenuItems([]);
+      setIsFetching(false);
+      return;
+    }
 
     const { data: items, error } = await supabase
       .from("menu_items")
@@ -318,10 +329,35 @@ const Page = () => {
             ) : menuItems.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-20 text-center">
-                  <p className="text-[#64748B] font-inter text-sm">
-                    No menu items found. Click &quot;Add New Item&quot; to get
-                    started!
-                  </p>
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="size-20 bg-orange-50 text-orange-300 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                      <span className="text-4xl">🍲</span>
+                    </div>
+                    <p className="text-[#0F172A] font-manrope font-semibold text-lg mb-1">
+                      Your menu is currently empty
+                    </p>
+                    <p className="text-[#64748B] font-inter text-sm max-w-sm">
+                      Click &quot;Add New Item&quot; to start curating your culinary offerings for your customers.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : menuItems.filter((item) =>
+                item.name.toLowerCase().includes(searchValue.toLowerCase()),
+              ).length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-20 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="size-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                      <MagnifyingGlassIcon size={36} weight="duotone" />
+                    </div>
+                    <p className="text-[#0F172A] font-manrope font-semibold text-lg mb-1">
+                      No matching items found
+                    </p>
+                    <p className="text-[#64748B] font-inter text-sm">
+                      We couldn&apos;t find anything matching &quot;{searchValue}&quot;.
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : (

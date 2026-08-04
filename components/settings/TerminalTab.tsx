@@ -27,7 +27,7 @@ const TerminalTab = () => {
         .from("restaurants")
         .select("id, slug, name, kds_password, kds_email")
         .eq("owner_id", user?.id)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         const fallbackSlug =

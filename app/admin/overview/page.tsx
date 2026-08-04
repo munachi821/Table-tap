@@ -61,7 +61,7 @@ const Overview = () => {
         .from("restaurants")
         .select("id")
         .eq("owner_id", user.user.id)
-        .single();
+        .maybeSingle();
         
       if (restaurant) {
         await fetchDashboardData(restaurant.id);
