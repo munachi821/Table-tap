@@ -74,15 +74,25 @@ const Kitchen = () => {
         if (user?.user) {
           // Fallback to metadata just in case
           setRestName(user.user.user_metadata?.name || "Kitchen Dashboard");
-          // Fetch the official name and logo from the database
-          const { data: restData, error: dbError } = await supabase
-            .from("restaurants")
-            .select("name, logo_url")
-            .eq("owner_id", user.user.id)
-            .single();
+          
+          // Fetch the official name and logo from the database using the restaurant_id stored in app_metadata
+          const restaurantId = user.user.app_metadata?.restaurant_id;
+          
+          if (restaurantId) {
+            const { data: restData, error: dbError } = await supabase
+              .from("restaurants")
+              .select("name, logo_url")
+              .eq("id", restaurantId)
+              .single();
 
-          if (dbError) {
-            console.error("DB error fetching restaurant:", dbError);
+            if (dbError) {
+              console.error("DB error fetching restaurant:", dbError);
+            }
+
+            if (restData) {
+              if (restData.name) setRestName(restData.name);
+              if (restData.logo_url) setRestImage(restData.logo_url);
+            }
           }
 
           if (restData) {
