@@ -94,11 +94,6 @@ const Kitchen = () => {
               if (restData.logo_url) setRestImage(restData.logo_url);
             }
           }
-
-          if (restData) {
-            if (restData.name) setRestName(restData.name);
-            if (restData.logo_url) setRestImage(restData.logo_url);
-          }
         } else {
           setRestName("Kitchen Dashboard");
         }

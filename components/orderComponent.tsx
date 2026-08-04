@@ -14,8 +14,13 @@ import Beverage from "@/components/beverageItem";
 import Item from "@/components/item";
 import { createClient } from "@/utils/supabase/client";
 import { useSearchParams } from "next/navigation";
-import { usePaystackPayment } from "react-paystack";
+import dynamic from "next/dynamic";
 import { toPng } from "html-to-image";
+
+const PaystackButton = dynamic(
+  () => import("react-paystack").then((mod) => mod.PaystackButton),
+  { ssr: false }
+);
 
 export interface foodItem {
   id: string;
@@ -171,15 +176,12 @@ const OrderComponent = () => {
 
   const paystackConfig = {
     reference: new Date().getTime().toString(),
-    email:
-      "guest@" + currentTable?.restaurants?.name.replace(/\s+/g, "") + ".com",
-    amount: cart.reduce((total, item) => total + item.price, 0) * 100,
+    email: "guest.checkout@tabletap.com",
+    amount: Math.round(cart.reduce((total, item) => total + item.price, 0) * 100),
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY as string,
   };
 
-  const initializePayment = usePaystackPayment(paystackConfig);
-
-  const onCheckout = () => {
+  const onSuccess = async () => {
     const finalOrder = {
       orderId: crypto.randomUUID(),
       tableNumber: currentTable?.table_name,
@@ -189,53 +191,50 @@ const OrderComponent = () => {
       placedAt: new Date(),
     };
 
-    const onSuccess = async () => {
-      setReciptData(finalOrder);
-      setCart([]);
-      setChefNotes("");
-      setSearchOpen(false);
-      setCartOpen(false);
+    setReciptData(finalOrder);
+    setCart([]);
+    setChefNotes("");
+    setSearchOpen(false);
+    setCartOpen(false);
 
-      console.log("Checkout complete!", finalOrder);
+    console.log("Checkout complete!", finalOrder);
 
-      const { data: newOrder, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          restaurant_id: currentTable?.restaurants?.id,
-          table_id: tableId,
-          total_amount: cart.reduce((total, item) => total + item.price, 0),
-          status: "paid",
-          notes: chefNotes,
-        })
-        .select("id")
-        .single();
+    const { data: newOrder, error: orderError } = await supabase
+      .from("orders")
+      .insert({
+        restaurant_id: currentTable?.restaurants?.id,
+        table_id: tableId,
+        total_amount: cart.reduce((total, item) => total + item.price, 0),
+        status: "paid",
+        notes: chefNotes,
+      })
+      .select("id")
+      .single();
 
-      if (orderError) {
-        console.error("Error inserting order", orderError);
-        return;
-      }
+    if (orderError) {
+      console.error("Error inserting order", orderError);
+      return;
+    }
 
-      const itemsToinsert = cart.map((cartItem) => ({
-        order_id: newOrder?.id,
-        menu_item_id: cartItem.menu_item_id,
-        quantity: cartItem.quantity,
-        unit_price: parseInt(cartItem.originalPrice),
-      }));
+    const itemsToinsert = cart.map((cartItem) => ({
+      order_id: newOrder?.id,
+      menu_item_id: cartItem.menu_item_id,
+      quantity: cartItem.quantity,
+      unit_price: parseInt(cartItem.originalPrice),
+    }));
 
-      const { error: orderItemsError } = await supabase
-        .from("order_items")
-        .insert(itemsToinsert);
+    const { error: orderItemsError } = await supabase
+      .from("order_items")
+      .insert(itemsToinsert);
 
-      if (orderItemsError) {
-        console.error("Error inserting order items", orderItemsError);
-        return;
-      }
-    };
-    const onClose = () => {
-      alert("Payment cancelled!");
-    };
+    if (orderItemsError) {
+      console.error("Error inserting order items", orderItemsError);
+      return;
+    }
+  };
 
-    initializePayment({ onSuccess, onClose });
+  const onClose = () => {
+    alert("Payment cancelled!");
   };
 
   const downloadRecipt = async () => {
@@ -563,16 +562,22 @@ const OrderComponent = () => {
                 ></textarea>
               </div>
 
-              <button
-                className="bg-orange-400 hover:bg-orange-400/90 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full disabled:bg-orange-300"
-                disabled={cart.length === 0}
-                onClick={onCheckout}
-              >
-                Checkout - ₦
-                {cart
-                  .reduce((total, item) => total + item.price, 0)
-                  .toLocaleString()}
-              </button>
+              {cart.length === 0 ? (
+                <button
+                  className="bg-orange-400 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full disabled:bg-orange-300"
+                  disabled={true}
+                >
+                  Checkout - ₦0
+                </button>
+              ) : (
+                <PaystackButton
+                  {...paystackConfig}
+                  onSuccess={onSuccess as any}
+                  onClose={onClose}
+                  text={`Checkout - ₦${cart.reduce((total, item) => total + item.price, 0).toLocaleString()}`}
+                  className="bg-orange-400 hover:bg-orange-400/90 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full"
+                />
+              )}
             </div>
           </div>
 
