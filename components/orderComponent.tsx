@@ -19,7 +19,7 @@ import { toPng } from "html-to-image";
 
 const PaystackButton = dynamic(
   () => import("react-paystack").then((mod) => mod.PaystackButton),
-  { ssr: false }
+  { ssr: false },
 );
 
 export interface foodItem {
@@ -68,6 +68,7 @@ const OrderComponent = () => {
   const [chefNotes, setChefNotes] = useState("");
   const [menuItems, setMenuItems] = useState<foodItem[]>([]);
   const [reciptData, setReciptData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const reciptRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +100,7 @@ const OrderComponent = () => {
       }
       setCurrentTable(tableData);
       setMenuItems(menuItemsData);
+      setIsLoading(false);
     };
 
     fetchData();
@@ -177,7 +179,9 @@ const OrderComponent = () => {
   const paystackConfig = {
     reference: new Date().getTime().toString(),
     email: "guest.checkout@tabletap.com",
-    amount: Math.round(cart.reduce((total, item) => total + item.price, 0) * 100),
+    amount: Math.round(
+      cart.reduce((total, item) => total + item.price, 0) * 100,
+    ),
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY as string,
   };
 
@@ -255,8 +259,61 @@ const OrderComponent = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <main className="pb-10 relative bg-white min-h-screen">
+        {/* Header Skeleton */}
+        <header className="py-2 -top-2 sticky z-50">
+          <nav className="bg-white px-3 sm:px-6 py-3 rounded-b-lg border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2 items-center animate-pulse">
+                <div className="size-13 rounded-full bg-gray-200" />
+                <div className="space-y-2">
+                  <div className="h-4 w-32 bg-gray-200 rounded" />
+                  <div className="h-3 w-48 bg-gray-100 rounded" />
+                </div>
+              </div>
+              <div className="flex gap-3 animate-pulse">
+                <div className="w-20 h-10 bg-gray-100 rounded-full hidden sm:block" />
+                <div className="size-10 bg-gray-200 rounded-full" />
+                <div className="size-10 bg-gray-200 rounded-full" />
+              </div>
+            </div>
+          </nav>
+        </header>
+
+        {/* Categories Skeleton */}
+        <div className="flex items-center gap-2 my-4 pl-9 overflow-x-hidden animate-pulse">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div
+              key={i}
+              className="h-8 w-24 bg-gray-200 rounded-full shrink-0"
+            />
+          ))}
+        </div>
+
+        {/* Section Skeleton */}
+        <div className="px-4 md:px-10 mt-8">
+          <div className="h-8 w-40 bg-gray-200 rounded-md mb-4 animate-pulse" />
+          <div className="flex gap-4 overflow-x-hidden">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-88 w-62 shrink-0 rounded-xl bg-gray-50 border border-gray-100 p-2 animate-pulse"
+              >
+                <div className="w-full h-62 bg-gray-200 rounded-lg mb-4" />
+                <div className="h-6 w-24 bg-gray-200 rounded mb-2" />
+                <div className="h-4 w-40 bg-gray-200 rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="pb-10 relative">
+    <main className="pb-10 relative min-h-screen">
       <header className="py-2 -top-2 sticky z-50">
         <nav className="bg-white px-3 sm:px-6 py-3 rounded-b-lg">
           <div className="text-black flex items-center justify-between">
