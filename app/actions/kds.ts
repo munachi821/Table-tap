@@ -24,7 +24,12 @@ export async function generateKDSCredentials(
     newPass += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   
-  const generatedEmail = `kitchen@${slug}.tabletap.com`;
+  const safeSlug = slug 
+    ? slug.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+    : "";
+  const finalSlug = safeSlug || restaurantId.substring(0, 8);
+  
+  const generatedEmail = `kitchen@${finalSlug}.tabletap.com`;
 
   const adminClient = createAdminClient();
 

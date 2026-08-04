@@ -32,13 +32,17 @@ export default function KitchenLogin() {
       setError("Invalid KDS credentials. Please try again.");
       setIsLoading(false);
     } else {
-      // Check if they are actually a KDS role (optional, but good for UX)
+      // Check if they are actually a KDS role
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      
       if (user?.app_metadata?.role !== "kds") {
-        // Technically they logged in, but we might want to warn them they aren't a kitchen user.
-        // Or we just let the RLS handle it.
+        // Sign them out immediately since they used valid credentials but lack the correct role
+        await supabase.auth.signOut();
+        setError("Access denied. This portal is strictly for authorized Kitchen Display Systems.");
+        setIsLoading(false);
+        return;
       }
 
       router.push("/kitchen");
