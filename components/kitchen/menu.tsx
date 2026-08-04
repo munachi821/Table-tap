@@ -46,9 +46,17 @@ const Menu = () => {
 
   useEffect(() => {
     const fetchMealData = async () => {
-      const { data, error } = await supabase
-        .from("menu_items")
-        .select("id, name, image_url, is_available");
+      const { data: userData } = await supabase.auth.getUser();
+      const restaurantId = userData?.user?.app_metadata?.restaurant_id;
+
+      let query = supabase.from("menu_items").select("id, name, image_url, is_available");
+      
+      if (restaurantId) {
+        query = query.eq("restaurant_id", restaurantId);
+      }
+
+      const { data, error } = await query;
+      
       if (data) {
         setMenuItems(data);
       }
@@ -124,16 +132,22 @@ const Menu = () => {
             className="bg-white border border-gray-200 rounded-lg p-2 w-fit"
             key={meals.id}
           >
-            <div className="w-60 h-60 rounded-md overflow-hidden bg-gray-50">
-              <Image
-                src={meals.image_url}
-                alt="Goat meat pepper soup"
-                width={240}
-                height={240}
-                className={`w-full h-full object-cover object-center transition-all duration-300 ${
-                  meals.is_available ? "" : "grayscale opacity-60"
-                }`}
-              />
+            <div className="w-60 h-60 rounded-md overflow-hidden bg-gray-50 relative flex items-center justify-center">
+              {meals.image_url ? (
+                <Image
+                  src={meals.image_url}
+                  alt={meals.name}
+                  fill
+                  className={`object-cover object-center transition-all duration-300 ${
+                    meals.is_available ? "" : "grayscale opacity-60"
+                  }`}
+                />
+              ) : (
+                <div className="text-gray-300 flex flex-col items-center">
+                  <span className="text-4xl">🍽️</span>
+                  <p className="text-xs mt-2 font-medium">No Image</p>
+                </div>
+              )}
             </div>
 
             <div className="mt-2 mb-1">
