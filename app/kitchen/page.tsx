@@ -165,9 +165,9 @@ const Kitchen = () => {
     <main className="bg-slate-50">
       <div className="w-full min-h-screen">
         {/* Navbar */}
-        <header className="flex justify-between bg-white px-4 py-3.5 items-center fixed w-full z-50">
-          <div className="flex items-center gap-3">
-            <div className="flex items-end gap-2">
+        <header className="flex flex-col md:flex-row justify-between bg-white px-4 py-3.5 items-start md:items-center fixed w-full z-50 shadow-sm border-b border-gray-100">
+          <div className="flex flex-row items-center justify-between w-full md:w-auto gap-3">
+            <div className="flex items-center gap-2">
               {restImage ? (
                 <Image
                   src={restImage}
@@ -183,15 +183,15 @@ const Kitchen = () => {
                 <p className="font-semibold text-lg leading-4 text-orange-500">
                   {restName}
                 </p>
-                <p className="text-xs font-semibold text-gray-500">
+                <p className="text-[10px] sm:text-xs font-semibold text-gray-500">
                   Kitchen Dashboard
                 </p>
               </div>
             </div>
-            <div className="flex gap-3 items-center">{changeOverview()}</div>
+            <div className="hidden sm:flex gap-3 items-center">{changeOverview()}</div>
           </div>
-          <div className="flex gap-4 items-center">
-            <div className="font-semibold flex gap-2 text-lg border px-2.5 rounded-full border-gray-200 py-1">
+          <div className="flex flex-row justify-between gap-4 items-center mt-3 md:mt-0 w-full md:w-auto">
+            <div className="font-semibold flex gap-1 sm:gap-2 text-[14px] sm:text-lg border px-1.5 sm:px-2.5 rounded-full border-gray-200 py-1 flex-1 sm:flex-none justify-center">
               <button
                 className={`py-0.5 rounded-full px-2 ${activeTab === "orders" ? "text-orange-400" : "text-gray-500 hover:text-orange-400"} flex gap-2 items-center cursor-pointer`}
                 onClick={() => setActiveTab("orders")}
@@ -219,7 +219,7 @@ const Kitchen = () => {
           </div>
         </header>
 
-        <div className="pt-5">
+        <div className="pt-[110px] md:pt-24 pb-10">
           <div className={activeTab === "orders" ? "block" : "hidden"}>
             <Order />
           </div>

@@ -153,7 +153,7 @@ const Order = () => {
           </div>
         ) : filterOrders.map((orders) => (
             <div key={orders.orderId} className="mb-6">
-            <div className="flex items-end gap-3 mb-4">
+            <div className="flex flex-wrap items-center sm:items-end gap-3 mb-4">
               <h2 className="font-semibold text-2xl text-gray-700">
                 {orders.tableNumber}
               </h2>
@@ -179,7 +179,7 @@ const Order = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {orders.items.map((items, index) => (
                 <div
                   className="rounded-xl border-2 border-gray-700 p-2 bg-white/50 backdrop-blur-xl flex flex-col justify-between"

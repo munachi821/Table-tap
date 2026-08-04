@@ -83,7 +83,7 @@ const Menu = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between m-3">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between m-3 gap-4">
         <h1 className="text-2xl text-gray-700 font-semibold">
           {isLoading
             ? "Loading menu..."
@@ -92,10 +92,10 @@ const Menu = () => {
               : "Toggle meal availability"}
         </h1>
 
-        <div className="flex items-center gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-fit ">
+        <div className="flex items-center gap-2 sm:gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-full md:w-fit">
           <input
             type="text"
-            className="w-80 h-8 outline-0 border-orange-100 border pl-1"
+            className="w-full md:w-80 h-8 outline-0 border-orange-100 border pl-1 rounded"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search menu items..."
@@ -108,13 +108,13 @@ const Menu = () => {
 
       <div className="px-4 mt-6">
         {isLoading ? (
-          <div className="grid grid-cols-5 gap-x-5 gap-y-6 animate-pulse">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-x-5 sm:gap-y-6 animate-pulse place-items-center sm:place-items-start">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="bg-white border border-gray-200 rounded-lg p-2 w-fit"
+                className="bg-white border border-gray-200 rounded-lg p-2 w-full sm:w-fit max-w-sm"
               >
-                <div className="w-60 h-60 rounded-md bg-gray-200 mb-4" />
+                <div className="w-full aspect-square sm:w-60 sm:h-60 rounded-md bg-gray-200 mb-4" />
                 <div className="flex justify-between items-center mb-2">
                   <div className="h-4 w-24 bg-gray-200 rounded" />
                   <div className="w-12 h-6 bg-gray-200 rounded-full" />
@@ -124,7 +124,7 @@ const Menu = () => {
             ))}
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center mt-20 text-gray-400 col-span-5">
+          <div className="flex flex-col items-center justify-center mt-20 text-gray-400 col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-5 text-center px-4">
             <div className="size-24 bg-orange-50 text-orange-300 rounded-full flex items-center justify-center mb-5 shadow-inner">
               <Pizza size={48} weight="duotone" />
             </div>
@@ -138,13 +138,13 @@ const Menu = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-5 gap-x-5 gap-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-x-5 sm:gap-y-6 place-items-center sm:place-items-start">
             {filteredItems.map((meals) => (
               <div
-                className="bg-white border border-gray-200 rounded-lg p-2 w-fit"
+                className="bg-white border border-gray-200 rounded-lg p-2 w-full sm:w-fit max-w-sm"
                 key={meals.id}
               >
-                <div className="w-60 h-60 rounded-md overflow-hidden bg-gray-50 relative flex items-center justify-center">
+                <div className="w-full aspect-square sm:w-60 sm:h-60 rounded-md overflow-hidden bg-gray-50 relative flex items-center justify-center">
                   {meals.image_url ? (
                     <Image
                       src={meals.image_url}

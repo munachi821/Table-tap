@@ -25,29 +25,29 @@ const SettingsPage = () => {
         </p>
       </div>
 
-      <div className="p-4 grid grid-cols-11 mt-4 gap-6 relative flex-1 items-start">
+      <div className="p-4 grid grid-cols-1 lg:grid-cols-11 mt-4 gap-6 relative flex-1 items-start">
         {/* Sticky Sidebar */}
-        <div className="col-span-3 space-y-2 sticky top-35">
+        <div className="col-span-1 lg:col-span-3 space-y-2 sticky top-35 flex flex-row lg:flex-col overflow-x-auto hide-scrollbar pb-2 lg:pb-0">
           <div
-            className={`py-3.5 px-4.5 ${activeTab === "profile" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
+            className={`py-3.5 px-4.5 min-w-max ${activeTab === "profile" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
             onClick={() => setActiveTab("profile")}
           >
             <HouseIcon size={21} weight="bold" /> <p>Restaurant Profile</p>
           </div>
           <div
-            className={`py-3.5 px-4.5 ${activeTab === "terminal" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
+            className={`py-3.5 px-4.5 min-w-max ${activeTab === "terminal" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
             onClick={() => setActiveTab("terminal")}
           >
             <DesktopIcon size={21} weight="bold" /> <p>Terminal Access</p>
           </div>
           <div
-            className={`py-3.5 px-4.5 ${activeTab === "operations" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
+            className={`py-3.5 px-4.5 min-w-max ${activeTab === "operations" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
             onClick={() => setActiveTab("operations")}
           >
             <PersonIcon size={21} weight="bold" /> <p>Operations</p>
           </div>
           <div
-            className={`py-3.5 px-4.5 ${activeTab === "billing" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
+            className={`py-3.5 px-4.5 min-w-max ${activeTab === "billing" ? "bg-[#F8EEE9] text-[#9D4300]" : "hover:bg-[#F2F4F6] text-[#724237]"} transition-colors cursor-pointer font-semibold flex items-center gap-3 rounded-2xl`}
             onClick={() => setActiveTab("billing")}
           >
             <CreditCardIcon size={21} weight="bold" /> <p>Billing & Plans</p>
@@ -55,7 +55,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="col-span-8 bg-white rounded-3xl border border-[#E6E8EA] shadow-sm">
+        <div className="col-span-1 lg:col-span-8 bg-white rounded-3xl border border-[#E6E8EA] shadow-sm overflow-hidden">
           {activeTab === "profile" && <ProfileTab />}
           {activeTab === "terminal" && <TerminalTab />}
           {activeTab === "operations" && <OperationsTab />}

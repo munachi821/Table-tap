@@ -282,20 +282,20 @@ const Page = () => {
         </p>
       </nav>
 
-      <div className="mt-6 flex items-center justify-between">
-        <div className="bg-white flex items-center pl-4 pr-1 gap-3 w-fit rounded-lg border border-[#E2E8F0] shadow-sm overflow-hidden h-11">
+      <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-white flex items-center pl-4 pr-1 gap-3 w-full sm:w-fit rounded-lg border border-[#E2E8F0] shadow-sm overflow-hidden h-11">
           <MagnifyingGlassIcon size={20} className="text-[#94A3B8]" />
           <input
             type="text"
             placeholder="Search menu items..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="w-lg h-full text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] font-inter outline-0"
+            className="w-full sm:w-lg h-full text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] font-inter outline-0"
           />
         </div>
 
         <button
-          className="rounded-full px-5 h-10 text-[14.5px] font-semibold bg-orange-400 hover:bg-orange-500 transition-colors text-white flex items-center gap-2 font-inter"
+          className="rounded-full px-5 w-full sm:w-auto h-10 text-[14.5px] font-semibold bg-orange-400 hover:bg-orange-500 transition-colors text-white flex items-center justify-center gap-2 font-inter"
           onClick={() => setIsModalOpen(true)}
         >
           <PlusIcon size={18} weight="bold" color="#ffffff" />
@@ -303,8 +303,8 @@ const Page = () => {
         </button>
       </div>
 
-      <div className="mt-8 bg-white border border-[#F1F5F9] rounded-2xl overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
+      <div className="mt-8 bg-white border border-[#F1F5F9] rounded-2xl overflow-x-auto shadow-sm hide-scrollbar">
+        <table className="w-full min-w-[700px] text-left border-collapse">
           <thead className="bg-[#F8FAFC]">
             <tr className="border-b border-[#F1F5F9] text-[11.5px] font-bold font-inter text-[#64748B] uppercase tracking-[0.08em]">
               <th className="py-4 px-6">Item</th>

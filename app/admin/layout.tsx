@@ -30,7 +30,7 @@ export default function Layout({
       >
         <AuthGuard>
           <AdminSidebar />
-          <div className="w-full h-full bg-[#F8FAFC] overflow-auto relative">
+          <div className="w-full h-full bg-[#F8FAFC] overflow-auto relative pt-16 md:pt-0">
             {children}
           </div>
         </AuthGuard>

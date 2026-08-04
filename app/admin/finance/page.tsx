@@ -127,7 +127,7 @@ const FinancePage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 mt-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-6 gap-4">
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50">
           <div className="p-2 w-fit rounded-xl bg-[#F4EAE2] text-[#9E4301]">
             <WalletIcon size={25} weight="bold" />
@@ -196,7 +196,7 @@ const FinancePage = () => {
       </div>
 
       <div className="bg-white p-5 rounded-2xl mt-4 shadow-sm border border-gray-50">
-        <div className="flex items-end justify-between">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
           <div className="font-manrope">
             <p className="font-semibold text-xl">Last 30 Days Revenue</p>
             <p className="text-base text-gray-500">
@@ -215,7 +215,7 @@ const FinancePage = () => {
         </div>
 
         <div className="w-full mt-6 p-1">
-          <div className="flex justify-between items-center mb-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-2">
             <h2 className="text-lg text-[#1F2937] font-medium tracking-tight">
               30-Day Revenue Trend
             </h2>
@@ -280,7 +280,7 @@ const FinancePage = () => {
       </div>
 
       <div className="bg-white p-5 rounded-2xl mt-4 shadow-sm border border-gray-50">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
           <h2 className="font-semibold text-xl text-[#1F2937]">
             Recent Bank Settlements
           </h2>
@@ -292,13 +292,13 @@ const FinancePage = () => {
             <input
               type="text"
               placeholder="Search by ID..."
-              className="bg-[#F8FAFC] text-sm pl-10 pr-4 py-2.5 rounded-full border-none focus:ring-0 w-70 outline-none text-gray-600"
+              className="bg-[#F8FAFC] text-sm pl-10 pr-4 py-2.5 rounded-full border-none focus:ring-0 w-full md:w-70 outline-none text-gray-600"
             />
           </div>
         </div>
 
-        <div className="w-full">
-          <table className="w-full text-left font-manrope">
+        <div className="w-full overflow-x-auto hide-scrollbar">
+          <table className="w-full min-w-[700px] text-left font-manrope">
             <thead>
               <tr className="border-b border-gray-100 text-[#9B8E87] text-[11px] font-bold uppercase tracking-wider">
                 <th className="pb-4 font-inter">Settlement ID</th>

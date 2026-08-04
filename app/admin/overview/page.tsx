@@ -174,8 +174,8 @@ const Overview = () => {
 
   return (
     <div className="py-4 pr-4">
-      <header className="sticky top-0">
-        <nav className="p-3.5 flex justify-between items-end">
+      <header className="sticky top-0 z-10 bg-[#F8FAFC]/90 backdrop-blur-md">
+        <nav className="p-3.5 flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
           <div>
             <p className="text-xs font-medium text-[#584237] tracking-wide">
               DASHBOARD OVERVIEW
@@ -191,7 +191,7 @@ const Overview = () => {
           </div>
         </nav>
       </header>
-      <div className="grid grid-cols-4 gap-x-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-3 md:px-0 mt-4 md:mt-0">
         <div className="bg-white p-4 pt-5 rounded-xl flex flex-col gap-4 border shadow-xs border-gray-200">
           <header className="flex justify-between items-start">
             <div className="p-2 bg-[#F9EEE4] w-fit rounded-[14px]">
@@ -288,8 +288,8 @@ const Overview = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-5 mt-8 max-w-full">
-        <div className="col-span-4 bg-white rounded-xl pb-7 border shadow-xs border-gray-200">
+      <div className="grid grid-cols-1 xl:grid-cols-7 gap-5 mt-8 max-w-full px-3 md:px-0">
+        <div className="col-span-1 xl:col-span-4 bg-white rounded-xl pb-7 border shadow-xs border-gray-200">
           <header className="flex justify-between items-center p-6 pb-4">
             <p className="font-bold text-lg font-manrope text-[#191C1E]">
               Top Selling Items Today
@@ -353,7 +353,7 @@ const Overview = () => {
           </div>
         </div>
 
-        <div className="bg-white col-span-3 rounded-xl pb-6 border shadow-xs border-gray-200 flex flex-col">
+        <div className="bg-white col-span-1 xl:col-span-3 rounded-xl pb-6 border shadow-xs border-gray-200 flex flex-col">
           <header className="flex justify-between items-center p-6 pb-4 shrink-0">
             <p className="font-bold text-lg font-manrope text-[#191C1E]">
               Live Table Feed

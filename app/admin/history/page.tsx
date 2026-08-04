@@ -138,7 +138,7 @@ const HistoryPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 mt-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 mt-6 gap-4">
         <div className="bg-white p-6 rounded-2xl">
           <div className="bg-[#D5E0F8] p-2 text-[#586377] rounded-xl w-fit">
             <WalletIcon size={24} weight="bold" />
@@ -191,8 +191,8 @@ const HistoryPage = () => {
         </div>
       </div>
 
-      <div className="mt-5 flex justify-between items-center">
-        <div className="font-manrope space-x-4">
+      <div className="mt-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div className="font-manrope flex gap-2 overflow-x-auto w-full pb-2 hide-scrollbar">
           {["All Orders", "Paid", "Refunded", "Cancelled"].map((tab) => (
             <button
               key={tab}
@@ -208,7 +208,7 @@ const HistoryPage = () => {
           ))}
         </div>
 
-        <div className="flex gap-2.5 items-center">
+        <div className="flex w-full lg:w-auto justify-between gap-2 items-center">
           <div className="flex items-center gap-2 font-semibold shadow-sm py-2 px-5 text-[#191C1E] rounded-full bg-white w-fit">
             <CalendarDotsIcon size={19} className="text-[#9D4300]" />
             <p>{fullDate()}</p>
