@@ -4,6 +4,7 @@ import {
   CaretDownIcon,
   DownloadSimpleIcon,
   WalletIcon,
+  ReceiptIcon,
 } from "@phosphor-icons/react";
 import {
   ChartPieIcon,
@@ -298,10 +299,22 @@ const HistoryPage = () => {
                   </td>
                 </tr>
               );
-            }) : (
+            ) : (
               <tr>
-                <td colSpan={7} className="text-center py-10 text-gray-500 font-medium">
-                  No orders found.
+                <td colSpan={7} className="py-20 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="size-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                      <ReceiptIcon size={36} weight="duotone" />
+                    </div>
+                    <p className="text-[#0F172A] font-manrope font-semibold text-lg mb-1">
+                      No orders found
+                    </p>
+                    <p className="text-[#64748B] font-inter text-sm max-w-sm">
+                      {filterStatus === "All Orders" 
+                        ? "Your order history is completely empty right now. Orders will appear here once customers start purchasing." 
+                        : `You don't have any ${filterStatus.toLowerCase()} orders.`}
+                    </p>
+                  </div>
                 </td>
               </tr>
             )}

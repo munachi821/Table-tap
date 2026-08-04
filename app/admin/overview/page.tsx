@@ -338,7 +338,17 @@ const Overview = () => {
                 </div>
               );
             }) : (
-              <p className="text-gray-500 text-sm italic mt-4 text-center">No items sold today yet.</p>
+              <div className="flex flex-col items-center justify-center h-full text-center px-4 -mt-10">
+                <div className="size-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-3 shadow-inner">
+                  <span className="text-3xl">📉</span>
+                </div>
+                <p className="text-[#0F172A] font-manrope font-semibold text-[15px] mb-1">
+                  No sales yet
+                </p>
+                <p className="text-[#64748B] font-inter text-xs max-w-[200px]">
+                  When customers start ordering today, your top selling items will appear here.
+                </p>
+              </div>
             )}
           </div>
         </div>
