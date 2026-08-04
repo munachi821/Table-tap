@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Menu from "@/components/kitchen/menu";
 import Order from "@/components/kitchen/order";
 import { createClient } from "@/utils/supabase/client";
+import Image from "next/image";
 
 const Kitchen = () => {
   const supabase = createClient();
@@ -74,10 +75,10 @@ const Kitchen = () => {
         if (user?.user) {
           // Fallback to metadata just in case
           setRestName(user.user.user_metadata?.name || "Kitchen Dashboard");
-          
+
           // Fetch the official name and logo from the database using the restaurant_id stored in app_metadata
           const restaurantId = user.user.app_metadata?.restaurant_id;
-          
+
           if (restaurantId) {
             const { data: restData, error: dbError } = await supabase
               .from("restaurants")
@@ -168,10 +169,12 @@ const Kitchen = () => {
           <div className="flex items-center gap-3">
             <div className="flex items-end gap-2">
               {restImage ? (
-                <img
+                <Image
                   src={restImage}
                   alt="Restaurant Logo"
-                  className="size-11 rounded-full border border-orange-100 object-cover"
+                  width={44}
+                  height={44}
+                  className="rounded-full border border-orange-100 object-cover"
                 />
               ) : (
                 <div className="size-11 rounded-full border border-orange-100 bg-gray-100 animate-pulse"></div>
@@ -216,7 +219,7 @@ const Kitchen = () => {
           </div>
         </header>
 
-        <div className="pt-20">
+        <div className="pt-5">
           <div className={activeTab === "orders" ? "block" : "hidden"}>
             <Order />
           </div>

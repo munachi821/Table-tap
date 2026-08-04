@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/client";
 import TimeElapsed from "./timeElapsed";
 import { useEffect, useRef, useState } from "react";
+import { CookingPot } from "@phosphor-icons/react";
 
 interface Orderitem {
   id: string;
@@ -135,9 +136,23 @@ const Order = () => {
       </div>
 
       {/* Main Body */}
-      <div className="p-4">
-        {filterOrders.map((orders) => (
-          <div key={orders.orderId} className="mb-6">
+      <div className="p-4 mt-16">
+        {filterOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center mt-32 text-gray-400">
+            <div className="size-24 bg-orange-50 text-orange-300 rounded-full flex items-center justify-center mb-5 shadow-inner">
+              <CookingPot size={48} weight="duotone" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+              No {activeTab === "paid" ? "pending" : "completed"} orders yet
+            </h2>
+            <p className="text-base font-medium text-gray-500">
+              {activeTab === "paid"
+                ? "When customers place orders, they will appear here automatically in real-time."
+                : "You haven't completed any orders yet today. Let's get cooking!"}
+            </p>
+          </div>
+        ) : filterOrders.map((orders) => (
+            <div key={orders.orderId} className="mb-6">
             <div className="flex items-end gap-3 mb-4">
               <h2 className="font-semibold text-2xl text-gray-700">
                 {orders.tableNumber}
