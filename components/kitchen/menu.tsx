@@ -83,7 +83,7 @@ const Menu = () => {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between m-3 gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between m-3 gap-4 pt-14">
         <h1 className="text-2xl text-gray-700 font-semibold">
           {isLoading
             ? "Loading menu..."
