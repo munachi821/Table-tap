@@ -188,7 +188,9 @@ const Kitchen = () => {
                 </p>
               </div>
             </div>
-            <div className="hidden sm:flex gap-3 items-center">{changeOverview()}</div>
+            <div className="hidden sm:flex gap-3 items-center">
+              {changeOverview()}
+            </div>
           </div>
           <div className="flex flex-row justify-between gap-4 items-center mt-3 md:mt-0 w-full md:w-auto">
             <div className="font-semibold flex gap-1 sm:gap-2 text-[14px] sm:text-lg border px-1.5 sm:px-2.5 rounded-full border-gray-200 py-1 flex-1 sm:flex-none justify-center">
@@ -219,7 +221,7 @@ const Kitchen = () => {
           </div>
         </header>
 
-        <div className="pt-[110px] md:pt-24 pb-10">
+        <div className="pt-5 md:pt-5 pb-10">
           <div className={activeTab === "orders" ? "block" : "hidden"}>
             <Order />
           </div>

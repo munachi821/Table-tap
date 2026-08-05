@@ -16,6 +16,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { toPng } from "html-to-image";
+import { Toaster, toast } from "sonner";
 
 const PaystackButton = dynamic(
   () => import("react-paystack").then((mod) => mod.PaystackButton),
@@ -146,6 +147,8 @@ const OrderComponent = () => {
 
   const addToCart = (item: foodItem, quantity: number = 1) => {
     const unitPrice = parseInt(item.price);
+    
+    toast.success(`Added ${quantity} ${item.name} to cart`);
 
     setCart((prev) => {
       const existingItemIndex = prev.findIndex((c) => c.name === item.name);
@@ -751,6 +754,7 @@ const OrderComponent = () => {
           </div>
         </div>
       )}
+      <Toaster richColors position="top-center" />
     </main>
   );
 };
