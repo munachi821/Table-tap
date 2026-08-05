@@ -24,18 +24,13 @@ const Kitchen = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const { data, error } = await supabase
+      const { count, error } = await supabase
         .from("orders")
-        .select(
-          `id, created_at, status, notes, tables(table_name), order_items(id, quantity, menu_items(name))`,
-        )
-        .in("status", ["paid", "completed"])
-        .order("created_at", { ascending: false });
+        .select("id", { count: "exact", head: true })
+        .eq("status", "paid");
 
-      if (data) {
-        setPendingCount(
-          data.filter((order) => order.status === "paid").length || 0,
-        );
+      if (count !== null) {
+        setPendingCount(count);
       } else if (error) {
         console.error("error fetching pending count", error);
       }

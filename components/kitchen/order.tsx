@@ -45,12 +45,14 @@ const Order = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
       const { data, error } = await supabase
         .from("orders")
         .select(
           `id, created_at, status, notes, tables(table_name), order_items(id, quantity, menu_items(name))`,
         )
-        .in("status", ["paid", "completed"])
+        .or(`status.eq.paid,and(status.eq.completed,created_at.gte.${twentyFourHoursAgo})`)
         .order("created_at", { ascending: false });
 
       if (data) {
