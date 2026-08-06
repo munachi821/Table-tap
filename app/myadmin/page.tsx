@@ -1,167 +1,183 @@
-"use client";
+import { InfoIcon } from "@phosphor-icons/react/dist/ssr";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import { BellIcon, GearIcon, InfoIcon } from "@phosphor-icons/react";
+export default async function Page() {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  const superAdminEmail = process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL || "munachi@table-tap.com";
+  
+  // God Mode Auth Check
+  if (!session || (session.user.email !== superAdminEmail && session.user.email !== "admin@table-tap.com")) {
+    redirect("/myadmin/login");
+  }
 
-const Page = () => {
+  // Fetch real data
+  const { data: restaurants } = await supabase.from("restaurants").select("*").order('created_at', { ascending: false });
+  const totalRestaurants = restaurants?.length || 0;
+  
+  const activeRestaurants = restaurants?.filter((r) => r.status === "ACTIVE") || [];
+  const mrr = activeRestaurants.length * 80000;
+  
+  // Calculate today's signups
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const signupsToday = restaurants?.filter((r) => new Date(r.created_at) >= today).length || 0;
+
   return (
-    <div className="min-h-screen bg-white text-[#1B1D1E] font-inter">
+    <div className="min-h-screen bg-[#FAFAFA] text-[#111111] font-inter selection:bg-black/10">
       {/* Header */}
-      <header className="px-8 py-4 flex items-center justify-between border-b border-[#E6E8EA]">
-        <h1 className="text-2xl font-bold">Table-tap God Mode</h1>
+      <header className="px-8 h-20 flex items-center justify-between border-b border-black/[0.08] bg-white/50 backdrop-blur-xl sticky top-0 z-50">
+        <h1 className="text-xl font-semibold tracking-tight">God Mode</h1>
         <div className="flex items-center gap-6">
-          <button className="bg-black hover:bg-black/90 text-white px-5 py-2.5 rounded-md text-sm font-bold transition-colors cursor-pointer">
-            + Add Restaurant
+          <form action={async () => {
+            "use server";
+            const cookieStore = await cookies();
+            const supabase = createClient(cookieStore);
+            await supabase.auth.signOut();
+            redirect("/myadmin/login");
+          }}>
+             <button type="submit" className="text-[13px] font-medium text-black/50 hover:text-black transition-colors cursor-pointer">
+              Log out
+            </button>
+          </form>
+          <button className="bg-black hover:bg-black/90 text-white px-5 py-2.5 rounded-full text-[13px] font-medium transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.16)] active:scale-95">
+            + Add Tenant
           </button>
-          <div className="flex items-center gap-4 text-[#475569]">
-            <button className="hover:text-black transition-colors cursor-pointer">
-              <BellIcon size={24} />
-            </button>
-            <button className="hover:text-black transition-colors cursor-pointer">
-              <GearIcon size={24} />
-            </button>
-          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-8 py-12">
-        {/* Revenue Overview */}
-        <div className="mb-12">
-          <h2 className="text-[#64748B] text-xs font-bold tracking-widest uppercase mb-2">
-            Revenue Overview
-          </h2>
-          <p className="text-[64px] leading-tight font-black tracking-tight mb-3">
-            ₦160,000
-          </p>
-          <div className="flex items-center gap-4 text-[#64748B] text-sm font-medium">
-            <p>Total MRR</p>
-            <div className="w-px h-4 bg-[#E6E8EA]"></div>
-            <p>2 Active Licenses at ₦80k/mo</p>
+        
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
+          {/* Revenue Card */}
+          <div className="bg-white border border-black/[0.08] rounded-2xl p-7 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+            <h2 className="text-black/50 text-[11px] font-semibold tracking-widest uppercase mb-4">
+              Revenue Overview
+            </h2>
+            <p className="text-[48px] leading-none font-semibold tracking-[-0.04em] mb-4">
+              ₦{mrr.toLocaleString()}
+            </p>
+            <div className="flex items-center gap-2 text-black/50 text-[13px] font-medium">
+              <p>Total MRR</p>
+              <div className="w-1 h-1 rounded-full bg-black/20"></div>
+              <p>{activeRestaurants.length} Active Licenses at ₦80k/mo</p>
+            </div>
+          </div>
+
+          {/* Users Card */}
+          <div className="bg-white border border-black/[0.08] rounded-2xl p-7 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden">
+             {/* Subtle decorative background for the growth card */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#10B981]/5 rounded-bl-full pointer-events-none"></div>
+            
+            <h2 className="text-black/50 text-[11px] font-semibold tracking-widest uppercase mb-4 relative z-10">
+              Platform Growth
+            </h2>
+            <p className="text-[48px] leading-none font-semibold tracking-[-0.04em] mb-4 relative z-10">
+              {totalRestaurants}
+            </p>
+            <div className="flex items-center gap-2 text-black/50 text-[13px] font-medium relative z-10">
+              <p>Total Restaurants</p>
+              <div className="w-1 h-1 rounded-full bg-black/20"></div>
+              <p className="text-[#10B981] font-semibold">{signupsToday} signed up today</p>
+            </div>
           </div>
         </div>
 
-        <div className="w-full h-px bg-[#E6E8EA] mb-12"></div>
-
         {/* Restaurant Management */}
-        <div className="mb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-[#64748B] text-xs font-bold tracking-widest uppercase">
-              Restaurant Management
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h2 className="text-[15px] font-semibold tracking-tight">
+              Tenant Directory
             </h2>
-            <p className="text-[#64748B] text-sm font-medium">
-              3 Entities Found
+            <p className="text-black/50 text-[13px] font-medium">
+              {totalRestaurants} Total
             </p>
           </div>
 
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#E6E8EA] text-[#64748B] text-xs font-bold tracking-widest uppercase">
-                <th className="py-4 font-inter">Restaurant</th>
-                <th className="py-4 font-inter">Status</th>
-                <th className="py-4 font-inter text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Row 1 */}
-              <tr className="border-b border-[#E6E8EA]">
-                <td className="py-6 text-lg font-bold">Nana&apos;s Kitchen</td>
-                <td className="py-6">
-                  <div className="flex items-center gap-2 text-[#10B981] text-xs font-bold tracking-widest uppercase">
-                    <div className="w-2 h-2 rounded-full bg-[#10B981]"></div>
-                    Active
-                  </div>
-                </td>
-                <td className="py-6 text-right space-x-6">
-                  <button className="text-[#EF4444] hover:text-red-700 font-bold text-sm transition-colors cursor-pointer">
-                    Suspend
-                  </button>
-                </td>
-              </tr>
-              {/* Row 2 */}
-              <tr className="border-b border-[#E6E8EA]">
-                <td className="py-6 text-lg font-bold">The Grill House</td>
-                <td className="py-6">
-                  <div className="flex items-center gap-2 text-[#F97316] text-xs font-bold tracking-widest uppercase">
-                    <div className="w-2 h-2 rounded-full bg-[#F97316]"></div>
-                    Pending Payment
-                  </div>
-                </td>
-                <td className="py-6 text-right space-x-6">
-                  <button className="text-[#1B1D1E] hover:text-gray-600 font-bold text-sm transition-colors cursor-pointer">
-                    Activate License
-                  </button>
-                  <button className="text-[#EF4444] hover:text-red-700 font-bold text-sm transition-colors cursor-pointer">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-              {/* Row 3 */}
-              <tr className="border-b border-[#E6E8EA]">
-                <td className="py-6 text-lg font-bold">Campus Bites</td>
-                <td className="py-6">
-                  <div className="flex items-center gap-2 text-[#EF4444] text-xs font-bold tracking-widest uppercase">
-                    <div className="w-2 h-2 rounded-full bg-[#EF4444]"></div>
-                    Suspended
-                  </div>
-                </td>
-                <td className="py-6 text-right space-x-6">
-                  <button className="text-[#1B1D1E] hover:text-gray-600 font-bold text-sm transition-colors cursor-pointer">
-                    Reactivate
-                  </button>
-                  <button className="text-[#EF4444] hover:text-red-700 font-bold text-sm transition-colors cursor-pointer">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="bg-white border border-black/[0.08] rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-black/[0.04] text-black/40 text-[11px] font-semibold tracking-widest uppercase bg-[#FAFAFA]/50">
+                    <th className="py-4 px-6 font-inter font-semibold">Restaurant</th>
+                    <th className="py-4 px-6 font-inter font-semibold">Status</th>
+                    <th className="py-4 px-6 font-inter font-semibold">Joined</th>
+                    <th className="py-4 px-6 font-inter font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="text-[14px]">
+                  {restaurants?.map((restaurant) => (
+                    <tr key={restaurant.id} className="border-b border-black/[0.04] hover:bg-[#FAFAFA]/50 transition-colors last:border-b-0 group">
+                      <td className="py-4 px-6">
+                        <p className="font-semibold text-black/90">{restaurant.name}</p>
+                        <p className="text-[13px] text-black/50 mt-0.5">{restaurant.address || 'No address provided'}</p>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${
+                          restaurant.status === 'ACTIVE' ? 'bg-[#10B981]/10 text-[#10B981]' : 
+                          restaurant.status === 'SUSPENDED' ? 'bg-[#EF4444]/10 text-[#EF4444]' : 
+                          'bg-[#F97316]/10 text-[#F97316]'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            restaurant.status === 'ACTIVE' ? 'bg-[#10B981]' : 
+                            restaurant.status === 'SUSPENDED' ? 'bg-[#EF4444]' : 
+                            'bg-[#F97316]'
+                          }`}></div>
+                          {restaurant.status}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 text-black/50 font-medium text-[13px]">
+                        {new Date(restaurant.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
+                      <td className="py-4 px-6 text-right space-x-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                         {restaurant.status === 'ACTIVE' ? (
+                            <button className="text-[#EF4444] hover:bg-[#EF4444]/10 px-3 py-1.5 rounded-md font-semibold text-[13px] transition-colors cursor-pointer">
+                              Suspend
+                            </button>
+                         ) : (
+                            <button className="text-[#10B981] hover:bg-[#10B981]/10 px-3 py-1.5 rounded-md font-semibold text-[13px] transition-colors cursor-pointer">
+                              Reactivate
+                            </button>
+                         )}
+                      </td>
+                    </tr>
+                  ))}
+
+                  {restaurants?.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-16 text-center text-black/40 text-[14px]">
+                        No tenants found in the database.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         {/* System Integrity Alert */}
-        <div className="bg-[#F8FAFC] border border-[#E6E8EA] rounded-lg p-6 flex gap-4">
-          <div className="text-[#64748B] shrink-0 mt-0.5">
-            <InfoIcon size={20} weight="bold" />
+        <div className="bg-[#FFF4F4] border border-[#FFE4E6] rounded-2xl p-5 flex gap-4">
+          <div className="text-[#E11D48] shrink-0 mt-0.5">
+            <InfoIcon size={20} weight="fill" />
           </div>
           <div>
-            <h3 className="text-[#1B1D1E] text-xs font-bold tracking-widest uppercase mb-2">
-              System Integrity
+            <h3 className="text-[#BE123C] text-[13px] font-bold tracking-tight mb-1">
+              Production Database Alert
             </h3>
-            <p className="text-[#64748B] text-sm leading-relaxed">
-              You are currently in God Mode. All actions performed here are
-              permanent and directly affect the production database. Suspended
-              restaurants will lose access to their POS and ordering systems
-              immediately.
+            <p className="text-[#9F1239] text-[13px] leading-relaxed font-medium">
+              You are operating in God Mode. Actions taken here immediately alter live tenant data. Suspending a tenant will revoke their API and dashboard access instantly.
             </p>
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-[#E6E8EA] px-8 py-6 flex items-center justify-between text-[#64748B] text-xs font-bold tracking-widest uppercase bg-white mt-12">
-        <p>© 2024 Table-Tap. All rights reserved.</p>
-        <div className="flex gap-6">
-          <a
-            href="#"
-            className="hover:text-black transition-colors underline underline-offset-4 decoration-1"
-          >
-            Support
-          </a>
-          <a
-            href="#"
-            className="hover:text-black transition-colors underline underline-offset-4 decoration-1"
-          >
-            Privacy Policy
-          </a>
-          <a
-            href="#"
-            className="hover:text-black transition-colors underline underline-offset-4 decoration-1"
-          >
-            Documentation
-          </a>
-        </div>
-      </footer>
     </div>
   );
-};
-
-export default Page;
+}
