@@ -37,7 +37,7 @@ export default function TenantActions({ id, currentStatus }: { id: string; curre
       onClick={() => handleToggle("ACTIVE")}
       className="text-[#10B981] hover:bg-[#10B981]/10 px-3 py-1.5 rounded-md font-semibold text-[13px] transition-colors cursor-pointer disabled:opacity-50"
     >
-      {isLoading ? "Working..." : "Reactivate"}
+      {isLoading ? "Working..." : "Unsuspend"}
     </button>
   );
 }
