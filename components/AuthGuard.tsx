@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { getPlatformSettings } from "@/app/actions/platform";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,43 +24,56 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // 2. Check if the user has an active subscription in their metadata
-      // --- DISABLED PAYMENT CHECK FOR TESTING ---
-      /*
-      const hasPaid = session.user.user_metadata?.has_active_subscription;
+      // 2. Fetch platform settings
+      const settings = await getPlatformSettings();
 
-      if (!hasPaid) {
-        // If they logged in but haven't paid, kick them to a payment page!
-        // (If you don't have a /payment page yet, you could send them back to login or an error page)
-        router.push("/login");
+      // 3. Check if the user has an active subscription in their metadata (IF paywall is enabled)
+      if (settings.paywall_enabled) {
+        const hasPaid = session.user.user_metadata?.has_active_subscription;
+
+        if (!hasPaid) {
+          // If they logged in but haven't paid, kick them to login page
+          router.push("/login");
+          return;
+        }
+
+        const metadata = session.user.user_metadata;
+        const hasFlag = metadata?.has_active_subscription;
+        const expiresAt = metadata?.subscription_expires_at;
+
+        const expiryDate = expiresAt ? new Date(expiresAt) : null;
+        const today = new Date();
+
+        if (hasFlag && expiryDate && today < expiryDate) {
+          // Subscription is valid, do nothing
+        } else {
+          alert(
+            "Your subscription has expired. Please renew your subscription to continue using our services.",
+          );
+          await supabase.auth.updateUser({
+            data: {
+              has_active_subscription: false,
+            },
+          });
+          await supabase.auth.signOut();
+          router.push("/login");
+          return;
+        }
+      }
+
+      // 4. Verify that the restaurant is not suspended
+      const { data: restaurant } = await supabase
+        .from("restaurants")
+        .select("status")
+        .eq("owner_id", session.user.id)
+        .maybeSingle();
+
+      if (restaurant?.status === "SUSPENDED") {
+        router.push("/suspended");
         return;
       }
 
-      const metadata = session.user.user_metadata;
-      const hasFlag = metadata?.has_active_subscription;
-      const expiresAt = metadata?.subscription_expires_at;
-
-      const expiryDate = expiresAt ? new Date(expiresAt) : null;
-      const today = new Date();
-
-      if (hasFlag && expiryDate && today < expiryDate) {
-        // Subscription is valid, do nothing and let it reach setIsLoading(false)
-      } else {
-        alert(
-          "Your subscription has expired. Please renew your subscription to continue using our services.",
-        );
-        await supabase.auth.updateUser({
-          data: {
-            has_active_subscription: false,
-          },
-        });
-        await supabase.auth.signOut();
-        router.push("/login");
-        return;
-      }
-      */
-
-      // 3. User is logged in (payment check bypassed), let them through!
+      // 4. User is logged in (payment check bypassed), let them through!
       setIsLoading(false);
     };
 

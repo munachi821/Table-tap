@@ -7,6 +7,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { CloudArrowUpIcon, EyeIcon, EyeSlashIcon, LockKeyIcon } from "@phosphor-icons/react";
 import { usePaystackPayment } from "react-paystack";
+import { getPlatformSettings } from "@/app/actions/platform";
+import { useEffect } from "react";
 
 export default function SignupForm() {
   const supabase = createClient();
@@ -21,11 +23,16 @@ export default function SignupForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [logoUrl, setLogoUrl] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
+  const [platformConfig, setPlatformConfig] = useState({ paywall_enabled: false, subscription_price: 80000 });
+
+  useEffect(() => {
+    getPlatformSettings().then(setPlatformConfig);
+  }, []);
 
   const paystackConfig = {
     reference: new Date().getTime().toString(),
     email: email,
-    amount: 80000 * 100, // Amount is in kobo (80k Naira)
+    amount: platformConfig.subscription_price * 100, // Amount is in kobo
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY as string,
   };
 
@@ -93,7 +100,6 @@ export default function SignupForm() {
     }
 
     setIsLoading(false);
-    alert("Account created successfully! Proceeding to payment...");
 
     const onSuccess = async (response: any) => {
       const today = new Date();
@@ -140,8 +146,13 @@ export default function SignupForm() {
       );
     };
 
-    // Trigger the Paystack popup
-    initializePayment({ onSuccess, onClose });
+    if (platformConfig.paywall_enabled) {
+      alert("Account created successfully! Proceeding to payment...");
+      initializePayment({ onSuccess, onClose });
+    } else {
+      alert("Account created successfully! Redirecting to dashboard...");
+      await onSuccess({ reference: "trial-" + Date.now() });
+    }
 
     setName("");
     setAddress("");
@@ -272,9 +283,10 @@ export default function SignupForm() {
 
         <button
           type="submit"
-          className="w-full bg-[#EA580C] hover:bg-[#D97706] text-white h-12 rounded-md font-medium text-[15px] transition-colors mt-2"
+          className="w-full bg-[#EA580C] hover:bg-[#D97706] text-white h-12 rounded-md font-medium text-[15px] transition-colors mt-2 disabled:opacity-50"
+          disabled={isLoading}
         >
-          {isLoading ? "Signing up..." : "Continue to Payment (₦80,000/mo)"}
+          {isLoading ? "Signing up..." : platformConfig.paywall_enabled ? `Continue to Payment (₦${platformConfig.subscription_price.toLocaleString()}/mo)` : "Create Account"}
         </button>
       </form>
 
