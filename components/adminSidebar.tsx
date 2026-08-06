@@ -75,7 +75,10 @@ const AdminSidebar = () => {
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setIsMobileOpen(false)} />
+          <div
+            className="fixed inset-0 bg-black/50 transition-opacity"
+            onClick={() => setIsMobileOpen(false)}
+          />
           <div className="relative flex w-64 max-w-xs flex-col bg-[#F8FAFC] h-full shadow-xl">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
               <div>
@@ -86,11 +89,14 @@ const AdminSidebar = () => {
                   CEO&apos;S DASHBOARD
                 </p>
               </div>
-              <button onClick={() => setIsMobileOpen(false)} className="p-2 -mr-2 text-[#475569] hover:bg-gray-200 rounded-lg">
+              <button
+                onClick={() => setIsMobileOpen(false)}
+                className="p-2 -mr-2 text-[#475569] hover:bg-gray-200 rounded-lg"
+              >
                 <X size={20} weight="bold" />
               </button>
             </div>
-            
+
             <div className="px-4 py-4 flex flex-col justify-between flex-1 overflow-y-auto">
               <ul className="flex flex-col gap-2">
                 {admintabs.map((tab) => {
@@ -107,7 +113,10 @@ const AdminSidebar = () => {
                             : "text-[#475569] hover:bg-gray-100/50"
                         } p-3 rounded-xl font-semibold transition-all`}
                       >
-                        <Icon size={22} weight={isActive ? "fill" : "regular"} />
+                        <Icon
+                          size={22}
+                          weight={isActive ? "fill" : "regular"}
+                        />
                         {tab.name}
                       </Link>
                     </li>
@@ -128,7 +137,7 @@ const AdminSidebar = () => {
       )}
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex w-60 h-full shrink-0 bg-[#F8FAFC] flex-col border-r border-gray-100 z-10">
+      <div className="hidden md:flex w-60 h-full shrink-0 flex-col border-r border-gray-100 z-10 mr-5">
         <div className="p-6">
           <h2 className="text-2xl w-25 whitespace-wrap text-[#0F172A] font-bold font-manrope leading-8">
             {restName}

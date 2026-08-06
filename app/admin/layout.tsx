@@ -26,11 +26,11 @@ export default function Layout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${manRope.variable} antialiased flex h-screen overflow-hidden`}
+        className={`${inter.variable} ${manRope.variable} antialiased flex h-screen overflow-hidden bg-[#F8FAFC]`}
       >
         <AuthGuard>
           <AdminSidebar />
-          <div className="w-full h-full bg-[#F8FAFC] overflow-auto relative pt-16 md:pt-0">
+          <div className="w-full h-full overflow-auto relative pt-16 md:pt-0">
             {children}
           </div>
         </AuthGuard>

@@ -437,7 +437,7 @@ const Page = () => {
       </div>
 
       <div
-        className={`fixed top-0 bottom-0 right-0 left-0 bg-black/50 backdrop-blur-xs ${isModalOpen ? "block" : "hidden"}`}
+        className={`fixed top-0 bottom-0 right-0 left-0 bg-black/50 backdrop-blur-xs z-50 ${isModalOpen ? "block" : "hidden"}`}
         onClick={() => setIsModalOpen(false)}
       >
         <div
