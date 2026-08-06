@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import TenantActions from "./TenantActions";
+import PlatformSettings from "./PlatformSettings";
+import { getPlatformSettings } from "@/app/actions/platform";
 import { Toaster } from "sonner";
 
 export default async function Page() {
@@ -11,6 +13,9 @@ export default async function Page() {
   const supabase = createClient(cookieStore);
   
   const { data: { session } } = await supabase.auth.getSession();
+
+  // Settings
+  const platformSettings = await getPlatformSettings();
   
   const superAdminEmail = process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL || "munachi@table-tap.com";
   
@@ -56,10 +61,10 @@ export default async function Page() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-8 py-12">
+      <main className="max-w-7xl mx-auto px-8 py-12">
         
         {/* Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12 px-8">
           {/* Revenue Card */}
           <div className="bg-white border border-black/[0.08] rounded-2xl p-7 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
             <h2 className="text-black/50 text-[11px] font-semibold tracking-widest uppercase mb-4">
@@ -95,47 +100,43 @@ export default async function Page() {
         </div>
 
         {/* Restaurant Management */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-4 px-2">
-            <h2 className="text-[15px] font-semibold tracking-tight">
-              Tenant Directory
-            </h2>
-            <p className="text-black/50 text-[13px] font-medium">
-              {totalRestaurants} Total
-            </p>
-          </div>
-
-          <div className="bg-white border border-black/[0.08] rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-black/[0.04] text-black/40 text-[11px] font-semibold tracking-widest uppercase bg-[#FAFAFA]/50">
-                    <th className="py-4 px-6 font-inter font-semibold">Restaurant</th>
-                    <th className="py-4 px-6 font-inter font-semibold">Status</th>
-                    <th className="py-4 px-6 font-inter font-semibold">Joined</th>
-                    <th className="py-4 px-6 font-inter font-semibold text-right">Actions</th>
+        <div className="p-8 pt-4 grid grid-cols-1 xl:grid-cols-4 gap-6">
+          <div className="xl:col-span-3">
+            <div className="bg-white border border-[#F1F5F9] rounded-2xl overflow-x-auto shadow-sm">
+              <table className="w-full min-w-[600px] text-left border-collapse">
+                <thead className="bg-[#F8FAFC]">
+                  <tr className="border-b border-[#F1F5F9] text-[11px] font-bold font-inter text-[#64748B] uppercase tracking-[0.08em]">
+                    <th className="py-4 px-6">Tenant Name</th>
+                    <th className="py-4 px-6">Owner Email</th>
+                    <th className="py-4 px-6 text-center">Status</th>
+                    <th className="py-4 px-6">Joined Date</th>
+                    <th className="py-4 px-6 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="text-[14px]">
+                <tbody className="divide-y divide-[#F1F5F9]">
                   {restaurants?.map((restaurant) => (
-                    <tr key={restaurant.id} className="border-b border-black/[0.04] hover:bg-[#FAFAFA]/50 transition-colors last:border-b-0 group">
+                    <tr key={restaurant.id} className="hover:bg-[#FAFAFA] transition-colors group">
                       <td className="py-4 px-6">
-                        <p className="font-semibold text-black/90">{restaurant.name}</p>
-                        <p className="text-[13px] text-black/50 mt-0.5">{restaurant.address || 'No address provided'}</p>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${
-                          restaurant.status === 'ACTIVE' ? 'bg-[#10B981]/10 text-[#10B981]' : 
-                          restaurant.status === 'SUSPENDED' ? 'bg-[#EF4444]/10 text-[#EF4444]' : 
-                          'bg-[#F97316]/10 text-[#F97316]'
-                        }`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${
-                            restaurant.status === 'ACTIVE' ? 'bg-[#10B981]' : 
-                            restaurant.status === 'SUSPENDED' ? 'bg-[#EF4444]' : 
-                            'bg-[#F97316]'
-                          }`}></div>
-                          {restaurant.status}
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/40 font-bold text-xs shrink-0">
+                            {restaurant.name.charAt(0)}
+                          </div>
+                          <span className="font-semibold text-[14px] text-black/90">
+                            {restaurant.name}
+                          </span>
                         </div>
+                      </td>
+                      <td className="py-4 px-6 text-[#64748B] font-medium text-[13px]">
+                         {restaurant.owner_email || 'N/A'}
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
+                          restaurant.status === 'ACTIVE' 
+                            ? 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]' 
+                            : 'bg-[#FEF2F2] text-[#EF4444] border-[#FECACA]'
+                        }`}>
+                          {restaurant.status}
+                        </span>
                       </td>
                       <td className="py-4 px-6 text-black/50 font-medium text-[13px]">
                         {new Date(restaurant.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -145,11 +146,10 @@ export default async function Page() {
                       </td>
                     </tr>
                   ))}
-
                   {restaurants?.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-16 text-center text-black/40 text-[14px]">
-                        No tenants found in the database.
+                      <td colSpan={5} className="py-12 text-center text-[#64748B] font-medium text-[14px]">
+                        No tenants found. Start onboarding!
                       </td>
                     </tr>
                   )}
@@ -157,20 +157,24 @@ export default async function Page() {
               </table>
             </div>
           </div>
-        </div>
-
-        {/* System Integrity Alert */}
-        <div className="bg-[#FFF4F4] border border-[#FFE4E6] rounded-2xl p-5 flex gap-4">
-          <div className="text-[#E11D48] shrink-0 mt-0.5">
-            <InfoIcon size={20} weight="fill" />
-          </div>
-          <div>
-            <h3 className="text-[#BE123C] text-[13px] font-bold tracking-tight mb-1">
-              Production Database Alert
-            </h3>
-            <p className="text-[#9F1239] text-[13px] leading-relaxed font-medium">
-              You are operating in God Mode. Actions taken here immediately alter live tenant data. Suspending a tenant will revoke their API and dashboard access instantly.
-            </p>
+          
+          <div className="space-y-6">
+            <PlatformSettings initialSettings={platformSettings} />
+            
+            {/* System Integrity Alert */}
+            <div className="bg-[#FFF4F4] border border-[#FFE4E6] rounded-2xl p-5 flex gap-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+              <div className="text-[#E11D48] shrink-0 mt-0.5">
+                <InfoIcon size={20} weight="fill" />
+              </div>
+              <div>
+                <h3 className="text-[#BE123C] text-[13px] font-bold tracking-tight mb-1">
+                  Production Database Alert
+                </h3>
+                <p className="text-[#9F1239] text-[13px] leading-relaxed font-medium">
+                  You are operating in God Mode. Actions taken here immediately alter live tenant data. Suspending a tenant will revoke their API and dashboard access instantly.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </main>
