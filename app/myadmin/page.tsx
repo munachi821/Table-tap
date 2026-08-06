@@ -2,6 +2,9 @@ import { InfoIcon } from "@phosphor-icons/react/dist/ssr";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import TenantActions from "./TenantActions";
+import { Toaster } from "sonner";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -30,6 +33,7 @@ export default async function Page() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#111111] font-inter selection:bg-black/10">
+      <Toaster position="top-center" richColors theme="light" />
       {/* Header */}
       <header className="px-8 h-20 flex items-center justify-between border-b border-black/[0.08] bg-white/50 backdrop-blur-xl sticky top-0 z-50">
         <h1 className="text-xl font-semibold tracking-tight">God Mode</h1>
@@ -45,9 +49,9 @@ export default async function Page() {
               Log out
             </button>
           </form>
-          <button className="bg-black hover:bg-black/90 text-white px-5 py-2.5 rounded-full text-[13px] font-medium transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.16)] active:scale-95">
+          <Link href="/" className="bg-black hover:bg-black/90 text-white px-5 py-2.5 rounded-full text-[13px] font-medium transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.16)] active:scale-95">
             + Add Tenant
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -137,15 +141,7 @@ export default async function Page() {
                         {new Date(restaurant.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
                       <td className="py-4 px-6 text-right space-x-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                         {restaurant.status === 'ACTIVE' ? (
-                            <button className="text-[#EF4444] hover:bg-[#EF4444]/10 px-3 py-1.5 rounded-md font-semibold text-[13px] transition-colors cursor-pointer">
-                              Suspend
-                            </button>
-                         ) : (
-                            <button className="text-[#10B981] hover:bg-[#10B981]/10 px-3 py-1.5 rounded-md font-semibold text-[13px] transition-colors cursor-pointer">
-                              Reactivate
-                            </button>
-                         )}
+                        <TenantActions id={restaurant.id} currentStatus={restaurant.status} />
                       </td>
                     </tr>
                   ))}
