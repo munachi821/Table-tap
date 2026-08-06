@@ -9,6 +9,7 @@ import { CloudArrowUpIcon, EyeIcon, EyeSlashIcon, LockKeyIcon } from "@phosphor-
 import { usePaystackPayment } from "react-paystack";
 import { getPlatformSettings } from "@/app/actions/platform";
 import { useEffect } from "react";
+import { Toaster, toast } from "sonner";
 
 export default function SignupForm() {
   const supabase = createClient();
@@ -45,7 +46,7 @@ export default function SignupForm() {
       const prevUrl = URL.createObjectURL(file);
       setResLogoPrev(prevUrl);
     } else {
-      alert("File size must be less than 2MB");
+      toast.error("File size must be less than 2MB");
     }
   };
 
@@ -66,7 +67,7 @@ export default function SignupForm() {
 
     if (signUpError) {
       setIsLoading(false);
-      return alert("Error signing up: " + signUpError.message);
+      return toast.error("Error signing up: " + signUpError.message);
     }
 
     // 2. Upload logo if it exists
@@ -81,9 +82,7 @@ export default function SignupForm() {
 
       if (uploadError) {
         setIsLoading(false);
-        return alert(
-          "Account created, but error uploading logo: " + uploadError.message,
-        );
+        return toast.error("Account created, but error uploading logo: " + uploadError.message);
       }
 
       // 3. Get the public URL
@@ -112,7 +111,6 @@ export default function SignupForm() {
           subscription_expires_at: thirtyDaysFromNow.toISOString(),
         },
       });
-      alert("Payment successful! Welcome to your dashboard.");
 
       const generatedSlug = name
         .toLowerCase()
@@ -134,23 +132,22 @@ export default function SignupForm() {
         .select();
 
       if (dbError) {
-        return alert("Error creating restaurant: " + dbError.message);
+        return toast.error("Error creating restaurant: " + dbError.message);
       }
 
+      toast.success("Successfully logged in!");
       router.push("/admin/overview");
     };
 
     const onClose = () => {
-      alert(
-        "Payment cancelled. You must complete payment to access the dashboard.",
-      );
+      toast.error("Payment cancelled. You must complete payment to access the dashboard.");
     };
 
     if (platformConfig.paywall_enabled) {
-      alert("Account created successfully! Proceeding to payment...");
+      toast.success("Account created successfully! Proceeding to payment...");
       initializePayment({ onSuccess, onClose });
     } else {
-      alert("Account created successfully! Redirecting to dashboard...");
+      toast.success("Account created successfully!");
       await onSuccess({ reference: "trial-" + Date.now() });
     }
 
@@ -286,7 +283,7 @@ export default function SignupForm() {
           className="w-full bg-[#EA580C] hover:bg-[#D97706] text-white h-12 rounded-md font-medium text-[15px] transition-colors mt-2 disabled:opacity-50"
           disabled={isLoading}
         >
-          {isLoading ? "Signing up..." : platformConfig.paywall_enabled ? `Continue to Payment (₦${platformConfig.subscription_price.toLocaleString()}/mo)` : "Create Account"}
+          {isLoading ? "Signing up..." : platformConfig.paywall_enabled ? `Continue to Payment (₦${platformConfig.subscription_price.toLocaleString()}/mo)` : "Sign up"}
         </button>
       </form>
 

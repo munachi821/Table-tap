@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Toaster, toast } from "sonner";
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -39,28 +41,25 @@ export default function LoginPage() {
   }, []);
 
   const handleLogin = async () => {
-    // Add logic here, e.g.:
+    setIsLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (error) return alert(error.message);
-
-    // --- DISABLED PAYMENT CHECK FOR TESTING ---
-    /*
-    const hasPaid = data.user?.user_metadata?.has_active_subscription;
-    if (hasPaid) {
-      router.push("/admin/overview");
-    } else {
-      alert("You don't have an active subscription! Please sign up and pay to access the dashboard.");
-      await supabase.auth.signOut();
+    
+    if (error) {
+      toast.error(error.message);
+      setIsLoading(false);
+      return;
     }
-    */
+
+    toast.success("Successfully logged in!");
     router.push("/admin/overview");
   };
 
   return (
     <div className="flex bg-white font-inter h-screen">
+      <Toaster position="top-center" richColors theme="light" />
       {/* Left Panel */}
       <div className="hidden lg:flex w-1/2 bg-[#0F172A] relative flex-col justify-between overflow-hidden h-screen">
         <div className="absolute inset-0 bg-linear-to-br from-[#1E293B] to-[#0F172A] z-0"></div>
@@ -153,9 +152,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full bg-[#EA580C] hover:bg-[#D97706] text-white h-12 rounded-md font-medium text-[15px] transition-colors mt-2"
+              disabled={isLoading}
+              className="w-full bg-[#EA580C] hover:bg-[#D97706] text-white h-12 rounded-md font-medium text-[15px] transition-colors mt-2 disabled:opacity-50"
             >
-              Log in
+              {isLoading ? "Logging in..." : "Log in"}
             </button>
           </form>
 
