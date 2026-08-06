@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { CloudArrowUpIcon, EyeIcon, LockKeyIcon } from "@phosphor-icons/react";
+import { CloudArrowUpIcon, EyeIcon, EyeSlashIcon, LockKeyIcon } from "@phosphor-icons/react";
 import { usePaystackPayment } from "react-paystack";
 
 export default function SignupForm() {
@@ -20,6 +20,7 @@ export default function SignupForm() {
   const [resLogoPrev, setResLogoPrev] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [logoUrl, setLogoUrl] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const paystackConfig = {
     reference: new Date().getTime().toString(),
@@ -252,7 +253,7 @@ export default function SignupForm() {
           </label>
           <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -261,9 +262,10 @@ export default function SignupForm() {
             />
             <button
               type="button"
+              onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B] transition-colors cursor-pointer"
             >
-              <EyeIcon size={18} />
+              {showPassword ? <EyeSlashIcon size={18} /> : <EyeIcon size={18} />}
             </button>
           </div>
         </div>

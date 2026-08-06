@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircleIcon, EyeIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, EyeIcon, EyeSlashIcon } from "@phosphor-icons/react";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -133,7 +134,7 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -142,9 +143,10 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B] transition-colors cursor-pointer"
                 >
-                  <EyeIcon size={18} />
+                  {showPassword ? <EyeSlashIcon size={18} /> : <EyeIcon size={18} />}
                 </button>
               </div>
             </div>
