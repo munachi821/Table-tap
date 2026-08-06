@@ -7,6 +7,7 @@ import {
   TrashIcon,
   XIcon,
   DownloadSimpleIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -80,7 +81,7 @@ const OrderComponent = () => {
       }
       const { data: tableData, error: tablesError } = await supabase
         .from("tables")
-        .select("*, restaurants(id, name, address, logo_url)")
+        .select("*, restaurants(id, name, address, logo_url, status)")
         .eq("id", tableId)
         .maybeSingle();
       if (tablesError) {
@@ -310,6 +311,20 @@ const OrderComponent = () => {
               </div>
             ))}
           </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (currentTable?.restaurants?.status === "SUSPENDED") {
+    return (
+      <main className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-sm w-full text-center">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+             <WarningCircleIcon size={32} weight="duotone" className="text-red-500" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Store Unavailable</h2>
+          <p className="text-sm text-gray-500">This restaurant is not accepting orders at the moment. Please try again later.</p>
         </div>
       </main>
     );
