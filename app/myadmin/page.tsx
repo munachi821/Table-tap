@@ -11,30 +11,42 @@ import { Toaster } from "sonner";
 export default async function Page() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  
-  const { data: { session } } = await supabase.auth.getSession();
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   // Settings
   const platformSettings = await getPlatformSettings();
-  
-  const superAdminEmail = process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL || "munachi@table-tap.com";
-  
+
+  const superAdminEmail =
+    process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL || "munachi@table-tap.com";
+
   // God Mode Auth Check
-  if (!session || (session.user.email !== superAdminEmail && session.user.email !== "admin@table-tap.com")) {
+  if (
+    !session ||
+    (session.user.email !== superAdminEmail &&
+      session.user.email !== "admin@table-tap.com")
+  ) {
     redirect("/myadmin/login");
   }
 
   // Fetch real data
-  const { data: restaurants } = await supabase.from("restaurants").select("*").order('created_at', { ascending: false });
+  const { data: restaurants } = await supabase
+    .from("restaurants")
+    .select("*")
+    .order("created_at", { ascending: false });
   const totalRestaurants = restaurants?.length || 0;
-  
-  const activeRestaurants = restaurants?.filter((r) => r.status === "ACTIVE") || [];
+
+  const activeRestaurants =
+    restaurants?.filter((r) => r.status === "ACTIVE") || [];
   const mrr = activeRestaurants.length * 80000;
-  
+
   // Calculate today's signups
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const signupsToday = restaurants?.filter((r) => new Date(r.created_at) >= today).length || 0;
+  const signupsToday =
+    restaurants?.filter((r) => new Date(r.created_at) >= today).length || 0;
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#111111] font-inter selection:bg-black/10">
@@ -43,18 +55,26 @@ export default async function Page() {
       <header className="px-8 h-20 flex items-center justify-between border-b border-black/[0.08] bg-white/50 backdrop-blur-xl sticky top-0 z-50">
         <h1 className="text-xl font-semibold tracking-tight">God Mode</h1>
         <div className="flex items-center gap-6">
-          <form action={async () => {
-            "use server";
-            const cookieStore = await cookies();
-            const supabase = createClient(cookieStore);
-            await supabase.auth.signOut();
-            redirect("/myadmin/login");
-          }}>
-             <button type="submit" className="text-[13px] font-medium text-black/50 hover:text-black transition-colors cursor-pointer">
+          <form
+            action={async () => {
+              "use server";
+              const cookieStore = await cookies();
+              const supabase = createClient(cookieStore);
+              await supabase.auth.signOut();
+              redirect("/myadmin/login");
+            }}
+          >
+            <button
+              type="submit"
+              className="text-[13px] font-medium text-black/50 hover:text-black transition-colors cursor-pointer"
+            >
               Log out
             </button>
           </form>
-          <Link href="/" className="bg-black hover:bg-black/90 text-white px-5 py-2.5 rounded-full text-[13px] font-medium transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.16)] active:scale-95">
+          <Link
+            href="/"
+            className="bg-black hover:bg-black/90 text-white px-5 py-2.5 rounded-full text-[13px] font-medium transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.12)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.16)] active:scale-95"
+          >
             + Add Tenant
           </Link>
         </div>
@@ -62,7 +82,6 @@ export default async function Page() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-8 py-12">
-        
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12 px-8">
           {/* Revenue Card */}
@@ -82,9 +101,9 @@ export default async function Page() {
 
           {/* Users Card */}
           <div className="bg-white border border-black/[0.08] rounded-2xl p-7 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden">
-             {/* Subtle decorative background for the growth card */}
+            {/* Subtle decorative background for the growth card */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#10B981]/5 rounded-bl-full pointer-events-none"></div>
-            
+
             <h2 className="text-black/50 text-[11px] font-semibold tracking-widest uppercase mb-4 relative z-10">
               Platform Growth
             </h2>
@@ -94,14 +113,16 @@ export default async function Page() {
             <div className="flex items-center gap-2 text-black/50 text-[13px] font-medium relative z-10">
               <p>Total Restaurants</p>
               <div className="w-1 h-1 rounded-full bg-black/20"></div>
-              <p className="text-[#10B981] font-semibold">{signupsToday} signed up today</p>
+              <p className="text-[#10B981] font-semibold">
+                {signupsToday} signed up today
+              </p>
             </div>
           </div>
         </div>
 
         {/* Restaurant Management */}
-        <div className="p-8 pt-4 grid grid-cols-1 xl:grid-cols-4 gap-6">
-          <div className="xl:col-span-3">
+        <div className="p-8 pt-4 flex flex-col gap-6">
+          <div className="">
             <div className="bg-white border border-[#F1F5F9] rounded-2xl overflow-x-auto shadow-sm">
               <table className="w-full min-w-[600px] text-left border-collapse">
                 <thead className="bg-[#F8FAFC]">
@@ -115,7 +136,10 @@ export default async function Page() {
                 </thead>
                 <tbody className="divide-y divide-[#F1F5F9]">
                   {restaurants?.map((restaurant) => (
-                    <tr key={restaurant.id} className="hover:bg-[#FAFAFA] transition-colors group">
+                    <tr
+                      key={restaurant.id}
+                      className="hover:bg-[#FAFAFA] transition-colors group"
+                    >
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-black/40 font-bold text-xs shrink-0">
@@ -127,28 +151,39 @@ export default async function Page() {
                         </div>
                       </td>
                       <td className="py-4 px-6 text-[#64748B] font-medium text-[13px]">
-                         {restaurant.owner_email || 'N/A'}
+                        {restaurant.owner_email || "N/A"}
                       </td>
                       <td className="py-4 px-6 text-center">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
-                          restaurant.status === 'ACTIVE' 
-                            ? 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]' 
-                            : 'bg-[#FEF2F2] text-[#EF4444] border-[#FECACA]'
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
+                            restaurant.status === "ACTIVE"
+                              ? "bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]"
+                              : "bg-[#FEF2F2] text-[#EF4444] border-[#FECACA]"
+                          }`}
+                        >
                           {restaurant.status}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-black/50 font-medium text-[13px]">
-                        {new Date(restaurant.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(restaurant.created_at).toLocaleDateString(
+                          "en-US",
+                          { month: "short", day: "numeric", year: "numeric" },
+                        )}
                       </td>
                       <td className="py-4 px-6 text-right space-x-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <TenantActions id={restaurant.id} currentStatus={restaurant.status} />
+                        <TenantActions
+                          id={restaurant.id}
+                          currentStatus={restaurant.status}
+                        />
                       </td>
                     </tr>
                   ))}
                   {restaurants?.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-12 text-center text-[#64748B] font-medium text-[14px]">
+                      <td
+                        colSpan={5}
+                        className="py-12 text-center text-[#64748B] font-medium text-[14px]"
+                      >
                         No tenants found. Start onboarding!
                       </td>
                     </tr>
@@ -157,10 +192,10 @@ export default async function Page() {
               </table>
             </div>
           </div>
-          
+
           <div className="space-y-6">
             <PlatformSettings initialSettings={platformSettings} />
-            
+
             {/* System Integrity Alert */}
             <div className="bg-[#FFF4F4] border border-[#FFE4E6] rounded-2xl p-5 flex gap-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
               <div className="text-[#E11D48] shrink-0 mt-0.5">
@@ -171,7 +206,9 @@ export default async function Page() {
                   Production Database Alert
                 </h3>
                 <p className="text-[#9F1239] text-[13px] leading-relaxed font-medium">
-                  You are operating in God Mode. Actions taken here immediately alter live tenant data. Suspending a tenant will revoke their API and dashboard access instantly.
+                  You are operating in God Mode. Actions taken here immediately
+                  alter live tenant data. Suspending a tenant will revoke their
+                  API and dashboard access instantly.
                 </p>
               </div>
             </div>
