@@ -351,7 +351,19 @@ const OrderComponent = () => {
 
         {/* Section Skeleton */}
         <div className="px-4 md:px-10 mt-8">
-          <div className="h-8 w-40 bg-gray-200 rounded-md mb-4 animate-pulse" />
+          <div className="h-8 w-40 bg-gray-200 rounded-md mb-4 animate-pulse flex" />
+          <div className="flex gap-4 overflow-x-hidden">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-88 w-62 shrink-0 rounded-xl bg-gray-50 border border-gray-100 p-2 animate-pulse"
+              >
+                <div className="w-full h-62 bg-gray-200 rounded-lg mb-4" />
+                <div className="h-6 w-24 bg-gray-200 rounded mb-2" />
+                <div className="h-4 w-40 bg-gray-200 rounded" />
+              </div>
+            ))}
+          </div>
           <div className="flex gap-4 overflow-x-hidden">
             {[1, 2, 3, 4].map((i) => (
               <div
@@ -404,6 +416,7 @@ const OrderComponent = () => {
                     src={currentTable.restaurants.logo_url}
                     alt="Restaurant Logo"
                     fill
+                    sizes="52px"
                     className="object-cover"
                   />
                 ) : (
@@ -532,7 +545,7 @@ const OrderComponent = () => {
         /* Menu Items */
         <div className="px-4 md:px-10 mt-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4">
               Most Ordered
             </h2>
             <div className="flex gap-5 max-w-6xl overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
@@ -553,6 +566,7 @@ const OrderComponent = () => {
                       src={mostOrdered.image_url}
                       alt="detail about food 1"
                       fill={true}
+                      sizes="(max-width: 768px) 100vw, 300px"
                       className="object-contain object-center"
                     />
                   </div>
@@ -585,7 +599,7 @@ const OrderComponent = () => {
 
           {/* Beverage */}
           <div className="mt-10">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4">
               Beverages
             </h2>
             <div className="flex gap-5 max-w-6xl overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
@@ -601,7 +615,7 @@ const OrderComponent = () => {
 
           {/* Other tags */}
           <div className="mt-10">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+            <h2 className="text-2xl font-semibold tracking-tight text-gray-900 mb-4">
               All Items
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -631,14 +645,14 @@ const OrderComponent = () => {
         >
           {/* Cart */}
           <div
-            className={`absolute bottom-full right-0 mb-4 p-2 w-[350px] sm:w-[400px] bg-white border border-gray-100 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] origin-bottom-right transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+            className={`absolute bottom-full right-0 mb-4 p-2 flex flex-col w-[350px] sm:w-[400px] max-h-[calc(100dvh-120px)] bg-white border border-gray-100 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] origin-bottom-right transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
               cartOpen
                 ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
                 : "opacity-0 scale-95 translate-y-4 pointer-events-none"
             }`}
           >
-            <div className="flex justify-between items-center sticky top-2 rounded-b-xl mb-4 px-3 py-2">
-              <h3 className="font-bold tracking-tight text-gray-900 text-lg">
+            <div className="flex justify-between items-center rounded-b-xl px-3 py-2">
+              <h3 className="font-semibold tracking-tight text-gray-900 text-lg">
                 Your Order
               </h3>
               <button
@@ -649,7 +663,7 @@ const OrderComponent = () => {
               </button>
             </div>
 
-            <div className="w-full max-h-[50vh] flex flex-col gap-2 overflow-y-auto pr-1 hide-scrollbar">
+            <div className="w-full flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto pr-1 hide-scrollbar">
               {cart.length > 0 ? (
                 cart.map((item) => (
                   <div
@@ -662,6 +676,7 @@ const OrderComponent = () => {
                           src={item.image}
                           alt="checkout image"
                           fill={true}
+                          sizes="64px"
                           className="object-cover object-center"
                         />
                       </div>
@@ -755,45 +770,45 @@ const OrderComponent = () => {
       {/* Digital Receipt Modal */}
       {receiptData && (
         <div
-          className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto"
+          className="fixed inset-0 z-[100] overflow-y-auto bg-black/40 backdrop-blur-sm transition-all duration-300 ease-out"
           onClick={() => setReceiptData(null)}
         >
-          <div className="min-h-screen flex items-center justify-center py-10">
+          <div className="flex min-h-full p-4 sm:p-6">
             <div
-              className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"
+              className="bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] max-w-sm w-full p-6 text-center m-auto animate-in fade-in zoom-in-95 duration-400 ease-[cubic-bezier(0.23,1,0.32,1)]"
               onClick={(e) => e.stopPropagation()}
               ref={receiptRef}
             >
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-50">
+              <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-100/50">
                 <span className="text-3xl text-green-500 font-bold">✓</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-1">
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">
                 Payment Successful!
               </h2>
-              <p className="text-gray-500 mb-6 text-sm">
+              <p className="text-gray-500 font-medium mb-6 text-sm">
                 Your order has been sent to the kitchen.
               </p>
 
-              <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 text-left border border-gray-100">
+              <div className="bg-[#F8FAFC] rounded-2xl p-5 mb-6 text-left border border-gray-100">
                 <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 text-center">
                   Digital Receipt
                 </p>
 
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-gray-500">Order ID</span>
-                  <span className="font-mono text-gray-800 font-medium">
+                  <span className="text-gray-500 font-medium">Order ID</span>
+                  <span className="font-mono text-gray-900 font-semibold">
                     #{receiptData.orderId?.split("-")[0]}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-gray-500">Table</span>
-                  <span className="text-gray-800 font-medium">
+                  <span className="text-gray-500 font-medium">Table</span>
+                  <span className="text-gray-900 font-semibold">
                     {receiptData.tableNumber}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm mb-4">
-                  <span className="text-gray-500">Time</span>
-                  <span className="text-gray-800 font-medium">
+                  <span className="text-gray-500 font-medium">Time</span>
+                  <span className="text-gray-900 font-semibold">
                     {new Date(receiptData.placedAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -804,22 +819,24 @@ const OrderComponent = () => {
                 <div className="border-t border-dashed border-gray-300 py-3 my-3">
                   {receiptData.items?.map((item, i: number) => (
                     <div key={i} className="flex justify-between text-sm mb-2">
-                      <span className="text-gray-800">
-                        <span className="text-orange-500 font-bold">
+                      <span className="text-gray-800 font-medium">
+                        <span className="text-gray-900 font-bold mr-1">
                           {item.quantity}x
-                        </span>{" "}
+                        </span>
                         {item.name}
                       </span>
-                      <span className="font-bold text-gray-800">
+                      <span className="font-bold text-gray-900">
                         ₦{item.price.toLocaleString()}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div className="flex justify-between items-center border-t border-gray-300 pt-3">
-                  <span className="font-bold text-gray-600">Total Paid</span>
-                  <span className="text-orange-500 font-bold text-xl">
+                <div className="flex justify-between items-center border-t border-gray-200 pt-3">
+                  <span className="font-bold tracking-tight text-gray-700">
+                    Total Paid
+                  </span>
+                  <span className="text-orange-500 font-bold text-xl tracking-tight">
                     ₦
                     {receiptData.items
                       ?.reduce(
@@ -831,19 +848,19 @@ const OrderComponent = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 justify-center">
+              <div className="flex items-center gap-3 justify-center">
                 <button
-                  className="w-full bg-orange-400 text-white font-semibold py-3.5 rounded-full hover:bg-orange-400/80 transition-colors shadow-lg shadow-orange-200 font-manrope cursor-pointer"
+                  className="flex-1 bg-gray-900 text-white font-bold py-3.5 rounded-2xl hover:bg-black active:scale-[0.97] transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-xl shadow-gray-900/10 cursor-pointer"
                   onClick={() => setReceiptData(null)}
                 >
                   Close Receipt
                 </button>
 
                 <div
-                  className="flex items-center justify-center p-3.5 w-16 h-12 rounded-full bg-orange-400 hover:bg-orange-400/80 text-white transition-colors cursor-pointer"
+                  className="flex items-center justify-center p-3.5 w-14 h-14 rounded-2xl bg-orange-50 hover:bg-orange-100 text-orange-600 active:scale-[0.92] transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer shrink-0"
                   onClick={downloadReceipt}
                 >
-                  <DownloadSimpleIcon size={24} weight="bold" />
+                  <DownloadSimpleIcon size={22} weight="bold" />
                 </div>
               </div>
             </div>
