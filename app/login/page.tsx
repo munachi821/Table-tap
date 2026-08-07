@@ -18,26 +18,18 @@ export default function LoginPage() {
   useEffect(() => {
     const fetchSession = async () => {
       const {
-        data: { session },
+        data: { user },
         error,
-      } = await supabase.auth.getSession();
+      } = await supabase.auth.getUser();
       if (error) return console.log(error);
-      if (session) {
-        // --- DISABLED PAYMENT CHECK FOR TESTING ---
-        /*
-        const hasPaid = session.user.user_metadata?.has_active_subscription;
-        if (hasPaid) {
-          router.push("/admin/overview");
-        } else {
-          // If they are logged in but haven't paid, we log them out so they aren't stuck in a weird state
-          await supabase.auth.signOut();
-        }
-        */
+      if (user) {
+        // AuthGuard on admin layout handles paywall/subscription check
         router.push("/admin/overview");
       }
     };
 
     fetchSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogin = async () => {

@@ -29,11 +29,11 @@ export async function updatePlatformSettings(data: { paywall_enabled: boolean; s
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  // Authenticate super admin
-  const { data: { session } } = await supabase.auth.getSession();
-  const superAdminEmail = process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL || "munachi@table-tap.com";
+  // Use getUser() — verifies the JWT with the Supabase server (getSession is insecure)
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const superAdminEmail = process.env.SUPERADMIN_EMAIL || "munachi@table-tap.com";
   
-  if (!session || (session.user.email !== superAdminEmail && session.user.email !== "admin@table-tap.com")) {
+  if (authError || !user || (user.email !== superAdminEmail && user.email !== "admin@table-tap.com")) {
      return { success: false, error: "Unauthorized" };
   }
 

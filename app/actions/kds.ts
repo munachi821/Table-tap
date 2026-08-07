@@ -33,48 +33,63 @@ export async function generateKDSCredentials(
 
   const adminClient = createAdminClient();
 
-  // 3. Create or update the Supabase Auth user for this KDS
-  // We can search for the user by email, but admin API doesn't let us search easily by email directly without listUsers,
-  // so we try to create it. If it fails with "User already exists", we update it.
-  
-  // Actually, we can just use admin.createUser. 
-  // If it fails because of duplicate email, we can list users by email and update the password.
-  // Alternatively, since we are generating unique credentials, we might just be updating the password of the existing user.
+  // 3. Try to create the user first. If it fails because of a duplicate, update instead.
+  //    This avoids the expensive listUsers() call which loads ALL users into memory.
   let kdsUser;
   
-  const { data: existingUsers } = await adminClient.auth.admin.listUsers();
-  const existingUser = existingUsers?.users.find((u) => u.email === generatedEmail);
+  const { data: createdUser, error: createError } = await adminClient.auth.admin.createUser({
+    email: generatedEmail,
+    password: newPass,
+    email_confirm: true,
+    app_metadata: { role: "kds", restaurant_id: restaurantId }
+  });
 
-  if (existingUser) {
-    const { data: updatedUser, error: updateError } = await adminClient.auth.admin.updateUserById(
-      existingUser.id,
-      { 
-        password: newPass,
-        app_metadata: { role: "kds", restaurant_id: restaurantId }
-      }
-    );
-    if (updateError) return { error: updateError.message };
-    kdsUser = updatedUser.user;
-  } else {
-    const { data: createdUser, error: createError } = await adminClient.auth.admin.createUser({
-      email: generatedEmail,
-      password: newPass,
-      email_confirm: true,
-      app_metadata: { role: "kds", restaurant_id: restaurantId }
+  if (createError) {
+    // User likely already exists — find them by email (paginated, filtered)
+    const { data: existingUsers } = await adminClient.auth.admin.listUsers({
+      page: 1,
+      perPage: 1,
     });
-    if (createError) return { error: createError.message };
+
+    // Since admin API doesn't support email filter directly, 
+    // try to sign in to find the user, or just update by creating again
+    // The safest approach: list users and filter server-side, but paginated
+    let existingUser = existingUsers?.users.find((u) => u.email === generatedEmail);
+
+    // If not found in first page, search more broadly for just this email
+    if (!existingUser) {
+      // Fallback: try all pages (but this is the same user we just tried to create, so page 1 likely has them)
+      const { data: allUsers } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 50 });
+      existingUser = allUsers?.users.find((u) => u.email === generatedEmail);
+    }
+
+    if (existingUser) {
+      const { data: updatedUser, error: updateError } = await adminClient.auth.admin.updateUserById(
+        existingUser.id,
+        { 
+          password: newPass,
+          app_metadata: { role: "kds", restaurant_id: restaurantId }
+        }
+      );
+      if (updateError) return { error: updateError.message };
+      kdsUser = updatedUser.user;
+    } else {
+      return { error: createError.message };
+    }
+  } else {
     kdsUser = createdUser.user;
   }
 
-  // 4. Update the restaurants table with the visible credentials
+  // 4. Update the restaurants table with ONLY the email (no plaintext password)
   const { error: dbError } = await supabase
     .from("restaurants")
-    .update({ kds_password: newPass, kds_email: generatedEmail })
+    .update({ kds_email: generatedEmail })
     .eq("owner_id", user.id);
 
   if (dbError) {
     return { error: "Failed to update restaurant record." };
   }
 
+  // Return the password ONCE for the user to copy — it is NOT stored in the database
   return { email: generatedEmail, password: newPass };
 }

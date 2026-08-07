@@ -24,10 +24,19 @@ const Kitchen = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const { count, error } = await supabase
+      const { data: userData } = await supabase.auth.getUser();
+      const restaurantId = userData?.user?.app_metadata?.restaurant_id;
+
+      let query = supabase
         .from("orders")
         .select("id", { count: "exact", head: true })
         .eq("status", "paid");
+
+      if (restaurantId) {
+        query = query.eq("restaurant_id", restaurantId);
+      }
+
+      const { count, error } = await query;
 
       if (count !== null) {
         setPendingCount(count);
@@ -54,6 +63,7 @@ const Kitchen = () => {
     return () => {
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [restName, setRestName] = useState("Loading...");
@@ -133,6 +143,7 @@ const Kitchen = () => {
     return () => {
       supabase.removeChannel(menuChannel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const changeOverview = () => {

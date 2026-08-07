@@ -45,9 +45,12 @@ const Order = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const restaurantId = userData?.user?.app_metadata?.restaurant_id;
+
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("orders")
         .select(
           `id, created_at, status, notes, tables(table_name), order_items(id, quantity, menu_items(name))`,
@@ -55,17 +58,23 @@ const Order = () => {
         .or(`status.eq.paid,and(status.eq.completed,created_at.gte.${twentyFourHoursAgo})`)
         .order("created_at", { ascending: false });
 
+      if (restaurantId) {
+        query = query.eq("restaurant_id", restaurantId);
+      }
+
+      const { data, error } = await query;
+
       if (data) {
         const orders = data.map((items) => {
           return {
             orderId: items.id,
-            tableNumber: items.tables?.table_name,
+            tableNumber: (items.tables as unknown as { table_name: string } | null)?.table_name ?? "Unknown",
             status: items.status,
             placedAt: new Date(items.created_at),
             items: items.order_items.map((item) => {
               return {
                 id: item.id,
-                name: item.menu_items?.name,
+                name: (item.menu_items as unknown as { name: string } | null)?.name ?? "Unknown",
                 quantity: item.quantity,
                 isCompleted: false,
               };
@@ -99,6 +108,7 @@ const Order = () => {
     return () => {
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const markCompleted = async (orderId: string) => {

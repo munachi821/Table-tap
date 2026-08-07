@@ -162,7 +162,8 @@ const Overview = () => {
     };
 
     fetchUserAndData();
-  }, [supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isLoading) {
     return (
@@ -197,11 +198,6 @@ const Overview = () => {
             <div className="p-2 bg-[#F9EEE4] w-fit rounded-[14px]">
               <MoneyIcon size={26} color="#A4551F" weight="regular" />
             </div>
-
-            <div className="bg-[#E6F9F0] text-[#059669] flex items-center gap-1 px-2 py-1 w-fit text-[11px] rounded-full font-bold font-inter tracking-wide">
-              <ArrowUpIcon size={12} color="#059669" weight="bold" />
-              12%
-            </div>
           </header>
 
           <div className="flex flex-col gap-1">
@@ -212,7 +208,7 @@ const Overview = () => {
               ₦{grossRevenue.toLocaleString()}
             </p>
             <p className="text-[11px] text-[#64748B] font-inter">
-              vs yesterday
+              Today's earnings
             </p>
           </div>
         </div>

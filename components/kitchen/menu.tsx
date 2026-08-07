@@ -68,7 +68,7 @@ const Menu = () => {
 
     if (error || !data || data.length === 0) {
       console.error("Error updating availability or blocked by RLS:", error);
-      alert(
+      console.error(
         "Unable to update availability! You may not have permission if you aren't logged in as the admin.",
       );
 

@@ -99,7 +99,8 @@ const HistoryPage = () => {
     };
 
     fetchHistory();
-  }, [supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -299,7 +300,7 @@ const HistoryPage = () => {
                   </td>
                 </tr>
               );
-            ) : (
+            }) : (
               <tr>
                 <td colSpan={7} className="py-20 text-center">
                   <div className="flex flex-col items-center justify-center">

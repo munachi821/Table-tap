@@ -54,6 +54,7 @@ interface Table {
     address: string;
     logo_url: string;
     name: string;
+    status: string;
   };
 }
 const OrderComponent = () => {
@@ -69,10 +70,18 @@ const OrderComponent = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [chefNotes, setChefNotes] = useState("");
   const [menuItems, setMenuItems] = useState<foodItem[]>([]);
-  const [reciptData, setReciptData] = useState<any>(null);
+  const [receiptData, setReceiptData] = useState<{
+    orderId: string;
+    tableNumber: string | undefined;
+    items: CartItem[];
+    note: string;
+    status: string;
+    placedAt: Date;
+  } | null>(null);
+  const [mostOrderedItems, setMostOrderedItems] = useState<foodItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const reciptRef = useRef<HTMLDivElement>(null);
+  const receiptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,24 +98,66 @@ const OrderComponent = () => {
         return;
       }
 
-      if (!tableId) {
+      if (!tableData?.restaurants?.id) {
         return;
       }
+      const restaurantId = tableData.restaurants.id;
+
       const { data: menuItemsData, error: menuItemsError } = await supabase
         .from("menu_items")
         .select("*, menu_categories(name)")
-        .eq("restaurant_id", tableData?.restaurants?.id);
+        .eq("restaurant_id", restaurantId);
       if (menuItemsError) {
         console.error("Error fetching menu items", menuItemsError);
         return;
       }
+
+      // Fetch today's most ordered items from real order data
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const { data: todayOrders } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("restaurant_id", restaurantId)
+        .gte("created_at", startOfDay.toISOString());
+
+      if (todayOrders && todayOrders.length > 0) {
+        const orderIds = todayOrders.map((o) => o.id);
+        const { data: orderItems } = await supabase
+          .from("order_items")
+          .select("menu_item_id, quantity")
+          .in("order_id", orderIds);
+
+        if (orderItems && orderItems.length > 0 && menuItemsData) {
+          // Aggregate quantities by menu_item_id
+          const countMap = new Map<string, number>();
+          orderItems.forEach((oi) => {
+            countMap.set(oi.menu_item_id, (countMap.get(oi.menu_item_id) || 0) + oi.quantity);
+          });
+
+          // Sort menu items by their order count (descending) and take top 4
+          const sorted = menuItemsData
+            .filter((item) => countMap.has(item.id))
+            .sort((a, b) => (countMap.get(b.id) || 0) - (countMap.get(a.id) || 0))
+            .slice(0, 4);
+
+          setMostOrderedItems(sorted.length > 0 ? sorted : menuItemsData.slice(0, 4));
+        } else {
+          setMostOrderedItems(menuItemsData?.slice(0, 4) || []);
+        }
+      } else {
+        // No orders today, just show first 4 menu items as a fallback
+        setMostOrderedItems(menuItemsData?.slice(0, 4) || []);
+      }
+
       setCurrentTable(tableData);
       setMenuItems(menuItemsData);
       setIsLoading(false);
     };
 
     fetchData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tableId]);
 
   const uniqueCategories = Array.from(
     new Set(
@@ -152,7 +203,7 @@ const OrderComponent = () => {
     toast.success(`Added ${quantity} ${item.name} to cart`);
 
     setCart((prev) => {
-      const existingItemIndex = prev.findIndex((c) => c.name === item.name);
+      const existingItemIndex = prev.findIndex((c) => c.menu_item_id === item.id);
 
       if (existingItemIndex !== -1) {
         const updatedCart = [...prev];
@@ -181,7 +232,7 @@ const OrderComponent = () => {
   };
 
   const paystackConfig = {
-    reference: new Date().getTime().toString(),
+    reference: crypto.randomUUID(),
     email: "guest.checkout@tabletap.com",
     amount: Math.round(
       cart.reduce((total, item) => total + item.price, 0) * 100,
@@ -199,7 +250,7 @@ const OrderComponent = () => {
       placedAt: new Date(),
     };
 
-    setReciptData(finalOrder);
+    setReceiptData(finalOrder);
     setCart([]);
     setChefNotes("");
     setSearchOpen(false);
@@ -242,24 +293,24 @@ const OrderComponent = () => {
   };
 
   const onClose = () => {
-    alert("Payment cancelled!");
+    toast.error("Payment cancelled!");
   };
 
-  const downloadRecipt = async () => {
-    if (!reciptRef.current) return;
+  const downloadReceipt = async () => {
+    if (!receiptRef.current) return;
 
     try {
-      const dataUrl = await toPng(reciptRef.current, {
+      const dataUrl = await toPng(receiptRef.current, {
         pixelRatio: 2,
         backgroundColor: "#ffffff",
       });
 
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = `Recipt_${reciptData.orderId?.split("_")[0]}.png`;
+      link.download = `Receipt_${receiptData?.orderId?.split("_")[0]}.png`;
       link.click();
     } catch (err) {
-      console.error("Failed to download recipt", err);
+      console.error("Failed to download receipt", err);
     }
   };
 
@@ -472,7 +523,7 @@ const OrderComponent = () => {
           <div>
             <p className="text-2xl mb-2.5">Most Ordered</p>
             <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
-              {menuItems.slice(0, 4).map((mostOrdered, i) => (
+              {mostOrderedItems.map((mostOrdered, i) => (
                 <div
                   className="shadow-md h-88 w-62 shrink-0 rounded-xl overflow-hidden"
                   key={i}
@@ -647,7 +698,7 @@ const OrderComponent = () => {
               ) : (
                 <PaystackButton
                   {...paystackConfig}
-                  onSuccess={onSuccess as any}
+                  onSuccess={onSuccess}
                   onClose={onClose}
                   text={`Checkout - ₦${cart.reduce((total, item) => total + item.price, 0).toLocaleString()}`}
                   className="bg-orange-400 hover:bg-orange-400/90 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full"
@@ -672,16 +723,16 @@ const OrderComponent = () => {
       </div>
 
       {/* Digital Receipt Modal */}
-      {reciptData && (
+      {receiptData && (
         <div
           className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto"
-          onClick={() => setReciptData(null)}
+          onClick={() => setReceiptData(null)}
         >
           <div className="min-h-screen flex items-center justify-center py-10">
             <div
               className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"
               onClick={(e) => e.stopPropagation()}
-              ref={reciptRef}
+              ref={receiptRef}
             >
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-50">
                 <span className="text-3xl text-green-500 font-bold">✓</span>
@@ -701,19 +752,19 @@ const OrderComponent = () => {
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="text-gray-500">Order ID</span>
                   <span className="font-mono text-gray-800 font-medium">
-                    #{reciptData.orderId?.split("-")[0]}
+                    #{receiptData.orderId?.split("-")[0]}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="text-gray-500">Table</span>
                   <span className="text-gray-800 font-medium">
-                    {reciptData.tableNumber}
+                    {receiptData.tableNumber}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm mb-4">
                   <span className="text-gray-500">Time</span>
                   <span className="text-gray-800 font-medium">
-                    {new Date(reciptData.placedAt).toLocaleTimeString([], {
+                    {new Date(receiptData.placedAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
@@ -721,7 +772,7 @@ const OrderComponent = () => {
                 </div>
 
                 <div className="border-t border-dashed border-gray-300 py-3 my-3">
-                  {reciptData.items?.map((item: any, i: number) => (
+                  {receiptData.items?.map((item, i: number) => (
                     <div key={i} className="flex justify-between text-sm mb-2">
                       <span className="text-gray-800">
                         <span className="text-orange-500 font-bold">
@@ -740,9 +791,9 @@ const OrderComponent = () => {
                   <span className="font-bold text-gray-600">Total Paid</span>
                   <span className="text-orange-500 font-bold text-xl">
                     ₦
-                    {reciptData.items
+                    {receiptData.items
                       ?.reduce(
-                        (total: number, item: any) => total + item.price,
+                        (total: number, item: CartItem) => total + item.price,
                         0,
                       )
                       .toLocaleString()}
@@ -753,14 +804,14 @@ const OrderComponent = () => {
               <div className="flex items-center gap-2 justify-center">
                 <button
                   className="w-full bg-orange-400 text-white font-semibold py-3.5 rounded-full hover:bg-orange-400/80 transition-colors shadow-lg shadow-orange-200 font-manrope cursor-pointer"
-                  onClick={() => setReciptData(null)}
+                  onClick={() => setReceiptData(null)}
                 >
                   Close Receipt
                 </button>
 
                 <div
                   className="flex items-center justify-center p-3.5 w-16 h-12 rounded-full bg-orange-400 hover:bg-orange-400/80 text-white transition-colors cursor-pointer"
-                  onClick={downloadRecipt}
+                  onClick={downloadReceipt}
                 >
                   <DownloadSimpleIcon size={24} weight="bold" />
                 </div>

@@ -1,40 +1,25 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
-import "../globals.css";
 import AdminSidebar from "@/components/adminSidebar";
 import AuthGuard from "@/components/AuthGuard";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
 export const metadata: Metadata = {
   title: "Admin Dashboard",
-  description: "Admin dashboard for Nana's Kitchen",
+  description: "Admin dashboard for TableTap",
 };
 
-const manRope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-});
-export default function Layout({
+export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${manRope.variable} antialiased flex h-screen overflow-hidden bg-[#F8FAFC]`}
-      >
-        <AuthGuard>
-          <AdminSidebar />
-          <div className="w-full h-full overflow-auto relative pt-16 md:pt-0">
-            {children}
-          </div>
-        </AuthGuard>
-      </body>
-    </html>
+    <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
+      <AuthGuard>
+        <AdminSidebar />
+        <div className="w-full h-full overflow-auto relative pt-16 md:pt-0">
+          {children}
+        </div>
+      </AuthGuard>
+    </div>
   );
 }

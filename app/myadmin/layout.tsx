@@ -1,31 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
-import "../globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
-  title: "Admin Dashboard",
-  description: "Admin dashboard for Nana's kitchen",
+  title: "God Mode — Admin Dashboard",
+  description: "Super admin dashboard for TableTap",
 };
 
-const manRope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-});
-export default function Layout({
+export default function MyAdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`${inter.variable} ${manRope.variable} antialiased`}>
-        <div className="w-full h-full">{children}</div>
-      </body>
-    </html>
-  );
+  return <div className="w-full h-full">{children}</div>;
 }

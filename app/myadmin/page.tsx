@@ -13,20 +13,20 @@ export default async function Page() {
   const supabase = createClient(cookieStore);
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Settings
   const platformSettings = await getPlatformSettings();
 
   const superAdminEmail =
-    process.env.NEXT_PUBLIC_SUPERADMIN_EMAIL || "munachi@table-tap.com";
+    process.env.SUPERADMIN_EMAIL || "munachi@table-tap.com";
 
   // God Mode Auth Check
   if (
-    !session ||
-    (session.user.email !== superAdminEmail &&
-      session.user.email !== "admin@table-tap.com")
+    !user ||
+    (user.email !== superAdminEmail &&
+      user.email !== "admin@table-tap.com")
   ) {
     redirect("/myadmin/login");
   }
@@ -40,7 +40,7 @@ export default async function Page() {
 
   const activeRestaurants =
     restaurants?.filter((r) => r.status === "ACTIVE") || [];
-  const mrr = activeRestaurants.length * 80000;
+  const mrr = activeRestaurants.length * (platformSettings.subscription_price || 80000);
 
   // Calculate today's signups
   const today = new Date();
@@ -95,7 +95,7 @@ export default async function Page() {
             <div className="flex items-center gap-2 text-black/50 text-[13px] font-medium">
               <p>Total MRR</p>
               <div className="w-1 h-1 rounded-full bg-black/20"></div>
-              <p>{activeRestaurants.length} Active Licenses at ₦80k/mo</p>
+              <p>{activeRestaurants.length} Active Licenses at ₦{((platformSettings.subscription_price || 80000) / 1000).toFixed(0)}k/mo</p>
             </div>
           </div>
 

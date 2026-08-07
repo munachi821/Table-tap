@@ -1,29 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "../globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   title: "Order Section",
   description: "Order section for tableTap",
 };
 
-export default function RootLayout({
+export default function OrderLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} antialiased max-w-4xl mx-auto bg-white! min-h-screen border-x border-gray-200`}
-      >
-        {children}
-      </body>
-    </html>
+    <div className="max-w-4xl mx-auto bg-white! min-h-screen border-x border-gray-200">
+      {children}
+    </div>
   );
 }
