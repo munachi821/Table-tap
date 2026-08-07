@@ -131,15 +131,15 @@ const Order = () => {
   return (
     <div className="relative">
       {/* Filter Section */}
-      <div className="flex gap-3 bg-white py-1.5 px-2 rounded-lg border border-gray-200 w-fit shadow-md shadow-slate-200 absolute right-0 mt-1 mr-4">
+      <div className="flex gap-3 bg-white/90 backdrop-blur-md py-1.5 px-2 rounded-xl border border-gray-100 w-fit shadow-md fixed bottom-6 right-6 sm:top-24 sm:bottom-auto sm:right-8 z-[100]">
         {(["paid", "completed"] as filterType[]).map((filter) => (
           <button
             key={filter}
             onClick={() => setActiveTab(filter)}
-            className={`px-4 py-1.5 rounded-full text-base font-semibold capitalize transition-all ${
+            className={`px-4 py-1.5 rounded-full text-base font-semibold capitalize transition-all duration-200 ease-out active:scale-95 cursor-pointer ${
               activeTab === filter
-                ? "bg-slate-600 text-white shadow-base px-6"
-                : "text-slate-500 hover:bg-slate-100"
+                ? "bg-slate-700 text-white shadow-md shadow-slate-200/50 px-6"
+                : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
             }`}
           >
             {filter === "paid" ? "pending" : filter} Orders
@@ -164,29 +164,29 @@ const Order = () => {
             </p>
           </div>
         ) : filterOrders.map((orders) => (
-            <div key={orders.orderId} className="mb-6">
-            <div className="flex flex-wrap items-center sm:items-end gap-3 mb-4">
-              <h2 className="font-semibold text-2xl text-gray-700">
+          <div key={orders.orderId} className="mb-6 bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex flex-wrap items-center sm:items-end gap-3 mb-5 border-b border-gray-50 pb-3">
+              <h2 className="font-bold text-2xl text-gray-800 tracking-tight">
                 {orders.tableNumber}
               </h2>
-              <span className="text-lg font-medium text-slate-500 mb-px">
-                -
+              <span className="text-lg font-medium text-slate-300 mb-px">
+                /
               </span>
               <span className="text-lg font-medium text-slate-500">
-                #{orders.items.length}
+                {orders.items.length} items
               </span>
 
-              <span className="text-lg font-medium text-slate-500 mb-px">
-                -
+              <span className="text-lg font-medium text-slate-300 mb-px">
+                /
               </span>
 
-              <div className="text-orange-600 text-lg font-medium">
+              <div className="text-orange-500 text-lg font-semibold bg-orange-50 px-3 py-1 rounded-md">
                 <TimeElapsed placedAt={orders.placedAt} />
               </div>
 
               {orders.note && (
-                <p className="ml-4 text-red-500 font-semibold max-w-50 truncate">
-                  {orders.note}
+                <p className="ml-2 text-red-500 font-medium bg-red-50 px-3 py-1 rounded-md max-w-50 truncate">
+                  Note: {orders.note}
                 </p>
               )}
             </div>
@@ -194,23 +194,23 @@ const Order = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {orders.items.map((items, index) => (
                 <div
-                  className="rounded-xl border-2 border-gray-700 p-2 bg-white/50 backdrop-blur-xl flex flex-col justify-between"
+                  className="rounded-xl border border-gray-200 p-3 bg-gray-50 flex flex-col justify-between"
                   key={items.id}
                 >
-                  <header className="flex items-center justify-between border-b pb-2 mb-2 border-gray-300">
+                  <header className="flex items-center justify-between border-b pb-2 mb-2 border-gray-200/60">
                     <div
-                      className={`size-8 flex items-center justify-center text-white ${orders.status === "completed" ? "bg-orange-300" : "bg-orange-400/95"} text-lg font-bold rounded-full`}
+                      className={`size-7 flex items-center justify-center text-white ${orders.status === "completed" ? "bg-gray-400" : "bg-orange-500"} text-sm font-bold rounded-full shadow-sm`}
                     >
                       {index + 1}
                     </div>
 
-                    <p className="text-orange-400 shrink-0 font-semibold mr-2">
-                      Qty: {items.quantity}
+                    <p className="text-gray-700 shrink-0 font-bold bg-white px-2 py-0.5 rounded shadow-sm border border-gray-100">
+                      x{items.quantity}
                     </p>
                   </header>
 
-                  <div className="px-2">
-                    <div className="text-gray-700 font-semibold">
+                  <div className="px-1">
+                    <div className="text-gray-800 font-semibold text-lg leading-tight">
                       <p>{items.name}</p>
                     </div>
                   </div>
@@ -219,13 +219,16 @@ const Order = () => {
                 </div>
               ))}
             </div>
-            <button
-              className="px-6 py-1.5 rounded-full text-base font-semibold capitalize transition-colors hover:bg-[#fd9319]/90 bg-[#fd9319] text-white shadow-base cursor-pointer disabled:bg-orange-300 disabled:cursor-default mt-3"
-              disabled={orders.status === "completed"}
-              onClick={() => markCompleted(orders.orderId)}
-            >
-              {orders.status === "completed" ? "Order completed" : "Ready"}
-            </button>
+            
+            <div className="mt-5 flex justify-end">
+              <button
+                className="px-8 py-2.5 rounded-xl text-base font-bold tracking-wide transition-all duration-200 ease-out hover:bg-orange-600 active:scale-95 bg-orange-500 text-white shadow-lg shadow-orange-200/50 cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none disabled:active:scale-100 disabled:cursor-not-allowed"
+                disabled={orders.status === "completed"}
+                onClick={() => markCompleted(orders.orderId)}
+              >
+                {orders.status === "completed" ? "Completed" : "Mark as Ready"}
+              </button>
+            </div>
           </div>
         ))}
       </div>
