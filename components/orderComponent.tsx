@@ -132,16 +132,23 @@ const OrderComponent = () => {
           // Aggregate quantities by menu_item_id
           const countMap = new Map<string, number>();
           orderItems.forEach((oi) => {
-            countMap.set(oi.menu_item_id, (countMap.get(oi.menu_item_id) || 0) + oi.quantity);
+            countMap.set(
+              oi.menu_item_id,
+              (countMap.get(oi.menu_item_id) || 0) + oi.quantity,
+            );
           });
 
           // Sort menu items by their order count (descending) and take top 4
           const sorted = menuItemsData
             .filter((item) => countMap.has(item.id))
-            .sort((a, b) => (countMap.get(b.id) || 0) - (countMap.get(a.id) || 0))
+            .sort(
+              (a, b) => (countMap.get(b.id) || 0) - (countMap.get(a.id) || 0),
+            )
             .slice(0, 4);
 
-          setMostOrderedItems(sorted.length > 0 ? sorted : menuItemsData.slice(0, 4));
+          setMostOrderedItems(
+            sorted.length > 0 ? sorted : menuItemsData.slice(0, 4),
+          );
         } else {
           setMostOrderedItems(menuItemsData?.slice(0, 4) || []);
         }
@@ -199,11 +206,13 @@ const OrderComponent = () => {
 
   const addToCart = (item: foodItem, quantity: number = 1) => {
     const unitPrice = parseInt(item.price);
-    
+
     toast.success(`Added ${quantity} ${item.name} to cart`);
 
     setCart((prev) => {
-      const existingItemIndex = prev.findIndex((c) => c.menu_item_id === item.id);
+      const existingItemIndex = prev.findIndex(
+        (c) => c.menu_item_id === item.id,
+      );
 
       if (existingItemIndex !== -1) {
         const updatedCart = [...prev];
@@ -269,11 +278,15 @@ const OrderComponent = () => {
           menu_item_id: item.menu_item_id,
           quantity: item.quantity,
         })),
-      }
+      },
     );
 
     if (orderError) {
-      console.error("Error inserting secure order", JSON.stringify(orderError, null, 2), orderError);
+      console.error(
+        "Error inserting secure order",
+        JSON.stringify(orderError, null, 2),
+        orderError,
+      );
       toast.error(`Failed to place order securely: ${orderError.message}`);
       return;
     }
@@ -361,10 +374,19 @@ const OrderComponent = () => {
       <main className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-sm w-full text-center">
           <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-             <WarningCircleIcon size={32} weight="duotone" className="text-red-500" />
+            <WarningCircleIcon
+              size={32}
+              weight="duotone"
+              className="text-red-500"
+            />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Store Unavailable</h2>
-          <p className="text-sm text-gray-500">This restaurant is not accepting orders at the moment. Please try again later.</p>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Store Unavailable
+          </h2>
+          <p className="text-sm text-gray-500">
+            This restaurant is not accepting orders at the moment. Please try
+            again later.
+          </p>
         </div>
       </main>
     );
@@ -418,7 +440,7 @@ const OrderComponent = () => {
                 <input
                   ref={searchRef}
                   type="search"
-                  placeholder="Search Food"
+                  placeholder="Search menu..."
                   onBlur={() => {
                     if (search === "") setSearchOpen(false);
                   }}
@@ -426,7 +448,7 @@ const OrderComponent = () => {
                   onChange={(e) => {
                     setSearch(e.target.value);
                   }}
-                  className={`bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400 transition-all duration-300 ease-in-out ${
+                  className={`bg-transparent outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400 transition-all duration-300 ease-in-out ${
                     searchOpen
                       ? "w-32 sm:w-60 opacity-100 pl-2"
                       : "w-0 opacity-0 p-0 sr-only"
@@ -508,13 +530,15 @@ const OrderComponent = () => {
         </div>
       ) : (
         /* Menu Items */
-        <div className="px-4 md:px-10 mt-5">
+        <div className="px-4 md:px-10 mt-6">
           <div>
-            <p className="text-2xl mb-2.5">Most Ordered</p>
-            <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+              Most Ordered
+            </h2>
+            <div className="flex gap-5 max-w-6xl overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
               {mostOrderedItems.map((mostOrdered, i) => (
                 <div
-                  className="shadow-md h-88 w-62 shrink-0 rounded-xl overflow-hidden"
+                  className="bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow h-88 w-62 shrink-0 rounded-2xl overflow-hidden group"
                   key={i}
                 >
                   <div
@@ -560,9 +584,11 @@ const OrderComponent = () => {
           </div>
 
           {/* Beverage */}
-          <div>
-            <p className="text-2xl m-2.5">Beverages</p>
-            <div className="flex gap-4 max-w-6xl overflow-x-auto hide-scrollbar p-2">
+          <div className="mt-10">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+              Beverages
+            </h2>
+            <div className="flex gap-5 max-w-6xl overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
               {filterTags("beverage").map((beverage, i) => (
                 <Beverage
                   key={i}
@@ -574,8 +600,10 @@ const OrderComponent = () => {
           </div>
 
           {/* Other tags */}
-          <div className="mt-8">
-            <p className="text-2xl my-2.5">Other Meals</p>
+          <div className="mt-10">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+              All Items
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {menuItems.map((item) => (
                 <Item
@@ -591,8 +619,8 @@ const OrderComponent = () => {
 
       <div
         className={`fixed inset-0 z-50 transition-all duration-300 ${
-          cartOpen 
-            ? "pointer-events-auto bg-black/20 backdrop-blur-[2px]" 
+          cartOpen
+            ? "pointer-events-auto bg-black/20 backdrop-blur-[2px]"
             : "pointer-events-none bg-transparent backdrop-blur-none"
         }`}
         onClick={() => setCartOpen(false)}
@@ -603,14 +631,16 @@ const OrderComponent = () => {
         >
           {/* Cart */}
           <div
-            className={`absolute bottom-full right-0 mb-4 p-2 w-[350px] sm:w-[400px] bg-white border border-gray-200 rounded-2xl shadow-2xl origin-bottom-right transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
-              cartOpen 
-                ? "opacity-100 scale-100 translate-y-0 pointer-events-auto" 
+            className={`absolute bottom-full right-0 mb-4 p-2 w-[350px] sm:w-[400px] bg-white border border-gray-100 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] origin-bottom-right transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+              cartOpen
+                ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
                 : "opacity-0 scale-95 translate-y-4 pointer-events-none"
             }`}
           >
-            <div className="flex justify-between items-center sticky top-2 rounded-b-xl mb-2 my-1">
-              <p className="font-semibold text-gray-800">Checkout</p>
+            <div className="flex justify-between items-center sticky top-2 rounded-b-xl mb-4 px-3 py-2">
+              <h3 className="font-bold tracking-tight text-gray-900 text-lg">
+                Your Order
+              </h3>
               <button
                 className="text-gray-400 hover:text-orange-500 hover:bg-orange-50 active:scale-90 p-1 rounded-full transition-all cursor-pointer"
                 onClick={() => setCartOpen(false)}
@@ -641,13 +671,16 @@ const OrderComponent = () => {
                           ₦{item.originalPrice}
                         </p>
                         <div className="flex gap-1.5 font-semibold leading-tight text-gray-800 mb-1.5">
-                          <p className="truncate max-w-[140px]">
-                            {item.name}
-                          </p>
-                          <span className="text-gray-400 text-xs self-center">x{item.quantity}</span>
+                          <p className="truncate max-w-[140px]">{item.name}</p>
+                          <span className="text-gray-400 text-xs self-center">
+                            x{item.quantity}
+                          </span>
                         </div>
                         <p className="text-xs font-semibold text-gray-500">
-                          Total: <span className="text-gray-900">₦{item.price.toLocaleString()}</span>
+                          Total:{" "}
+                          <span className="text-gray-900">
+                            ₦{item.price.toLocaleString()}
+                          </span>
                         </p>
                       </div>
 
@@ -672,30 +705,30 @@ const OrderComponent = () => {
               )}
             </div>
 
-            <div className="pt-3 border-t border-gray-100 mt-2">
+            <div className="pt-4 border-t border-gray-100 mt-2 px-2 pb-2">
               <div className="w-full mb-3">
                 <textarea
-                  placeholder="Notes for the Kitchen?"
+                  placeholder="Add a note for the kitchen (optional)"
                   value={chefNotes}
                   onChange={(e) => setChefNotes(e.target.value)}
-                  className="w-full outline-0 border border-gray-200 bg-gray-50 focus:bg-white focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all p-3 text-sm rounded-xl resize-none h-20"
+                  className="w-full outline-0 border border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-300 transition-all p-3 text-sm font-medium rounded-xl resize-none h-20 placeholder:text-gray-400"
                 ></textarea>
               </div>
 
               {cart.length === 0 ? (
                 <button
-                  className="bg-gray-100 text-gray-400 font-semibold w-full py-3.5 rounded-xl cursor-not-allowed transition-all"
+                  className="bg-gray-100 text-gray-400 font-bold tracking-wide w-full py-3.5 rounded-xl cursor-not-allowed transition-all"
                   disabled={true}
                 >
-                  Checkout - ₦0
+                  Cart is empty
                 </button>
               ) : (
                 <PaystackButton
                   {...paystackConfig}
                   onSuccess={onSuccess}
                   onClose={onClose}
-                  text={`Checkout - ₦${cart.reduce((total, item) => total + item.price, 0).toLocaleString()}`}
-                  className="bg-orange-500 hover:bg-orange-600 active:scale-[0.98] shadow-lg shadow-orange-200/50 transition-all duration-200 ease-out text-white font-bold w-full py-3.5 rounded-xl"
+                  text={`Pay ₦${cart.reduce((total, item) => total + item.price, 0).toLocaleString()}`}
+                  className="bg-orange-500 hover:bg-orange-600 active:scale-[0.98] shadow-lg shadow-orange-200/50 transition-all duration-200 ease-out text-white font-semibold tracking-wide w-full py-3.5 rounded-xl"
                 />
               )}
             </div>
@@ -711,7 +744,10 @@ const OrderComponent = () => {
                 {cart.length}
               </div>
             )}
-            <BasketIcon size={28} weight={cart.length > 0 ? "fill" : "regular"} />
+            <BasketIcon
+              size={28}
+              weight={cart.length > 0 ? "fill" : "regular"}
+            />
           </button>
         </div>
       </div>
