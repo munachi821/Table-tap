@@ -261,9 +261,9 @@ const OrderComponent = () => {
     const { data: result, error: orderError } = await supabase.rpc(
       "place_secure_order",
       {
-        p_restaurant_id: currentTable?.restaurants?.id,
-        p_table_id: tableId,
-        p_notes: chefNotes,
+        p_restaurant_id: currentTable?.restaurants?.id || null,
+        p_table_id: tableId || null,
+        p_notes: chefNotes || "",
         p_paystack_reference: paystackConfig.reference,
         p_items: cart.map((item) => ({
           menu_item_id: item.menu_item_id,
@@ -273,8 +273,8 @@ const OrderComponent = () => {
     );
 
     if (orderError) {
-      console.error("Error inserting secure order", orderError);
-      toast.error("Failed to place order securely. Please contact staff.");
+      console.error("Error inserting secure order", JSON.stringify(orderError, null, 2), orderError);
+      toast.error(`Failed to place order securely: ${orderError.message}`);
       return;
     }
 
