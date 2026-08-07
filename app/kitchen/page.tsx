@@ -4,18 +4,29 @@ import {
   PizzaIcon,
   GearIcon,
   ForkKnifeIcon,
+  SignOut,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import Menu from "@/components/kitchen/menu";
 import Order from "@/components/kitchen/order";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const Kitchen = () => {
   const supabase = createClient();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("orders");
   const [pendingCount, setPendingCount] = useState(0);
   const [availableCount, setAvailableCount] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await supabase.auth.signOut();
+    router.push("/kitchen/login");
+  };
 
   /* Getting pending count */
   /* const pendingCount = orders.filter(
@@ -171,7 +182,7 @@ const Kitchen = () => {
     <main className="bg-slate-50">
       <div className="w-full min-h-screen">
         {/* Navbar */}
-        <header className="flex flex-col md:flex-row justify-between bg-white px-4 py-3.5 items-start md:items-center fixed w-full z-50 shadow-sm border-b border-gray-100">
+        <header className="flex flex-col md:flex-row justify-between bg-white px-4 py-3.5 items-start md:items-center fixed w-full z-[200] shadow-sm border-b border-gray-100">
           <div className="flex flex-row items-center justify-between w-full md:w-auto gap-3">
             <div className="flex items-center gap-2">
               {restImage ? (
@@ -217,12 +228,40 @@ const Kitchen = () => {
             </div>
 
             <div className="flex gap-2 items-center">
-              <div className="p-2 bg-white rounded-full border border-gray-200 text-gray-600">
-                <GearIcon size={20} />
+              <div className="relative">
+                <button
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  className={`p-2 rounded-full border border-gray-200 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.85] cursor-pointer ${
+                    isSettingsOpen
+                      ? "bg-gray-100 text-gray-800 shadow-inner"
+                      : "bg-white text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  <GearIcon size={20} />
+                </button>
+
+                {isSettingsOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-[90]"
+                      onClick={() => setIsSettingsOpen(false)}
+                    />
+                    <div className="absolute top-full right-0 mt-2 w-44 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-xl shadow-black-200/40 p-1.5 z-[100] animate-in fade-in zoom-in-95 duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] origin-top-right">
+                      <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+                      >
+                        <SignOut size={18} weight="bold" />
+                        {isLoggingOut ? "Logging out..." : "Log out"}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="p-2 bg-white rounded-full border border-gray-200 text-gray-600">
+              <button className="p-2 bg-white rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 active:scale-[0.85] transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer">
                 <BellIcon size={20} />
-              </div>
+              </button>
             </div>
           </div>
         </header>

@@ -98,7 +98,7 @@ const Menu = () => {
           <div className="flex items-center gap-2 sm:gap-3 bg-white/90 backdrop-blur-md py-1.5 px-2 rounded-xl border border-gray-100 w-full sm:w-80 md:w-96 shadow-lg pointer-events-auto">
             <input
               type="text"
-              className="w-full h-9 outline-0 font-medium text-sm text-gray-800 placeholder:text-gray-400 pl-2 rounded-lg bg-transparent"
+              className="w-full h-9 outline-0 font-medium text-sm text-gray-800 placeholder:text-gray-400 pl-2 rounded-lg bg-transparent placeholder:font-normal"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               placeholder="Search menu items..."
