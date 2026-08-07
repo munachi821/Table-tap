@@ -60,13 +60,13 @@ const AdminSidebar = () => {
   return (
     <>
       {/* Mobile Top Navbar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-40 flex items-center justify-between px-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 z-40 flex items-center justify-between px-4 transition-all">
         <h2 className="text-lg text-[#0F172A] font-bold font-manrope truncate pr-4">
           {restName}
         </h2>
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="p-2 -mr-2 text-[#475569] hover:bg-gray-100 rounded-lg"
+          className="p-2 -mr-2 text-[#475569] hover:bg-gray-100 hover:text-gray-900 rounded-lg active:scale-90 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
         >
           <List size={28} />
         </button>
@@ -76,10 +76,10 @@ const AdminSidebar = () => {
       {isMobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div
-            className="fixed inset-0 bg-black/50 transition-opacity"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
             onClick={() => setIsMobileOpen(false)}
           />
-          <div className="relative flex w-64 max-w-xs flex-col bg-[#F8FAFC] h-full shadow-xl">
+          <div className="relative flex w-64 max-w-xs flex-col bg-[#F8FAFC] h-full shadow-2xl shadow-black/20 animate-in slide-in-from-left-full duration-400 ease-[cubic-bezier(0.23,1,0.32,1)]">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
               <div>
                 <h2 className="text-xl text-[#0F172A] font-bold font-manrope leading-6 truncate w-40">
@@ -91,7 +91,7 @@ const AdminSidebar = () => {
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-2 -mr-2 text-[#475569] hover:bg-gray-200 rounded-lg"
+                className="p-2 -mr-2 text-[#475569] hover:bg-gray-200 hover:text-gray-900 rounded-lg active:scale-90 transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
               >
                 <X size={20} weight="bold" />
               </button>
@@ -109,9 +109,9 @@ const AdminSidebar = () => {
                         onClick={() => setIsMobileOpen(false)}
                         className={`flex items-center gap-3 text-[15px] ${
                           isActive
-                            ? "text-[#7C2D12] bg-white shadow-sm"
-                            : "text-[#475569] hover:bg-gray-100/50"
-                        } p-3 rounded-xl font-semibold transition-all`}
+                            ? "text-[#7C2D12] bg-white shadow-sm border border-orange-50/50"
+                            : "text-[#475569] hover:bg-gray-100/80 hover:text-gray-900"
+                        } p-3 rounded-xl font-semibold transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.96]`}
                       >
                         <Icon
                           size={22}
@@ -125,10 +125,10 @@ const AdminSidebar = () => {
               </ul>
 
               <div
-                className="flex items-center gap-3 text-[15px] text-red-500 hover:bg-red-50 p-3 rounded-xl cursor-pointer font-semibold transition-all mt-4"
+                className="flex items-center gap-3 text-[15px] text-red-500 hover:bg-red-50 p-3 rounded-xl cursor-pointer font-semibold transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.96] mt-4"
                 onClick={logout}
               >
-                <SignOutIcon size={22} />
+                <SignOutIcon size={22} weight="bold" />
                 Logout
               </div>
             </div>
@@ -157,11 +157,11 @@ const AdminSidebar = () => {
                 <li key={tab.name}>
                   <Link
                     href={tab.link}
-                    className={`flex items-center gap-2 text-lg ${
+                    className={`flex items-center gap-3 text-[15px] ${
                       isActive
-                        ? "text-[#7C2D12] bg-white shadow-sm"
-                        : "text-[#475569]/80 hover:bg-gray-100/30"
-                    } p-2 rounded-lg cursor-pointer font-medium transition-all`}
+                        ? "text-[#7C2D12] bg-white shadow-sm border border-orange-50/50"
+                        : "text-[#475569]/90 hover:bg-gray-100/50 hover:text-gray-900"
+                    } p-3 rounded-xl cursor-pointer font-semibold transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]`}
                   >
                     <Icon size={24} weight={isActive ? "fill" : "regular"} />
                     {tab.name}
@@ -172,10 +172,10 @@ const AdminSidebar = () => {
           </ul>
 
           <div
-            className="flex items-center gap-2 text-lg text-red-500 hover:bg-red-50 p-2 rounded-lg cursor-pointer font-medium transition-all mt-4"
+            className="flex items-center gap-3 text-[15px] text-red-500 hover:bg-red-50 hover:text-red-600 p-3 rounded-xl cursor-pointer font-semibold transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] mt-4"
             onClick={logout}
           >
-            <SignOutIcon size={24} />
+            <SignOutIcon size={22} weight="bold" />
             Logout
           </div>
         </div>
