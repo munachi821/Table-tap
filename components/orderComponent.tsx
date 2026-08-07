@@ -258,38 +258,27 @@ const OrderComponent = () => {
 
     console.log("Checkout complete!", finalOrder);
 
-    const { data: newOrder, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        restaurant_id: currentTable?.restaurants?.id,
-        table_id: tableId,
-        total_amount: cart.reduce((total, item) => total + item.price, 0),
-        status: "paid",
-        notes: chefNotes,
-      })
-      .select("id")
-      .single();
+    const { data: result, error: orderError } = await supabase.rpc(
+      "place_secure_order",
+      {
+        p_restaurant_id: currentTable?.restaurants?.id,
+        p_table_id: tableId,
+        p_notes: chefNotes,
+        p_paystack_reference: paystackConfig.reference,
+        p_items: cart.map((item) => ({
+          menu_item_id: item.menu_item_id,
+          quantity: item.quantity,
+        })),
+      }
+    );
 
     if (orderError) {
-      console.error("Error inserting order", orderError);
+      console.error("Error inserting secure order", orderError);
+      toast.error("Failed to place order securely. Please contact staff.");
       return;
     }
 
-    const itemsToinsert = cart.map((cartItem) => ({
-      order_id: newOrder?.id,
-      menu_item_id: cartItem.menu_item_id,
-      quantity: cartItem.quantity,
-      unit_price: parseInt(cartItem.originalPrice),
-    }));
-
-    const { error: orderItemsError } = await supabase
-      .from("order_items")
-      .insert(itemsToinsert);
-
-    if (orderItemsError) {
-      console.error("Error inserting order items", orderItemsError);
-      return;
-    }
+    console.log("Secure order placed:", result);
   };
 
   const onClose = () => {
