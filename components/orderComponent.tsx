@@ -450,7 +450,7 @@ const OrderComponent = () => {
         </nav>
       </header>
 
-      <div className="flex items-center gap-2 my-2 max-w-full overflow-x-auto hide-scrollbar pl-9">
+      <div className="flex items-center gap-2 my-2 max-w-full overflow-x-auto hide-scrollbar pl-9 py-2">
         {categories.map((category) => (
           <button
             key={category}
@@ -458,11 +458,11 @@ const OrderComponent = () => {
               setActiveCategory(category);
             }}
             className={`
-                  px-5 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap capitalize 
+                  px-5 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ease-out whitespace-nowrap capitalize active:scale-95
                   ${
                     activeCategory === category
                       ? "bg-orange-500 text-white shadow-md shadow-orange-200"
-                      : "bg-white text-gray-600 border border-gray-200 hover:border-orange-200"
+                      : "bg-white text-gray-600 border border-gray-200 hover:border-orange-300 hover:bg-orange-50"
                   }
                 `}
           >
@@ -548,7 +548,7 @@ const OrderComponent = () => {
                     </div>
                     <button
                       disabled={!mostOrdered.is_available}
-                      className={`${mostOrdered.is_available ? "bg-orange-400 hover:bg-orange-300 cursor-pointer text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"} transition-colors rounded-2xl py-3 px-4.5`}
+                      className={`${mostOrdered.is_available ? "bg-orange-400 hover:bg-orange-500 active:scale-[0.9] shadow-md shadow-orange-200/50 cursor-pointer text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"} transition-all duration-200 ease-out rounded-2xl py-3 px-4.5`}
                       onClick={() => handleItemClick(mostOrdered, 1)}
                     >
                       <PlusIcon weight="bold" size={25} />
@@ -590,36 +590,44 @@ const OrderComponent = () => {
       )}
 
       <div
-        className={`fixed ${cartOpen ? "top-0 right-0 left-0 bottom-0" : "right-0 bottom-0"} z-50`}
+        className={`fixed inset-0 z-50 transition-all duration-300 ${
+          cartOpen 
+            ? "pointer-events-auto bg-black/20 backdrop-blur-[2px]" 
+            : "pointer-events-none bg-transparent backdrop-blur-none"
+        }`}
         onClick={() => setCartOpen(false)}
       >
         <div
-          className="fixed bottom-0 right-0 m-4 flex items-end flex-col gap-3"
+          className="absolute bottom-0 right-0 m-4 pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Cart */}
           <div
-            className={`p-2 w-fit bg-white border border-gray-300 rounded-xl ${cartOpen ? "block" : "hidden"}`}
+            className={`absolute bottom-full right-0 mb-4 p-2 w-[350px] sm:w-[400px] bg-white border border-gray-200 rounded-2xl shadow-2xl origin-bottom-right transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+              cartOpen 
+                ? "opacity-100 scale-100 translate-y-0 pointer-events-auto" 
+                : "opacity-0 scale-95 translate-y-4 pointer-events-none"
+            }`}
           >
             <div className="flex justify-between items-center sticky top-2 rounded-b-xl mb-2 my-1">
               <p className="font-semibold text-gray-800">Checkout</p>
               <button
-                className="text-orange-400 cursor-pointer"
+                className="text-gray-400 hover:text-orange-500 hover:bg-orange-50 active:scale-90 p-1 rounded-full transition-all cursor-pointer"
                 onClick={() => setCartOpen(false)}
               >
                 <XIcon size={20} weight="bold" />
               </button>
             </div>
 
-            <div className="w-88 max-h-95 h-90 flex flex-col gap-2 overflow-y-auto">
+            <div className="w-full max-h-[50vh] flex flex-col gap-2 overflow-y-auto pr-1 hide-scrollbar">
               {cart.length > 0 ? (
                 cart.map((item) => (
                   <div
-                    className="border border-gray-200 rounded-lg p-2"
+                    className="border border-gray-100 bg-gray-50/50 rounded-xl p-2 transition-all hover:border-orange-100"
                     key={item.cartId}
                   >
                     <div className="flex gap-2 items-end relative">
-                      <div className="w-20 h-20 overflow-hidden rounded-lg shrink-0 relative">
+                      <div className="w-16 h-16 overflow-hidden rounded-lg shrink-0 relative shadow-sm">
                         <Image
                           src={item.image}
                           alt="checkout image"
@@ -628,58 +636,55 @@ const OrderComponent = () => {
                         />
                       </div>
 
-                      <div>
-                        <p className="font-bold text-lg text-orange-400 leading-4">
+                      <div className="flex-1 pb-1">
+                        <p className="font-bold text-base text-orange-500 leading-4 mb-1.5">
                           ₦{item.originalPrice}
                         </p>
-                        <span className="flex gap-2 font-semibold leading-6 text-gray-800">
-                          <p className="max-w-45 truncate overflow-x-hidden">
+                        <div className="flex gap-1.5 font-semibold leading-tight text-gray-800 mb-1.5">
+                          <p className="truncate max-w-[140px]">
                             {item.name}
-                          </p>{" "}
-                          -<p>{item.quantity}x</p>
-                        </span>
-                        <p className="leading-4 font-semibold">
-                          <span className="text-orange-400">Total:</span> ₦
-                          {item.price.toLocaleString()}
+                          </p>
+                          <span className="text-gray-400 text-xs self-center">x{item.quantity}</span>
+                        </div>
+                        <p className="text-xs font-semibold text-gray-500">
+                          Total: <span className="text-gray-900">₦{item.price.toLocaleString()}</span>
                         </p>
                       </div>
 
                       <button
-                        className="absolute right-0 top-0 m-2 text-orange-400 hover:text-orange-400/80 transition-colors cursor-pointer"
+                        className="absolute right-0 top-0 m-1 text-gray-300 hover:text-red-500 hover:bg-red-50 active:scale-90 p-1.5 rounded-md transition-all cursor-pointer"
                         onClick={() =>
                           setCart((prev) =>
                             prev.filter((c) => c.cartId !== item.cartId),
                           )
                         }
                       >
-                        <TrashIcon size={22} />
+                        <TrashIcon size={18} />
                       </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="mx-auto mt-5 font-semibold text-gray-800">
-                  <p>There are no items in your cart</p>
+                <div className="mx-auto my-8 font-semibold text-gray-400 flex flex-col items-center gap-2">
+                  <BasketIcon size={32} className="opacity-50" />
+                  <p>Your cart is empty</p>
                 </div>
               )}
             </div>
 
-            <div
-              className="pt-1.5
-                "
-            >
-              <div className="w-full">
+            <div className="pt-3 border-t border-gray-100 mt-2">
+              <div className="w-full mb-3">
                 <textarea
                   placeholder="Notes for the Kitchen?"
                   value={chefNotes}
                   onChange={(e) => setChefNotes(e.target.value)}
-                  className="w-full outline-0 border border-gray-300 p-1 text-sm rounded-lg"
+                  className="w-full outline-0 border border-gray-200 bg-gray-50 focus:bg-white focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all p-3 text-sm rounded-xl resize-none h-20"
                 ></textarea>
               </div>
 
               {cart.length === 0 ? (
                 <button
-                  className="bg-orange-400 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full disabled:bg-orange-300"
+                  className="bg-gray-100 text-gray-400 font-semibold w-full py-3.5 rounded-xl cursor-not-allowed transition-all"
                   disabled={true}
                 >
                   Checkout - ₦0
@@ -690,23 +695,23 @@ const OrderComponent = () => {
                   onSuccess={onSuccess}
                   onClose={onClose}
                   text={`Checkout - ₦${cart.reduce((total, item) => total + item.price, 0).toLocaleString()}`}
-                  className="bg-orange-400 hover:bg-orange-400/90 transition-colors text-white font-semibold w-full mt-2 py-2 rounded-full"
+                  className="bg-orange-500 hover:bg-orange-600 active:scale-[0.98] shadow-lg shadow-orange-200/50 transition-all duration-200 ease-out text-white font-bold w-full py-3.5 rounded-xl"
                 />
               )}
             </div>
           </div>
 
-          {/* Cart Open and count */}
+          {/* Cart Floating Button */}
           <button
-            className="text-orange-400 bg-orange-100 rounded-full p-4 cursor-pointer w-fit relative"
+            className="text-orange-500 bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgba(249,115,22,0.2)] hover:border-orange-200 active:scale-[0.92] transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] rounded-full p-4 cursor-pointer float-right relative"
             onClick={() => setCartOpen(!cartOpen)}
           >
             {cart.length > 0 && (
-              <div className="absolute text-xs size-4 rounded-full bg-orange-400/80 text-white flex items-center justify-center right-0 top-0">
+              <div className="absolute text-[11px] font-bold size-5 rounded-full bg-orange-500 text-white flex items-center justify-center -top-1 -right-1 shadow-sm shadow-orange-500/50">
                 {cart.length}
               </div>
             )}
-            <BasketIcon size={30} />
+            <BasketIcon size={28} weight={cart.length > 0 ? "fill" : "regular"} />
           </button>
         </div>
       </div>
