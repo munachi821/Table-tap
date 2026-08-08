@@ -112,48 +112,26 @@ const OrderComponent = () => {
         return;
       }
 
-      // Fetch today's most ordered items from real order data
-      const startOfDay = new Date();
-      startOfDay.setHours(0, 0, 0, 0);
-      const { data: todayOrders } = await supabase
-        .from("orders")
-        .select("id")
-        .eq("restaurant_id", restaurantId)
-        .gte("created_at", startOfDay.toISOString());
+      // Securely fetch the most ordered items from the server
+      const { data: trendingData } = await supabase.rpc("get_trending_items", {
+        p_restaurant_id: restaurantId,
+        p_limit: 4,
+      });
 
-      if (todayOrders && todayOrders.length > 0) {
-        const orderIds = todayOrders.map((o) => o.id);
-        const { data: orderItems } = await supabase
-          .from("order_items")
-          .select("menu_item_id, quantity")
-          .in("order_id", orderIds);
+      if (trendingData && trendingData.length > 0) {
+        // Map the IDs returned by the RPC back to the full menu item objects
+        const sortedItems = trendingData
+          .map((t: any) => menuItemsData?.find((item) => item.id === t.menu_item_id))
+          .filter(Boolean) as foodItem[];
 
-        if (orderItems && orderItems.length > 0 && menuItemsData) {
-          // Aggregate quantities by menu_item_id
-          const countMap = new Map<string, number>();
-          orderItems.forEach((oi) => {
-            countMap.set(
-              oi.menu_item_id,
-              (countMap.get(oi.menu_item_id) || 0) + oi.quantity,
-            );
-          });
-
-          // Sort menu items by their order count (descending) and take top 4
-          const sorted = menuItemsData
-            .filter((item) => countMap.has(item.id))
-            .sort(
-              (a, b) => (countMap.get(b.id) || 0) - (countMap.get(a.id) || 0),
-            )
-            .slice(0, 4);
-
-          setMostOrderedItems(
-            sorted.length > 0 ? sorted : menuItemsData.slice(0, 4),
-          );
+        // If for some reason the returned items don't map correctly, fallback to defaults
+        if (sortedItems.length > 0) {
+          setMostOrderedItems(sortedItems);
         } else {
           setMostOrderedItems(menuItemsData?.slice(0, 4) || []);
         }
       } else {
-        // No orders today, just show first 4 menu items as a fallback
+        // Fallback: If the restaurant has no recent orders, just show the first 4 items from the menu
         setMostOrderedItems(menuItemsData?.slice(0, 4) || []);
       }
 
