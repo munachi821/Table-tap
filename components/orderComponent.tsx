@@ -86,29 +86,37 @@ const OrderComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!tableId) {
+        setIsLoading(false);
         return;
       }
+
       const { data: tableData, error: tablesError } = await supabase
         .from("tables")
         .select("*, restaurants(id, name, address, logo_url, status)")
         .eq("id", tableId)
         .maybeSingle();
+
       if (tablesError) {
         console.error("Error fetching table", tablesError);
+        setIsLoading(false);
         return;
       }
 
       if (!tableData?.restaurants?.id) {
+        setIsLoading(false);
         return;
       }
+
       const restaurantId = tableData.restaurants.id;
 
       const { data: menuItemsData, error: menuItemsError } = await supabase
         .from("menu_items")
         .select("*, menu_categories(name)")
         .eq("restaurant_id", restaurantId);
+
       if (menuItemsError) {
         console.error("Error fetching menu items", menuItemsError);
+        setIsLoading(false);
         return;
       }
 
@@ -121,7 +129,9 @@ const OrderComponent = () => {
       if (trendingData && trendingData.length > 0) {
         // Map the IDs returned by the RPC back to the full menu item objects
         const sortedItems = trendingData
-          .map((t: any) => menuItemsData?.find((item) => item.id === t.menu_item_id))
+          .map((t: any) =>
+            menuItemsData?.find((item) => item.id === t.menu_item_id),
+          )
           .filter(Boolean) as foodItem[];
 
         // If for some reason the returned items don't map correctly, fallback to defaults
@@ -136,7 +146,7 @@ const OrderComponent = () => {
       }
 
       setCurrentTable(tableData);
-      setMenuItems(menuItemsData);
+      setMenuItems(menuItemsData || []);
       setIsLoading(false);
     };
 
@@ -359,7 +369,30 @@ const OrderComponent = () => {
     );
   }
 
-  if (currentTable?.restaurants?.status === "SUSPENDED") {
+  if (!currentTable) {
+    return (
+      <main className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-sm w-full text-center">
+          <div className="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <WarningCircleIcon
+              size={32}
+              weight="duotone"
+              className="text-orange-500"
+            />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Table Not Found
+          </h2>
+          <p className="text-sm text-gray-500">
+            We couldn&apos;t locate this table. Please scan the QR code on your
+            table again, or ask a staff member for assistance.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  if (currentTable.restaurants?.status === "SUSPENDED") {
     return (
       <main className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-sm w-full text-center">
@@ -394,7 +427,9 @@ const OrderComponent = () => {
                     src={currentTable.restaurants.logo_url}
                     alt="Restaurant Logo"
                     fill
+                    priority
                     sizes="52px"
+                    loading="eager"
                     className="object-cover"
                   />
                 ) : (
@@ -542,8 +577,10 @@ const OrderComponent = () => {
                     )}
                     <Image
                       src={mostOrdered.image_url}
-                      alt="detail about food 1"
-                      fill={true}
+                      alt={mostOrdered.name}
+                      fill
+                      priority
+                      loading="eager"
                       sizes="(max-width: 768px) 100vw, 300px"
                       className="object-contain object-center"
                     />
@@ -654,6 +691,7 @@ const OrderComponent = () => {
                           src={item.image}
                           alt="checkout image"
                           fill={true}
+                          loading="eager"
                           sizes="64px"
                           className="object-cover object-center"
                         />
