@@ -8,7 +8,8 @@ import {
   MoneyIcon,
   ReceiptIcon,
 } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { toast } from "sonner";
 
 interface TopItem {
   name: string;
@@ -23,7 +24,8 @@ interface LiveTable {
   statusText: string;
   timeText: string;
   tagText: string;
-  colorCode: "green" | "orange" | "gray";
+  colorCode: "green" | "orange" | "gray" | "red";
+  createdAt?: string;
 }
 
 const Overview = () => {
@@ -37,6 +39,10 @@ const Overview = () => {
   const [topItems, setTopItems] = useState<TopItem[]>([]);
   const [liveTables, setLiveTables] = useState<LiveTable[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const alertedTables = useRef<Set<string>>(new Set());
+  const prepTimeLimitRef = useRef(15);
+  const activeOrderTimesRef = useRef<string[]>([]);
+  const [overdueCount, setOverdueCount] = useState(0);
 
   const fullDate = () => {
     const date = new Date();
@@ -50,7 +56,14 @@ const Overview = () => {
   useEffect(() => {
     const fetchUserAndData = async () => {
       const { data: user } = await supabase.auth.getUser();
-      setRestName(user.user?.user_metadata?.name || "Restaurant");
+
+      const { data: restname } = await supabase
+        .from("restaurants")
+        .select("name")
+        .eq("owner_id", user?.user?.id)
+        .maybeSingle();
+
+      setRestName(restname?.name || "Restaurant");
 
       if (!user.user) {
         setIsLoading(false);
@@ -59,41 +72,61 @@ const Overview = () => {
 
       const { data: restaurant } = await supabase
         .from("restaurants")
-        .select("id")
+        .select("id, target_prep_time")
         .eq("owner_id", user.user.id)
         .maybeSingle();
 
       if (restaurant) {
-        await fetchDashboardData(restaurant.id);
+        if (restaurant.target_prep_time) {
+          prepTimeLimitRef.current = restaurant.target_prep_time;
+        }
+        await fetchDashboardData(
+          restaurant.id,
+          restaurant.target_prep_time || 15,
+        );
       } else {
         setIsLoading(false);
       }
     };
 
-    const fetchDashboardData = async (restId: string) => {
+    const fetchDashboardData = async (restId: string, prepLimit: number) => {
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
       const startISO = startOfDay.toISOString();
 
-      const { data: todayOrders } = await supabase
+      const { data: allFetchedOrders } = await supabase
         .from("orders")
         .select("id, total_amount, status, table_id, created_at")
         .eq("restaurant_id", restId)
-        .gte("created_at", startISO);
+        .or(`created_at.gte.${startISO},status.eq.pending,status.eq.paid,status.eq.in-progress`);
 
-      if (todayOrders) {
-        setOrdersToday(todayOrders.length);
-        setGrossRevenue(
-          todayOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0),
+      let todayOnlyOrders: any[] = [];
+      let activeOrders: any[] = [];
+
+      if (allFetchedOrders) {
+        todayOnlyOrders = allFetchedOrders.filter(
+          (o) => new Date(o.created_at) >= startOfDay
         );
 
-        const activeOrders = todayOrders.filter(
+        setOrdersToday(todayOnlyOrders.length);
+        setGrossRevenue(
+          todayOnlyOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0),
+        );
+
+        activeOrders = allFetchedOrders.filter(
           (o) =>
             o.status === "pending" ||
             o.status === "paid" ||
             o.status === "in-progress",
         );
         setKitchenLoad(activeOrders.length);
+        activeOrderTimesRef.current = activeOrders.map(o => o.created_at);
+
+        const initialOverdue = activeOrders.filter(o => {
+          const diff = Math.floor((new Date().getTime() - new Date(o.created_at).getTime()) / 60000);
+          return diff >= prepLimit;
+        }).length;
+        setOverdueCount(initialOverdue);
       }
 
       const { data: tablesData } = await supabase
@@ -101,15 +134,9 @@ const Overview = () => {
         .select("id, table_name")
         .eq("restaurant_id", restId);
 
-      if (tablesData && todayOrders) {
+      if (tablesData && activeOrders) {
         setTotalTables(tablesData.length);
 
-        const activeOrders = todayOrders.filter(
-          (o) =>
-            o.status === "pending" ||
-            o.status === "paid" ||
-            o.status === "in-progress",
-        );
         const activeTableIds = new Set(activeOrders.map((o) => o.table_id));
         setActiveTables(activeTableIds.size);
 
@@ -118,25 +145,26 @@ const Overview = () => {
             .filter((o) => o.table_id === table.id)
             .sort(
               (a, b) =>
-                new Date(b.created_at).getTime() -
-                new Date(a.created_at).getTime(),
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime(), // Oldest first
             );
-          const latestOrder = tableOrders[0];
+          const oldestOrder = tableOrders[0];
 
-          if (latestOrder) {
+          if (oldestOrder) {
             const diffMins = Math.floor(
               (new Date().getTime() -
-                new Date(latestOrder.created_at).getTime()) /
+                new Date(oldestOrder.created_at).getTime()) /
                 60000,
             );
             return {
               id: table.id,
               name: table.table_name,
               statusText:
-                latestOrder.status === "paid" ? "Awaiting Kitchen" : "Dining",
+                oldestOrder.status === "paid" ? "Awaiting Kitchen" : "Dining",
               timeText: `${diffMins} min`,
-              tagText: "In Service",
-              colorCode: "orange",
+              tagText: diffMins >= prepLimit ? "Overdue" : "In Service",
+              colorCode: diffMins >= prepLimit ? "red" : "orange",
+              createdAt: oldestOrder.created_at,
             };
           } else {
             return {
@@ -152,8 +180,8 @@ const Overview = () => {
         setLiveTables(live);
       }
 
-      if (todayOrders && todayOrders.length > 0) {
-        const orderIds = todayOrders.map((o) => o.id);
+      if (todayOnlyOrders && todayOnlyOrders.length > 0) {
+        const orderIds = todayOnlyOrders.map((o) => o.id);
         const { data: orderItems } = await supabase
           .from("order_items")
           .select(
@@ -195,6 +223,53 @@ const Overview = () => {
 
     fetchUserAndData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // SLA Timer Logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLiveTables((prev) =>
+        prev.map((table) => {
+          if (!table.createdAt) return table;
+
+          const diffMins = Math.floor(
+            (new Date().getTime() - new Date(table.createdAt).getTime()) /
+              60000,
+          );
+
+          const isBreached = diffMins >= prepTimeLimitRef.current;
+
+          if (isBreached && !alertedTables.current.has(table.id)) {
+            toast.error(
+              `${table.name} has been waiting for ${diffMins} minutes!`,
+              {
+                description: "This order has exceeded the target prep time.",
+                duration: 8000,
+              },
+            );
+            alertedTables.current.add(table.id);
+          }
+
+          return {
+            ...table,
+            timeText: `${diffMins} min`,
+            tagText: isBreached ? "Overdue" : "In Service",
+            colorCode: isBreached ? "red" : "orange",
+          };
+        }),
+      );
+
+      // 2. Update the global overdue count
+      const newOverdueCount = activeOrderTimesRef.current.filter((time) => {
+        const diffMins = Math.floor(
+          (new Date().getTime() - new Date(time).getTime()) / 60000
+        );
+        return diffMins >= prepTimeLimitRef.current;
+      }).length;
+      setOverdueCount(newOverdueCount);
+    }, 60000); // Check every minute
+
+    return () => clearInterval(timer);
   }, []);
 
   if (isLoading) {
@@ -293,9 +368,15 @@ const Overview = () => {
             <p className="text-2xl font-bold font-manrope text-[#191C1E]">
               {kitchenLoad} Tickets
             </p>
-            <p className="text-[11px] text-[#B91C1C] font-semibold">
-              Pending & Paid Orders
-            </p>
+            {overdueCount > 0 ? (
+              <p className="text-[11.5px] text-[#DC2626] font-semibold font-manrope animate-pulse mt-0.5">
+                {overdueCount} Overdue Order{overdueCount !== 1 ? "s" : ""}!
+              </p>
+            ) : (
+              <p className="text-[11px] text-[#64748B] font-medium">
+                Pending & Paid Orders
+              </p>
+            )}
           </div>
         </div>
 
@@ -408,16 +489,27 @@ const Overview = () => {
                       bgTag: "bg-[#D1FAE5]",
                       textTag: "text-[#047857]",
                     }
-                  : {
-                      line: "bg-[#D97706]",
-                      text: "text-[#D97706]",
-                      bgTag: "bg-[#FFEDD5]",
-                      textTag: "text-[#C2410C]",
-                    };
+                  : table.colorCode === "red"
+                    ? {
+                        line: "bg-[#EF4444]",
+                        text: "text-[#EF4444]",
+                        bgTag: "bg-[#FEE2E2]",
+                        textTag: "text-[#B91C1C]",
+                      }
+                    : {
+                        line: "bg-[#D97706]",
+                        text: "text-[#D97706]",
+                        bgTag: "bg-[#FFEDD5]",
+                        textTag: "text-[#C2410C]",
+                      };
 
               return (
                 <div
-                  className="flex bg-[#F8FAFC] rounded-[14px] overflow-hidden py-3 px-4 relative shrink-0"
+                  className={`flex ${
+                    table.colorCode === "red"
+                      ? "bg-[#FEF2F2] border border-[#FCA5A5]"
+                      : "bg-[#F8FAFC] border border-transparent"
+                  } rounded-[14px] overflow-hidden py-3 px-4 relative shrink-0 transition-colors duration-500`}
                   key={table.id}
                 >
                   <div

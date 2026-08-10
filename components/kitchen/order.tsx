@@ -24,6 +24,7 @@ const Order = () => {
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<filterType>("paid");
   const [orders, setOrders] = useState<kitchenOrder[]>([]);
+  const [prepTimeLimit, setPrepTimeLimit] = useState(15);
 
   const filterOrders = orders.filter((order) => {
     return order.status === activeTab;
@@ -46,7 +47,16 @@ const Order = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       const { data: userData } = await supabase.auth.getUser();
-      const restaurantId = userData?.user?.app_metadata?.restaurant_id;
+      let restaurantId = userData?.user?.app_metadata?.restaurant_id;
+
+      if (!restaurantId && userData?.user?.id) {
+        const { data: ownerRest } = await supabase
+          .from("restaurants")
+          .select("id")
+          .eq("owner_id", userData.user.id)
+          .maybeSingle();
+        restaurantId = ownerRest?.id;
+      }
 
       const twentyFourHoursAgo = new Date(
         Date.now() - 24 * 60 * 60 * 1000,
@@ -64,6 +74,16 @@ const Order = () => {
 
       if (restaurantId) {
         query = query.eq("restaurant_id", restaurantId);
+        
+        const { data: restData } = await supabase
+          .from("restaurants")
+          .select("target_prep_time")
+          .eq("id", restaurantId)
+          .maybeSingle();
+          
+        if (restData?.target_prep_time) {
+          setPrepTimeLimit(restData.target_prep_time);
+        }
       }
 
       const { data, error } = await query;
@@ -192,8 +212,12 @@ const Order = () => {
                   /
                 </span>
 
-                <div className="text-orange-500 text-lg font-semibold bg-orange-50 px-3 py-1 rounded-md">
-                  <TimeElapsed placedAt={orders.placedAt} />
+                <div>
+                  <TimeElapsed
+                    placedAt={orders.placedAt}
+                    isCompleted={orders.status === "completed"}
+                    thresholdMinutes={prepTimeLimit}
+                  />
                 </div>
 
                 {orders.note && (

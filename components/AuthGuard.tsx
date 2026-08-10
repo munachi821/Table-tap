@@ -85,15 +85,17 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   if (isLoading) {
     // Show a loading spinner while we verify their auth
     return (
-      <>
-        <Toaster richColors position="top-center" />
-        <div className="flex items-center justify-center h-screen w-full bg-[#F8FAFC]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EA580C]"></div>
-        </div>
-      </>
+      <div className="flex items-center justify-center h-screen w-full bg-[#F8FAFC]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EA580C]"></div>
+      </div>
     );
   }
 
   // If isLoading is false, they passed the check! Render the actual dashboard.
-  return <>{children}</>;
+  return (
+    <>
+      <Toaster richColors position="top-center" />
+      {children}
+    </>
+  );
 }
