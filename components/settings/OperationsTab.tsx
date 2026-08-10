@@ -113,6 +113,7 @@ const OperationsTab = () => {
                   <div className="bg-white w-4 h-4 rounded-full shadow-sm"></div>
                 </button>
               </div>
+            </div>
           </div>
         </div>
       </div>

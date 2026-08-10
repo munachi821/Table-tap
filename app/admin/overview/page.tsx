@@ -60,8 +60,6 @@ const Overview = () => {
       return;
     }
     prepTimeLimitRef.current = targetPrepTime || 15;
-    fetchDashboardData(restaurantId, targetPrepTime || 15);
-
     const fetchDashboardData = async (restId: string, prepLimit: number) => {
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
@@ -193,6 +191,8 @@ const Overview = () => {
       }
       setIsLoading(false);
     };
+
+    fetchDashboardData(restaurantId, targetPrepTime || 15);
 
     // Create realtime channel for auto-refresh
     const channel = supabase

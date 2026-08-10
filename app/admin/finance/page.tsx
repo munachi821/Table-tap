@@ -93,7 +93,6 @@ const FinancePage = () => {
 
           setChartData(formattedChartData);
         }
-      }
       setIsLoading(false);
     };
 
