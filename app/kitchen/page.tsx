@@ -12,6 +12,7 @@ import Order from "@/components/kitchen/order";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Toaster } from "sonner";
 
 const Kitchen = () => {
   const supabase = createClient();
@@ -36,7 +37,17 @@ const Kitchen = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       const { data: userData } = await supabase.auth.getUser();
-      const restaurantId = userData?.user?.app_metadata?.restaurant_id;
+      // Use KDS restaurant_id or fallback to owner's restaurant ID
+      let restaurantId = userData?.user?.app_metadata?.restaurant_id;
+
+      if (!restaurantId && userData?.user?.id) {
+        const { data: rest } = await supabase
+          .from("restaurants")
+          .select("id")
+          .eq("owner_id", userData.user.id)
+          .maybeSingle();
+        restaurantId = rest?.id;
+      }
 
       let query = supabase
         .from("orders")
@@ -62,7 +73,7 @@ const Kitchen = () => {
       .channel("kitchen-page-listeners")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "orders" },
+        { event: "*", schema: "public", table: "orders" },
         () => {
           setTimeout(() => {
             fetchOrders();
@@ -102,13 +113,24 @@ const Kitchen = () => {
               .eq("id", restaurantId)
               .maybeSingle();
 
+            if (restData) {
+              setRestName(restData.name);
+              setRestImage(restData.logo_url);
+            }
             if (dbError) {
               console.error("DB error fetching restaurant:", dbError);
             }
-
-            if (restData) {
-              if (restData.name) setRestName(restData.name);
-              if (restData.logo_url) setRestImage(restData.logo_url);
+          } else {
+            // Fallback: If logged in as owner instead of KDS role
+            const { data: ownerRestData } = await supabase
+              .from("restaurants")
+              .select("name, logo_url")
+              .eq("owner_id", user.user.id)
+              .maybeSingle();
+              
+            if (ownerRestData) {
+              setRestName(ownerRestData.name);
+              setRestImage(ownerRestData.logo_url);
             }
           }
         } else {
@@ -179,7 +201,8 @@ const Kitchen = () => {
     }
   };
   return (
-    <main className="bg-slate-50">
+    <main className="min-h-screen bg-[#F8FAFC]">
+      <Toaster richColors position="top-center" />
       <div className="w-full min-h-screen">
         {/* Navbar */}
         <header className="flex flex-col md:flex-row justify-between bg-white px-4 py-3.5 items-start md:items-center fixed w-full z-[200] shadow-sm border-b border-gray-100">

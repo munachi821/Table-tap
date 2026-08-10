@@ -20,7 +20,16 @@ const Menu = () => {
   useEffect(() => {
     const fetchMealData = async () => {
       const { data: userData } = await supabase.auth.getUser();
-      const restaurantId = userData?.user?.app_metadata?.restaurant_id;
+      let restaurantId = userData?.user?.app_metadata?.restaurant_id;
+
+      if (!restaurantId && userData?.user?.id) {
+        const { data: rest } = await supabase
+          .from("restaurants")
+          .select("id")
+          .eq("owner_id", userData.user.id)
+          .maybeSingle();
+        restaurantId = rest?.id;
+      }
 
       let query = supabase
         .from("menu_items")

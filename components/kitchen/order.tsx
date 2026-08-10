@@ -121,10 +121,10 @@ const Order = () => {
     fetchOrders();
 
     const channel = supabase
-      .channel("kitchen-orders-listeners")
+      .channel("kitchen-order-listeners")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "orders" },
+        { event: "*", schema: "public", table: "orders" },
         () => {
           setTimeout(() => {
             fetchOrders();
