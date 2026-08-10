@@ -8,6 +8,7 @@ import Image from "next/image";
 import { CloudArrowUpIcon, EyeIcon, EyeSlashIcon, LockKeyIcon } from "@phosphor-icons/react";
 import { usePaystackPayment } from "react-paystack";
 import { getPlatformSettings } from "@/app/actions/platform";
+import { verifySignupPayment } from "@/app/actions/verifySignupPayment";
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
 
