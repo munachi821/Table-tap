@@ -82,6 +82,14 @@ const OrderComponent = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const receiptRef = useRef<HTMLDivElement>(null);
+  const paystackReference = useRef<string>("");
+  
+  // Initialize on client side only to avoid hydration mismatch
+  useEffect(() => {
+    if (!paystackReference.current) {
+      paystackReference.current = crypto.randomUUID();
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -229,7 +237,7 @@ const OrderComponent = () => {
   };
 
   const paystackConfig = {
-    reference: crypto.randomUUID(),
+    reference: paystackReference.current,
     email: "guest.checkout@tabletap.com",
     amount: Math.round(
       cart.reduce((total, item) => total + item.price, 0) * 100,
@@ -238,6 +246,10 @@ const OrderComponent = () => {
   };
 
   const onSuccess = async () => {
+    // Generate new reference for next order
+    const usedReference = paystackReference.current;
+    paystackReference.current = crypto.randomUUID();
+
     const finalOrder = {
       orderId: crypto.randomUUID(),
       tableNumber: currentTable?.table_name,
@@ -261,7 +273,7 @@ const OrderComponent = () => {
         p_restaurant_id: currentTable?.restaurants?.id || null,
         p_table_id: tableId || null,
         p_notes: chefNotes || "",
-        p_paystack_reference: paystackConfig.reference,
+        p_paystack_reference: usedReference,
         p_items: cart.map((item) => ({
           menu_item_id: item.menu_item_id,
           quantity: item.quantity,
