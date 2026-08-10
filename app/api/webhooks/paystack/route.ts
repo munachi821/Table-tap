@@ -43,6 +43,22 @@ export async function POST(req: Request) {
       // 5. Update the order in the database to "paid" using Admin client (bypasses RLS)
       const supabase = createAdminClient();
 
+      const { data: existingOrder, error: fetchError } = await supabase
+        .from("orders")
+        .select("status")
+        .eq("paystack_reference", reference)
+        .maybeSingle();
+
+      if (!existingOrder) {
+        console.warn(`No order found for reference: ${reference}`);
+        return NextResponse.json({ received: true });
+      }
+
+      if (existingOrder.status === "paid" || existingOrder.status === "completed") {
+        console.log(`Order ${reference} already processed — skipping`);
+        return NextResponse.json({ received: true });
+      }
+
       const { error } = await supabase
         .from("orders")
         .update({ status: "paid" })

@@ -101,21 +101,19 @@ export default function SignupForm() {
     setIsLoading(false);
 
     const onSuccess = async (response: any) => {
-      const today = new Date();
-      const thirtyDaysFromNow = new Date(today.setDate(today.getDate() + 30));
-      // Payment was successful! Update user metadata
-      await supabase.auth.updateUser({
-        data: {
-          has_active_subscription: true,
-          paystack_reference: response.reference,
-          subscription_expires_at: thirtyDaysFromNow.toISOString(),
-        },
-      });
+      // 1. Verify payment on the server
+      const verificationResult = await verifySignupPayment(response.reference, signUpData?.user?.id as string);
+      
+      if (!verificationResult.success) {
+        return toast.error("Payment verification failed! Please contact support.");
+      }
 
+      // 2. Add random suffix to slug to avoid collisions
       const generatedSlug = name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-") // Replaces spaces and special chars with hyphens
-        .replace(/(^-|-$)+/g, ""); // Removes trailing hyphens
+        .replace(/(^-|-$)+/g, "") // Removes trailing hyphens
+        + "-" + Math.random().toString(36).substring(2, 6);
 
       const { error: dbError } = await supabase
         .from("restaurants")
