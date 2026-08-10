@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -28,10 +28,7 @@ export async function toggleTenantStatus(
   }
 
   // Create admin client to bypass RLS
-  const supabaseAdmin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  const supabaseAdmin = createAdminClient();
 
   const { error } = await supabaseAdmin
     .from("restaurants")
