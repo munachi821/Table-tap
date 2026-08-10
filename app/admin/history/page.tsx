@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { useRestaurant } from "@/context/RestaurantContext";
 
 interface OrderItem {
   quantity: number;
@@ -33,6 +34,7 @@ interface Order {
 
 const HistoryPage = () => {
   const supabase = createClient();
+  const { restaurantId } = useRestaurant();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,20 +57,12 @@ const HistoryPage = () => {
   };
 
   useEffect(() => {
+    if (!restaurantId) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchHistory = async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: restaurant } = await supabase
-        .from("restaurants")
-        .select("id")
-        .eq("owner_id", user.user.id)
-        .maybeSingle();
-
-      if (restaurant) {
         const { data: ordersData, error } = await supabase
           .from("orders")
           .select(`
@@ -76,7 +70,7 @@ const HistoryPage = () => {
             tables(table_name),
             order_items(quantity, menu_items(name))
           `)
-          .eq("restaurant_id", restaurant.id)
+          .eq("restaurant_id", restaurantId)
           .order("created_at", { ascending: false });
 
         if (ordersData) {
@@ -94,13 +88,11 @@ const HistoryPage = () => {
           setVoidedCount(voided.length);
           setVoidedAmount(voided.reduce((acc, o) => acc + (o.total_amount || 0), 0));
         }
-      }
-      setIsLoading(false);
+        setIsLoading(false);
     };
 
     fetchHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [restaurantId, supabase]);
 
   useEffect(() => {
     setCurrentPage(1);

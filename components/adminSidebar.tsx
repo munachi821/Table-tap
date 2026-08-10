@@ -15,29 +15,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
+import { useRestaurant } from "@/context/RestaurantContext";
 
 const AdminSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  const [restName, setRestName] = useState("");
+  const { restaurantName } = useRestaurant();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: user } = await supabase.auth.getUser();
-      const { data: userData, error } = await supabase
-        .from("restaurants")
-        .select("name")
-        .eq("owner_id", user?.user?.id)
-        .maybeSingle();
-      if (error) {
-        console.error("Error fetching user data", error);
-      }
-      setRestName(userData?.name || "Admin Dashboard");
-    };
-    fetchUser();
-  }, []);
 
   const admintabs = [
     { name: "Overview", Icon: SquaresFourIcon, link: "/admin/overview" },
@@ -62,7 +48,7 @@ const AdminSidebar = () => {
       {/* Mobile Top Navbar */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-40 flex items-center justify-between px-4">
         <h2 className="text-lg text-[#0F172A] font-bold font-manrope truncate pr-4">
-          {restName}
+          {restaurantName || "Admin Dashboard"}
         </h2>
         <button
           onClick={() => setIsMobileOpen(true)}
@@ -83,7 +69,7 @@ const AdminSidebar = () => {
             <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
               <div>
                 <h2 className="text-xl text-[#0F172A] font-bold font-manrope leading-6 truncate w-40">
-                  {restName}
+                  {restaurantName || "Admin Dashboard"}
                 </h2>
                 <p className="font-semibold text-[#94A3B8] text-[11px] mt-1">
                   CEO&apos;S DASHBOARD
@@ -140,7 +126,7 @@ const AdminSidebar = () => {
       <div className="hidden md:flex w-60 h-full shrink-0 flex-col border-r border-gray-100 z-10 mr-5">
         <div className="p-6">
           <h2 className="text-2xl w-25 whitespace-wrap text-[#0F172A] font-bold font-manrope leading-8">
-            {restName}
+            {restaurantName || "Admin Dashboard"}
           </h2>
           <p className="font-semibold text-[#94A3B8] text-sm">
             CEO&apos;S DASHBOARD

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import QRCode from "react-qr-code";
 import { toPng } from "html-to-image";
+import { useRestaurant } from "@/context/RestaurantContext";
 
 interface Table {
   table_name: string;
@@ -19,31 +20,22 @@ interface Table {
 }
 const Page = () => {
   const supabase = createClient();
+  const { restaurantId } = useRestaurant();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tableName, setTableName] = useState("");
   const [tables, setTables] = useState<Table[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { data } = await supabase.auth.getUser();
-
-    const { data: restaurant, error: gettingRestErr } = await supabase
-      .from("restaurants")
-      .select("id")
-      .eq("owner_id", data?.user?.id)
-      .maybeSingle();
-    if (gettingRestErr) {
-      console.error("Error getting restaurant", gettingRestErr);
-      return;
-    }
+    if (!restaurantId) return;
 
     const { error: tablesErr } = await supabase
       .from("tables")
       .insert({
-        restaurant_id: restaurant?.id,
+        restaurant_id: restaurantId,
         table_name: tableName,
       })
       .select();
@@ -58,18 +50,7 @@ const Page = () => {
   };
 
   const fetchTables = async () => {
-    const { data: user } = await supabase.auth.getUser();
-    if (!user.user) {
-      setIsLoading(false);
-      return;
-    }
-    const { data: restaurant } = await supabase
-      .from("restaurants")
-      .select("id")
-      .eq("owner_id", user.user.id)
-      .maybeSingle();
-
-    if (!restaurant) {
+    if (!restaurantId) {
       setTables([]);
       setIsLoading(false);
       return;
@@ -78,7 +59,7 @@ const Page = () => {
     const { data: tables, error: tablesErr } = await supabase
       .from("tables")
       .select("*")
-      .eq("restaurant_id", restaurant.id);
+      .eq("restaurant_id", restaurantId);
     if (tablesErr) {
       console.error("Error fetching tables", tablesErr);
       setIsLoading(false);

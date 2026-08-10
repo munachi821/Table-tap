@@ -17,9 +17,11 @@ import {
 } from "recharts";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { useRestaurant } from "@/context/RestaurantContext";
 
 const FinancePage = () => {
   const supabase = createClient();
+  const { restaurantId } = useRestaurant();
   const [isLoading, setIsLoading] = useState(true);
   const [grossVolume, setGrossVolume] = useState(0);
   const [processingFees, setProcessingFees] = useState(0);
@@ -28,20 +30,12 @@ const FinancePage = () => {
   const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!restaurantId) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchFinanceData = async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: restaurant } = await supabase
-        .from("restaurants")
-        .select("id")
-        .eq("owner_id", user.user.id)
-        .maybeSingle();
-
-      if (restaurant) {
         // get date 30 days ago
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
@@ -51,7 +45,7 @@ const FinancePage = () => {
         const { data: ordersData } = await supabase
           .from("orders")
           .select("created_at, total_amount, status")
-          .eq("restaurant_id", restaurant.id)
+          .eq("restaurant_id", restaurantId)
           .gte("created_at", dateString)
           .in("status", ["paid", "completed"]);
 
@@ -104,7 +98,7 @@ const FinancePage = () => {
     };
 
     fetchFinanceData();
-  }, [supabase]);
+  }, [restaurantId, supabase]);
 
   if (isLoading) {
     return (
@@ -297,65 +291,10 @@ const FinancePage = () => {
           </div>
         </div>
 
-        <div className="w-full overflow-x-auto hide-scrollbar">
-          <table className="w-full min-w-[700px] text-left font-manrope">
-            <thead>
-              <tr className="border-b border-gray-100 text-[#9B8E87] text-[11px] font-bold uppercase tracking-wider">
-                <th className="pb-4 font-inter">Settlement ID</th>
-                <th className="pb-4 font-inter">Date</th>
-                <th className="pb-4 font-inter">Destination Account</th>
-                <th className="pb-4 font-inter">Amount</th>
-                <th className="pb-4 font-inter">Status</th>
-                <th className="pb-4"></th>
-              </tr>
-            </thead>
-            <tbody className="text-[13px]">
-              <tr className="border-b border-gray-100">
-                <td className="py-4 font-semibold text-[#9E4301]">#ST_0092</td>
-                <td className="py-4 text-[#584237]">Today</td>
-                <td className="py-4 text-[#1B1D1E] font-medium">
-                  GTBank (**** 4829)
-                </td>
-                <td className="py-4 font-bold text-[#1B1D1E] text-sm">
-                  ₦{nextPayout.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </td>
-                <td className="py-4">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#F4EAE2] text-[#9E4301]">
-                    PROCESSING
-                  </span>
-                </td>
-                <td className="py-4 text-right">
-                  <button className="text-gray-400 hover:text-gray-600 cursor-pointer">
-                    <DotsThreeIcon size={24} weight="bold" />
-                  </button>
-                </td>
-              </tr>
-              <tr className="border-b border-gray-100">
-                <td className="py-4 font-semibold text-[#9E4301]">#ST_0091</td>
-                <td className="py-4 text-[#584237]">Yesterday</td>
-                <td className="py-4 text-[#1B1D1E] font-medium">
-                  GTBank (**** 4829)
-                </td>
-                <td className="py-4 font-bold text-[#1B1D1E] text-sm">
-                  ₦412,500
-                </td>
-                <td className="py-4">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#CDEBF8] text-[#096393]">
-                    SUCCESS
-                  </span>
-                </td>
-                <td className="py-4 text-right">
-                  <button className="text-gray-400 hover:text-gray-600 cursor-pointer">
-                    <DotsThreeIcon size={24} weight="bold" />
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div className="mt-6 mb-2 flex justify-center font-manrope">
-            <button className="text-[11px] font-bold text-[#9E4301] tracking-widest uppercase hover:underline cursor-pointer">
-              View Full Settlement History
-            </button>
+        <div className="w-full flex items-center justify-center h-48 bg-gray-50 rounded-xl mt-4 border border-dashed border-gray-200">
+          <div className="text-center">
+            <p className="text-gray-500 font-semibold mb-1">Coming Soon</p>
+            <p className="text-sm text-gray-400">Live settlement tracking is currently in development.</p>
           </div>
         </div>
       </div>

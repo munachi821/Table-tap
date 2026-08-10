@@ -3,36 +3,30 @@ import { FloppyDiskIcon, ListDashesIcon, WalletIcon, ClockIcon } from "@phosphor
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { useRestaurant } from "@/context/RestaurantContext";
 
 const OperationsTab = () => {
   const supabase = createClient();
+  const { restaurantId, targetPrepTime } = useRestaurant();
   const [prepTime, setPrepTime] = useState<number>(15);
-  const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.user) return;
+    if (targetPrepTime) {
+      setPrepTime(targetPrepTime);
+    }
+  }, [targetPrepTime]);
 
-      const { data: restaurant } = await supabase
-        .from("restaurants")
-        .select("id, target_prep_time")
-        .eq("owner_id", userData.user.id)
-        .maybeSingle();
-
-      if (restaurant) {
-        setRestaurantId(restaurant.id);
-        if (restaurant.target_prep_time) {
-          setPrepTime(restaurant.target_prep_time);
-        }
-      }
-    };
-    fetchSettings();
-  }, [supabase]);
+  const handleCancel = () => {
+    setPrepTime(targetPrepTime || 15);
+  };
 
   const handleSave = async () => {
     if (!restaurantId) return;
+    if (prepTime < 1 || prepTime > 120) {
+      toast.error("Prep time must be between 1 and 120 minutes.");
+      return;
+    }
     setIsLoading(true);
 
     const { error } = await supabase
@@ -113,16 +107,21 @@ const OperationsTab = () => {
                   Automatically append a standard 7.5% tax to all customer checkouts.
                 </p>
               </div>
-              <button type="button" className="w-12 h-6 rounded-full flex items-center p-1 transition-colors bg-[#10B981] shrink-0 cursor-pointer">
-                <div className="bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform translate-x-6"></div>
-              </button>
-            </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-bold px-2 py-1 bg-gray-100 text-gray-500 rounded-md uppercase tracking-wider">Coming Soon</span>
+                <button type="button" disabled className="w-12 h-6 rounded-full flex items-center p-1 transition-colors bg-gray-200 shrink-0 cursor-not-allowed">
+                  <div className="bg-white w-4 h-4 rounded-full shadow-sm"></div>
+                </button>
+              </div>
           </div>
         </div>
       </div>
 
       <div className="bg-[#F8FAFC] border-t border-[#E6E8EA] p-5 flex items-center justify-end gap-6 rounded-b-3xl">
-        <button className="text-[#64748B] hover:text-[#0F172A] text-sm font-semibold transition-colors cursor-pointer">
+        <button 
+          onClick={handleCancel}
+          className="text-[#64748B] hover:text-[#0F172A] text-sm font-semibold transition-colors cursor-pointer"
+        >
           Cancel Changes
         </button>
         <button 

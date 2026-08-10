@@ -5,11 +5,18 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { getPlatformSettings } from "@/app/actions/platform";
 import { toast, Toaster } from "sonner";
+import {
+  RestaurantContext,
+  RestaurantContextType,
+} from "@/context/RestaurantContext";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
+  const [contextData, setContextData] = useState<RestaurantContextType | null>(
+    null,
+  );
 
   useEffect(() => {
     const checkAuthAndSubscription = async () => {
@@ -65,7 +72,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       // 4. Verify that the restaurant is not suspended
       const { data: restaurant } = await supabase
         .from("restaurants")
-        .select("status")
+        .select("id, name, status, target_prep_time")
         .eq("owner_id", user.id)
         .maybeSingle();
 
@@ -75,6 +82,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       }
 
       // 5. User is verified and cleared — let them through!
+      setContextData({
+        userId: user.id,
+        restaurantId: restaurant?.id,
+        restaurantName: restaurant?.name,
+        targetPrepTime: restaurant?.target_prep_time,
+      });
       setIsLoading(false);
     };
 
@@ -95,7 +108,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Toaster richColors position="top-center" />
-      {children}
+      <RestaurantContext.Provider value={contextData!}>
+        {children}
+      </RestaurantContext.Provider>
     </>
   );
 }

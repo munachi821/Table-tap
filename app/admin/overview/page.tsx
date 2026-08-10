@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
+import { useRestaurant } from "@/context/RestaurantContext";
 
 interface TopItem {
   name: string;
@@ -30,7 +31,7 @@ interface LiveTable {
 
 const Overview = () => {
   const supabase = createClient();
-  const [restName, setRestName] = useState("");
+  const { restaurantId, restaurantName, targetPrepTime } = useRestaurant();
   const [grossRevenue, setGrossRevenue] = useState(0);
   const [ordersToday, setOrdersToday] = useState(0);
   const [activeTables, setActiveTables] = useState(0);
@@ -54,40 +55,12 @@ const Overview = () => {
   };
 
   useEffect(() => {
-    const fetchUserAndData = async () => {
-      const { data: user } = await supabase.auth.getUser();
-
-      const { data: restname } = await supabase
-        .from("restaurants")
-        .select("name")
-        .eq("owner_id", user?.user?.id)
-        .maybeSingle();
-
-      setRestName(restname?.name || "Restaurant");
-
-      if (!user.user) {
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: restaurant } = await supabase
-        .from("restaurants")
-        .select("id, target_prep_time")
-        .eq("owner_id", user.user.id)
-        .maybeSingle();
-
-      if (restaurant) {
-        if (restaurant.target_prep_time) {
-          prepTimeLimitRef.current = restaurant.target_prep_time;
-        }
-        await fetchDashboardData(
-          restaurant.id,
-          restaurant.target_prep_time || 15,
-        );
-      } else {
-        setIsLoading(false);
-      }
-    };
+    if (!restaurantId) {
+      setIsLoading(false);
+      return;
+    }
+    prepTimeLimitRef.current = targetPrepTime || 15;
+    fetchDashboardData(restaurantId, targetPrepTime || 15);
 
     const fetchDashboardData = async (restId: string, prepLimit: number) => {
       const startOfDay = new Date();
@@ -221,9 +194,24 @@ const Overview = () => {
       setIsLoading(false);
     };
 
-    fetchUserAndData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Create realtime channel for auto-refresh
+    const channel = supabase
+      .channel("admin-overview-listeners")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${restaurantId}` },
+        () => {
+          setTimeout(() => {
+            fetchDashboardData(restaurantId, targetPrepTime || 15);
+          }, 500);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [restaurantId, targetPrepTime, supabase]);
 
   // SLA Timer Logic
   useEffect(() => {
@@ -289,7 +277,7 @@ const Overview = () => {
               DASHBOARD OVERVIEW
             </p>
             <h2 className="text-2xl text-[#191C1E] font-bold font-manrope">
-              Today at {restName}
+              Today at {restaurantName || "Restaurant"}
             </h2>
           </div>
 
