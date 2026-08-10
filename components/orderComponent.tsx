@@ -717,11 +717,12 @@ const OrderComponent = () => {
 
                       <button
                         className="absolute right-0 top-0 m-1 text-gray-300 hover:text-red-500 hover:bg-red-50 active:scale-90 p-1.5 rounded-md transition-all cursor-pointer"
-                        onClick={() =>
+                        onClick={() => {
                           setCart((prev) =>
                             prev.filter((c) => c.cartId !== item.cartId),
-                          )
-                        }
+                          );
+                          toast.success("Item removed from cart");
+                        }}
                       >
                         <TrashIcon size={18} />
                       </button>
