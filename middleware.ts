@@ -42,14 +42,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protect /kitchen (but not /kitchen/login) — redirect to /kitchen/login if not authenticated
-  if (pathname === "/kitchen" && !user) {
+  if (pathname.startsWith("/kitchen") && pathname !== "/kitchen/login" && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/kitchen/login";
     return NextResponse.redirect(url);
   }
 
   // Protect /myadmin (but not /myadmin/login) — redirect to /myadmin/login if not authenticated
-  if (pathname === "/myadmin" && !user) {
+  if (pathname.startsWith("/myadmin") && pathname !== "/myadmin/login" && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/myadmin/login";
     return NextResponse.redirect(url);
