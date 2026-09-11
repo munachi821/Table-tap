@@ -4,6 +4,8 @@ import { CheckCircleIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 
 // Dynamically import the signup form with SSR disabled to prevent Paystack window errors
@@ -36,10 +38,20 @@ export default function Home() {
   return (
     <div className="flex bg-white font-inter h-screen">
       {/* Left Panel */}
-      <div className="hidden lg:flex w-1/2 bg-[#0F172A] relative flex-col justify-between overflow-hidden h-screen">
+      <div className="hidden lg:flex w-1/2 bg-[#0F172A] relative flex-col justify-between overflow-hidden h-screen p-16">
         <div className="absolute inset-0 bg-linear-to-br from-[#1E293B] to-[#0F172A] z-0"></div>
 
-        <div className="relative z-10 px-16 py-24 flex-1 flex flex-col justify-center">
+        <div className="relative z-10">
+          <Image
+            src="/tabletap.png"
+            alt="TableTap"
+            width={140}
+            height={34}
+            className="h-8 w-auto object-contain brightness-0 invert opacity-90"
+          />
+        </div>
+
+        <div className="relative z-10 flex-1 flex flex-col justify-center">
           <h1 className="text-white text-5xl md:text-[56px] font-bold font-serif leading-[1.1] mb-8 max-w-lg">
             Run your restaurant on autopilot.
           </h1>
@@ -67,10 +79,23 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        <div className="relative z-10 text-xs text-[#94A3B8]">
+          © {new Date().getFullYear()} TableTap. All rights reserved.
+        </div>
       </div>
 
       {/* Right Panel */}
       <div className="w-full lg:w-1/2 flex flex-col py-12 px-8 lg:px-24 overflow-y-auto h-screen">
+        <div className="lg:hidden max-w-md mx-auto w-full mb-6">
+          <Image
+            src="/tabletap.png"
+            alt="TableTap"
+            width={130}
+            height={32}
+            className="h-7 w-auto object-contain"
+          />
+        </div>
         <SignupForm />
 
         <div className="w-full max-w-md mx-auto mt-24 flex justify-end gap-6 text-[#94A3B8] text-[13px] font-medium">
