@@ -15,6 +15,11 @@ const manRope = Manrope({
 export const metadata: Metadata = {
   title: "TableTap",
   description: "Run your restaurant on autopilot",
+  icons: {
+    icon: "/tabletap-logo.png",
+    shortcut: "/tabletap-logo.png",
+    apple: "/tabletap-logo.png",
+  },
 };
 
 export default function RootLayout({
