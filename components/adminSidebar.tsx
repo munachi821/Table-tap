@@ -12,6 +12,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
@@ -21,7 +22,7 @@ const AdminSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  const { restaurantName } = useRestaurant();
+  const { restaurantName, logoUrl } = useRestaurant();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
 
@@ -47,9 +48,20 @@ const AdminSidebar = () => {
     <>
       {/* Mobile Top Navbar */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-40 flex items-center justify-between px-4">
-        <h2 className="text-lg text-[#0F172A] font-bold font-manrope truncate pr-4">
-          {restaurantName || "Admin Dashboard"}
-        </h2>
+        <div className="flex items-center gap-2.5 truncate pr-2">
+          <div className="relative size-8 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center">
+            <Image
+              src={logoUrl || "/tabletap-logo.png"}
+              alt={restaurantName || "TableTap"}
+              fill
+              sizes="32px"
+              className={`object-cover ${!logoUrl ? "p-1 object-contain" : ""}`}
+            />
+          </div>
+          <h2 className="text-base text-[#0F172A] font-bold font-manrope truncate">
+            {restaurantName || "Admin Dashboard"}
+          </h2>
+        </div>
         <button
           onClick={() => setIsMobileOpen(true)}
           className="p-2 -mr-2 text-[#475569] hover:bg-gray-100 rounded-lg"
@@ -67,13 +79,24 @@ const AdminSidebar = () => {
           />
           <div className="relative flex w-64 max-w-xs flex-col bg-[#F8FAFC] h-full shadow-xl">
             <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
-              <div>
-                <h2 className="text-xl text-[#0F172A] font-bold font-manrope leading-6 truncate w-40">
-                  {restaurantName || "Admin Dashboard"}
-                </h2>
-                <p className="font-semibold text-[#94A3B8] text-[11px] mt-1">
-                  CEO&apos;S DASHBOARD
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="relative size-10 rounded-xl bg-white border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
+                  <Image
+                    src={logoUrl || "/tabletap-logo.png"}
+                    alt={restaurantName || "TableTap"}
+                    fill
+                    sizes="40px"
+                    className={`object-cover ${!logoUrl ? "p-1.5 object-contain" : ""}`}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-base text-[#0F172A] font-bold font-manrope leading-5 truncate w-36">
+                    {restaurantName || "Admin Dashboard"}
+                  </h2>
+                  <p className="font-semibold text-[#94A3B8] text-[10px] mt-0.5 tracking-wider uppercase">
+                    CEO&apos;S DASHBOARD
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
@@ -125,12 +148,25 @@ const AdminSidebar = () => {
       {/* Desktop Sidebar */}
       <div className="hidden md:flex w-60 h-full shrink-0 flex-col border-r border-gray-100 z-10 mr-5">
         <div className="p-6">
-          <h2 className="text-2xl w-25 whitespace-wrap text-[#0F172A] font-bold font-manrope leading-8">
-            {restaurantName || "Admin Dashboard"}
-          </h2>
-          <p className="font-semibold text-[#94A3B8] text-sm">
-            CEO&apos;S DASHBOARD
-          </p>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="relative size-11 rounded-xl bg-white border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
+              <Image
+                src={logoUrl || "/tabletap-logo.png"}
+                alt={restaurantName || "TableTap"}
+                fill
+                sizes="44px"
+                className={`object-cover ${!logoUrl ? "p-1.5 object-contain" : ""}`}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg text-[#0F172A] font-bold font-manrope leading-5 truncate">
+                {restaurantName || "Admin Dashboard"}
+              </h2>
+              <p className="font-semibold text-[#94A3B8] text-[11px] mt-0.5 tracking-wider uppercase">
+                CEO&apos;S DASHBOARD
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="px-4 pb-4 flex justify-between flex-col h-[calc(100vh-120px)] overflow-y-auto">

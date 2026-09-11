@@ -72,7 +72,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       // 4. Verify that the restaurant is not suspended
       const { data: restaurant } = await supabase
         .from("restaurants")
-        .select("id, name, status, target_prep_time")
+        .select("id, name, status, target_prep_time, logo_url")
         .eq("owner_id", user.id)
         .maybeSingle();
 
@@ -87,6 +87,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         restaurantId: restaurant?.id,
         restaurantName: restaurant?.name,
         targetPrepTime: restaurant?.target_prep_time,
+        logoUrl: restaurant?.logo_url,
       });
       setIsLoading(false);
     };

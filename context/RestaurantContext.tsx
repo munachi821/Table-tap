@@ -7,6 +7,7 @@ export interface RestaurantContextType {
   restaurantId: string;
   restaurantName: string;
   targetPrepTime: number;
+  logoUrl?: string;
 }
 
 export const RestaurantContext = createContext<
