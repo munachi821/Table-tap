@@ -13,3 +13,9 @@
   -ms-overflow-style: none !important; /* IE and Edge */
   scrollbar-width: none !important; /* Firefox */
 }
+.hero-img {
+  background-image: url("/tabletap_foodImg.png");
+  background-position: right;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
