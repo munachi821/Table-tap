@@ -302,17 +302,21 @@ const OrderComponent = () => {
     if (!receiptRef.current) return;
 
     try {
+      toast.loading("Generating receipt image...", { id: "receipt-download" });
       const dataUrl = await toPng(receiptRef.current, {
         pixelRatio: 2,
         backgroundColor: "#ffffff",
+        cacheBust: true,
       });
 
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = `Receipt_${receiptData?.orderId?.split("_")[0]}.png`;
+      link.download = `Receipt_${receiptData?.orderId?.split("-")[0] || "order"}.png`;
       link.click();
+      toast.success("Receipt downloaded!", { id: "receipt-download" });
     } catch (err) {
       console.error("Failed to download receipt", err);
+      toast.error("Failed to download receipt image", { id: "receipt-download" });
     }
   };
 
@@ -323,11 +327,19 @@ const OrderComponent = () => {
         <header className="py-2 -top-2 sticky z-50">
           <nav className="bg-white px-3 sm:px-6 py-3 rounded-b-lg border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <div className="flex gap-2 items-center animate-pulse">
-                <div className="size-13 rounded-full bg-gray-200" />
+              <div className="flex gap-2.5 items-center">
+                <div className="size-13 rounded-full border border-orange-100 bg-orange-50/50 p-2.5 flex items-center justify-center">
+                  <Image
+                    src="/tabletap-logo.png"
+                    alt="TableTap"
+                    width={28}
+                    height={28}
+                    className="opacity-40 animate-pulse object-contain"
+                  />
+                </div>
                 <div className="space-y-2">
-                  <div className="h-4 w-32 bg-gray-200 rounded" />
-                  <div className="h-3 w-48 bg-gray-100 rounded" />
+                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-3 w-48 bg-gray-100 rounded animate-pulse" />
                 </div>
               </div>
               <div className="flex gap-3 animate-pulse">
@@ -352,18 +364,6 @@ const OrderComponent = () => {
         {/* Section Skeleton */}
         <div className="px-4 md:px-10 mt-8">
           <div className="h-8 w-40 bg-gray-200 rounded-md mb-4 animate-pulse flex" />
-          <div className="flex gap-4 overflow-x-hidden">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="h-88 w-62 shrink-0 rounded-xl bg-gray-50 border border-gray-100 p-2 animate-pulse"
-              >
-                <div className="w-full h-62 bg-gray-200 rounded-lg mb-4" />
-                <div className="h-6 w-24 bg-gray-200 rounded mb-2" />
-                <div className="h-4 w-40 bg-gray-200 rounded" />
-              </div>
-            ))}
-          </div>
           <div className="flex gap-4 overflow-x-hidden">
             {[1, 2, 3, 4].map((i) => (
               <div
@@ -433,20 +433,16 @@ const OrderComponent = () => {
         <nav className="bg-white px-3 sm:px-6 py-3 rounded-b-lg">
           <div className="text-black flex items-center justify-between">
             <div className="flex gap-2 items-center">
-              <div className="size-13 rounded-full border border-orange-200 overflow-hidden relative">
-                {currentTable?.restaurants?.logo_url ? (
-                  <Image
-                    src={currentTable.restaurants.logo_url}
-                    alt="Restaurant Logo"
-                    fill
-                    priority
-                    sizes="52px"
-                    loading="eager"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-100" />
-                )}
+              <div className="size-13 rounded-full border border-orange-200 overflow-hidden relative bg-white">
+                <Image
+                  src={currentTable?.restaurants?.logo_url || "/tabletap-logo.png"}
+                  alt={currentTable?.restaurants?.name || "TableTap"}
+                  fill
+                  priority
+                  sizes="52px"
+                  loading="eager"
+                  className={`object-cover ${!currentTable?.restaurants?.logo_url ? "p-2 object-contain" : ""}`}
+                />
               </div>
               <div>
                 <p className="text-lg leading-5">
@@ -808,13 +804,24 @@ const OrderComponent = () => {
               onClick={(e) => e.stopPropagation()}
               ref={receiptRef}
             >
-              <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-100/50">
-                <span className="text-3xl text-green-500 font-bold">✓</span>
+              <div className="flex items-center justify-center mb-3">
+                <Image
+                  src="/tabletap.png"
+                  alt="TableTap"
+                  width={110}
+                  height={28}
+                  unoptimized
+                  className="h-6 w-auto object-contain"
+                />
+              </div>
+
+              <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 border-4 border-green-100/50">
+                <span className="text-2xl text-green-500 font-bold">✓</span>
               </div>
               <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">
                 Payment Successful!
               </h2>
-              <p className="text-gray-500 font-medium mb-6 text-sm">
+              <p className="text-gray-500 font-medium mb-5 text-sm">
                 Your order has been sent to the kitchen.
               </p>
 
@@ -896,6 +903,18 @@ const OrderComponent = () => {
           </div>
         </div>
       )}
+      {/* Subtle Powered by TableTap footer */}
+      <div className="mt-16 mb-4 flex items-center justify-center gap-1.5 text-xs text-gray-400 font-medium select-none">
+        <span>Powered by</span>
+        <Image
+          src="/tabletap.png"
+          alt="TableTap"
+          width={70}
+          height={16}
+          className="h-3.5 w-auto object-contain opacity-50 grayscale hover:grayscale-0 hover:opacity-90 transition-all"
+        />
+      </div>
+
       <Toaster richColors position="top-center" />
     </main>
   );
