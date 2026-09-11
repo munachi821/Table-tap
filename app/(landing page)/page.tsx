@@ -1,19 +1,12 @@
 "use client";
 
-import { CheckCircleIcon } from "@phosphor-icons/react";
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import dynamic from "next/dynamic";
 
-// Dynamically import the signup form with SSR disabled to prevent Paystack window errors
-const SignupForm = dynamic(() => import("@/components/SignupForm"), {
-  ssr: false,
-});
-
-export default function Home() {
+export default function LandingPage() {
   const supabase = createClient();
   const router = useRouter();
 
@@ -36,80 +29,72 @@ export default function Home() {
   }, [router, supabase]);
 
   return (
-    <div className="flex bg-white font-inter h-screen">
-      {/* Left Panel */}
-      <div className="hidden lg:flex w-1/2 bg-[#0F172A] relative flex-col justify-between overflow-hidden h-screen p-16">
-        <div className="absolute inset-0 bg-linear-to-br from-[#1E293B] to-[#0F172A] z-0"></div>
+    <div className="min-h-screen bg-[#0F172A] text-white font-inter">
+      {/* Navigation Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0F172A]/80 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/tabletap.png"
+              alt="TableTap"
+              width={140}
+              height={34}
+              priority
+              className="h-8 w-auto object-contain brightness-0 invert"
+            />
+          </Link>
 
-        <div className="relative z-10">
-          <Image
-            src="/tabletap.png"
-            alt="TableTap"
-            width={140}
-            height={34}
-            className="h-8 w-auto object-contain brightness-0 invert opacity-90"
-          />
-        </div>
-
-        <div className="relative z-10 flex-1 flex flex-col justify-center">
-          <h1 className="text-white text-5xl md:text-[56px] font-bold font-serif leading-[1.1] mb-8 max-w-lg">
-            Run your restaurant on autopilot.
-          </h1>
-
-          <div className="w-12 h-px bg-white/20 mb-12"></div>
-
-          <div className="space-y-6 text-[#CBD5E1]">
-            <div className="flex items-center gap-4">
-              <CheckCircleIcon size={24} className="text-[#94A3B8]" />
-              <p className="font-medium text-[17px]">
-                100% Cashless QR Ordering
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <CheckCircleIcon size={24} className="text-[#94A3B8]" />
-              <p className="font-medium text-[17px]">
-                Eliminate Waiter Errors & Theft
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <CheckCircleIcon size={24} className="text-[#94A3B8]" />
-              <p className="font-medium text-[17px]">
-                Live Kitchen Display System (KDS)
-              </p>
-            </div>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/signup"
+              className="text-sm font-semibold bg-[#EA580C] hover:bg-[#D97706] text-white px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-orange-500/20 active:scale-95"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
+      </header>
 
-        <div className="relative z-10 text-xs text-[#94A3B8]">
-          © {new Date().getFullYear()} TableTap. All rights reserved.
-        </div>
-      </div>
+      {/* Main Landing Canvas */}
+      <main className="pt-20">
+        <section className="relative min-h-[calc(100vh-80px)] flex items-center justify-center px-6 py-24">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-[#EA580C] mb-8">
+              <span className="size-2 rounded-full bg-[#EA580C] animate-pulse"></span>
+              The Modern Restaurant OS
+            </div>
 
-      {/* Right Panel */}
-      <div className="w-full lg:w-1/2 flex flex-col py-12 px-8 lg:px-24 overflow-y-auto h-screen">
-        <div className="lg:hidden max-w-md mx-auto w-full mb-6">
-          <Image
-            src="/tabletap.png"
-            alt="TableTap"
-            width={130}
-            height={32}
-            className="h-7 w-auto object-contain"
-          />
-        </div>
-        <SignupForm />
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold font-serif tracking-tight leading-[1.1] mb-6">
+              Run your restaurant on <span className="text-[#EA580C]">autopilot</span>.
+            </h1>
 
-        <div className="w-full max-w-md mx-auto mt-24 flex justify-end gap-6 text-[#94A3B8] text-[13px] font-medium">
-          <a href="#" className="hover:text-[#64748B] transition-colors">
-            Terms
-          </a>
-          <a href="#" className="hover:text-[#64748B] transition-colors">
-            Privacy
-          </a>
-          <a href="#" className="hover:text-[#64748B] transition-colors">
-            Help
-          </a>
-        </div>
-      </div>
+            <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+              100% cashless table ordering, real-time kitchen displays, and automated settlements.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/signup"
+                className="w-full sm:w-auto bg-[#EA580C] hover:bg-[#D97706] text-white px-8 py-4 rounded-xl font-bold text-base transition-all shadow-xl shadow-orange-500/25 active:scale-95"
+              >
+                Start Free Trial
+              </Link>
+              <Link
+                href="/login"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/15 border border-white/10 text-white px-8 py-4 rounded-xl font-semibold text-base transition-all active:scale-95"
+              >
+                Sign In to Dashboard
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
