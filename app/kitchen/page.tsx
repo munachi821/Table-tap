@@ -217,7 +217,13 @@ const Kitchen = () => {
                   className="rounded-full border border-orange-100 object-cover"
                 />
               ) : (
-                <div className="size-11 rounded-full border border-orange-100 bg-gray-100 animate-pulse"></div>
+                <Image
+                  src="/tabletap-logo.png"
+                  alt="TableTap Logo"
+                  width={44}
+                  height={44}
+                  className="rounded-full border border-orange-100 p-1.5 bg-white object-contain"
+                />
               )}
               <div>
                 <p className="font-semibold text-lg leading-4 text-orange-500">
