@@ -303,10 +303,20 @@ const OrderComponent = () => {
 
     try {
       toast.loading("Generating receipt image...", { id: "receipt-download" });
-      const dataUrl = await toPng(receiptRef.current, {
+      
+      const element = receiptRef.current;
+      
+      // Warm-up pass to ensure images and fonts are loaded in cloned foreignObject
+      await toPng(element, { cacheBust: true }).catch(() => {});
+
+      const dataUrl = await toPng(element, {
         pixelRatio: 2,
         backgroundColor: "#ffffff",
         cacheBust: true,
+        style: {
+          transform: "none",
+          animation: "none",
+        },
       });
 
       const link = document.createElement("a");
@@ -802,89 +812,93 @@ const OrderComponent = () => {
             <div
               className="bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] max-w-sm w-full p-6 text-center m-auto animate-in fade-in zoom-in-95 duration-400 ease-[cubic-bezier(0.23,1,0.32,1)]"
               onClick={(e) => e.stopPropagation()}
-              ref={receiptRef}
             >
-              <div className="flex items-center justify-center mb-3">
-                <Image
-                  src="/tabletap.png"
-                  alt="TableTap"
-                  width={110}
-                  height={28}
-                  unoptimized
-                  className="h-6 w-auto object-contain"
-                />
-              </div>
+              {/* Receipt Content to be Captured */}
+              <div ref={receiptRef} className="bg-white">
+                <div className="flex items-center justify-center mb-3">
+                  <Image
+                    src="/tabletap.png"
+                    alt="TableTap"
+                    width={110}
+                    height={28}
+                    unoptimized
+                    priority
+                    className="h-6 w-auto object-contain"
+                  />
+                </div>
 
-              <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 border-4 border-green-100/50">
-                <span className="text-2xl text-green-500 font-bold">✓</span>
-              </div>
-              <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">
-                Payment Successful!
-              </h2>
-              <p className="text-gray-500 font-medium mb-5 text-sm">
-                Your order has been sent to the kitchen.
-              </p>
-
-              <div className="bg-[#F8FAFC] rounded-2xl p-5 mb-6 text-left border border-gray-100">
-                <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 text-center">
-                  Digital Receipt
+                <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3 border-4 border-green-100/50">
+                  <span className="text-2xl text-green-500 font-bold">✓</span>
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">
+                  Payment Successful!
+                </h2>
+                <p className="text-gray-500 font-medium mb-5 text-sm">
+                  Your order has been sent to the kitchen.
                 </p>
 
-                <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-gray-500 font-medium">Order ID</span>
-                  <span className="font-mono text-gray-900 font-semibold">
-                    #{receiptData.orderId?.split("-")[0]}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-gray-500 font-medium">Table</span>
-                  <span className="text-gray-900 font-semibold">
-                    {receiptData.tableNumber}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm mb-4">
-                  <span className="text-gray-500 font-medium">Time</span>
-                  <span className="text-gray-900 font-semibold">
-                    {new Date(receiptData.placedAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
+                <div className="bg-[#F8FAFC] rounded-2xl p-5 mb-2 text-left border border-gray-100">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-3 text-center">
+                    Digital Receipt
+                  </p>
 
-                <div className="border-t border-dashed border-gray-300 py-3 my-3">
-                  {receiptData.items?.map((item, i: number) => (
-                    <div key={i} className="flex justify-between text-sm mb-2">
-                      <span className="text-gray-800 font-medium">
-                        <span className="text-gray-900 font-bold mr-1">
-                          {item.quantity}x
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-gray-500 font-medium">Order ID</span>
+                    <span className="font-mono text-gray-900 font-semibold">
+                      #{receiptData.orderId?.split("-")[0]}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className="text-gray-500 font-medium">Table</span>
+                    <span className="text-gray-900 font-semibold">
+                      {receiptData.tableNumber}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm mb-4">
+                    <span className="text-gray-500 font-medium">Time</span>
+                    <span className="text-gray-900 font-semibold">
+                      {new Date(receiptData.placedAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="border-t border-dashed border-gray-300 py-3 my-3">
+                    {receiptData.items?.map((item, i: number) => (
+                      <div key={i} className="flex justify-between text-sm mb-2">
+                        <span className="text-gray-800 font-medium">
+                          <span className="text-gray-900 font-bold mr-1">
+                            {item.quantity}x
+                          </span>
+                          {item.name}
                         </span>
-                        {item.name}
-                      </span>
-                      <span className="font-bold text-gray-900">
-                        ₦{item.price.toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                        <span className="font-bold text-gray-900">
+                          ₦{item.price.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
 
-                <div className="flex justify-between items-center border-t border-gray-200 pt-3">
-                  <span className="font-bold tracking-tight text-gray-700">
-                    Total Paid
-                  </span>
-                  <span className="text-orange-500 font-bold text-xl tracking-tight">
-                    ₦
-                    {receiptData.items
-                      ?.reduce(
-                        (total: number, item: CartItem) => total + item.price,
-                        0,
-                      )
-                      .toLocaleString()}
-                  </span>
+                  <div className="flex justify-between items-center border-t border-gray-200 pt-3">
+                    <span className="font-bold tracking-tight text-gray-700">
+                      Total Paid
+                    </span>
+                    <span className="text-orange-500 font-bold text-xl tracking-tight">
+                      ₦
+                      {receiptData.items
+                        ?.reduce(
+                          (total: number, item: CartItem) => total + item.price,
+                          0,
+                        )
+                        .toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 justify-center">
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 justify-center mt-4">
                 <button
                   className="flex-1 bg-gray-900 text-white font-bold py-3.5 rounded-2xl hover:bg-black active:scale-[0.97] transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-xl shadow-gray-900/10 cursor-pointer"
                   onClick={() => setReceiptData(null)}
