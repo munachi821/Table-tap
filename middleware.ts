@@ -27,10 +27,15 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // Refresh the session so it stays alive
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (!error && data?.user) {
+      user = data.user;
+    }
+  } catch (err) {
+    console.warn("Supabase auth check in middleware temporarily unavailable:", err);
+  }
 
   const pathname = request.nextUrl.pathname;
 

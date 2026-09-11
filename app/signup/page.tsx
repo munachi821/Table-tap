@@ -19,16 +19,20 @@ export default function SignupPage() {
 
   useEffect(() => {
     const fetchSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-      if (error) return console.log(error);
-      if (session) {
-        const hasPaid = session.user.user_metadata?.has_active_subscription;
-        if (hasPaid) {
-          router.push("/admin/overview");
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) return console.warn("Session check error:", error.message);
+        if (session) {
+          const hasPaid = session.user.user_metadata?.has_active_subscription;
+          if (hasPaid) {
+            router.push("/admin/overview");
+          }
         }
+      } catch (err) {
+        console.warn("Unable to fetch session:", err);
       }
     };
 
