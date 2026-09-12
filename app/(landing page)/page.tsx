@@ -22,7 +22,7 @@ export default function LandingPage() {
             <h2 className="text-2xl font-bold text-[#101828]">TableTap</h2>
           </Link>
 
-          <ul className="flex items-center gap-8 font-medium py-3 px-10 rounded-full glass-card">
+          <ul className="flex items-center gap-10 font-medium py-3 px-10 rounded-full">
             <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
               For Restaurants
             </li>
@@ -30,7 +30,7 @@ export default function LandingPage() {
               How it works
             </li>
             <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
-              Benefits
+              Pricing
             </li>
             <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
               FAQ
@@ -59,7 +59,7 @@ export default function LandingPage() {
       </header>
 
       {/* Main Landing Canvas */}
-      <div className="hero-img w-full h-screen pl-15">
+      <section className="hero-img w-full h-screen pl-15">
         <div className="max-w-md h-full flex items-center">
           <div>
             <div>
@@ -81,6 +81,14 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
+      </section>
+
+      <div className="bg-white mx-8 mt-15 p-8 rounded-3xl">
+        <h2 className="text-xl text-center">Your table can do more.</h2>
+        <p>
+          Guests scan, order and pay right from the table. Your team gets to
+          focus on the experience.
+        </p>
       </div>
     </div>
   );
