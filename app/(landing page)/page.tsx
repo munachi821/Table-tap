@@ -22,17 +22,25 @@ export default function LandingPage() {
             <h2 className="text-2xl font-bold text-[#101828]">TableTap</h2>
           </Link>
 
-          <ul className="flex items-center gap-8 font-medium">
-            <li>For Restaurants</li>
-            <li>How it works</li>
-            <li>Benefits</li>
-            <li>FAQ</li>
+          <ul className="flex items-center gap-8 font-medium py-3 px-10 rounded-full glass-card">
+            <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
+              For Restaurants
+            </li>
+            <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
+              How it works
+            </li>
+            <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
+              Benefits
+            </li>
+            <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
+              FAQ
+            </li>
           </ul>
 
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-sm font-medium text-white hover:text-white/80 px-4 py-2 rounded-lg transition-colors"
+              className="text-[15px] font-semibold text-[#101828] hover:text-white/80 px-4 py-2 rounded-lg transition-colors"
             >
               Log in
             </Link>
