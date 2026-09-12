@@ -1,6 +1,12 @@
 "use client";
-import { ArrowRightIcon } from "@phosphor-icons/react";
-import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr";
+import {
+  ArrowRightIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+} from "@phosphor-icons/react";
+import login from "@/public/login.png";
+import menu from "@/public/menu.png";
+import tables from "@/public/qr-screen.png";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -83,13 +89,121 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className="bg-white mx-8 mt-15 p-8 rounded-3xl">
-        <h2 className="text-xl text-center">Your table can do more.</h2>
-        <p>
-          Guests scan, order and pay right from the table. Your team gets to
-          focus on the experience.
-        </p>
-      </div>
+      <section className="mx-8 mt-13 p-8">
+        <div className="w-fit mx-auto flex items-center flex-col gap-4">
+          <h2 className="text-5xl text-center text-[#101828] font-bold">
+            Get your restaurant <span className="text-[#E85D2A]">ready.</span>
+          </h2>
+          <p className="text-center text-lg max-w-lg text-[#6e6e6e]">
+            Set up your account, add your menu, create your tables, and
+            you&apos;re ready to take orders.
+          </p>
+        </div>
+
+        <div className="space-y-16 sm:space-y-24 mt-16 max-w-6xl mx-auto">
+          {/* Step 01 */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="space-y-4 max-w-md">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#E85D2A] bg-[#E85D2A]/10 px-3 py-1 rounded-full block w-fit">
+                Step 01
+              </span>
+              <h3 className="text-[#101828] text-3xl font-bold font-manrope">
+                Sign up your Restaurant
+              </h3>
+              <p className="text-[#64748B] text-base leading-relaxed">
+                Set up your restaurant profile, upload your branding, and
+                connect instant payouts in just a few clicks.
+              </p>
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-3 rounded-full bg-[#101828] text-white px-6 py-3 mt-8 cursor-pointer group hover:bg-[#101828]/90 text-sm font-semibold transition-all active:scale-95"
+              >
+                <span>Register</span>
+                <CaretRightIcon
+                  weight="bold"
+                  className="group-hover:translate-x-1 transition-all"
+                />
+              </Link>
+            </div>
+
+            <div className="w-[520px] h-[500px] overflow-hidden rounded-4xl">
+              <Image
+                src={login}
+                alt="login onboarding screen"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          </div>
+
+          {/* Step 02 */}
+          <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-10">
+            <div className="space-y-4 max-w-md">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#E85D2A] bg-[#E85D2A]/10 px-3 py-1 rounded-full block w-fit">
+                Step 02
+              </span>
+              <h3 className="text-[#101828] text-3xl font-bold font-manrope">
+                Add your menu
+              </h3>
+              <p className="text-[#64748B] text-base leading-relaxed">
+                Add your dishes, prices, photos, and categories. Toggle item
+                availability in real-time as orders roll in.
+              </p>
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-3 rounded-full bg-[#101828] text-white px-6 py-3 mt-8 cursor-pointer group hover:bg-[#101828]/90 text-sm font-semibold transition-all active:scale-95"
+              >
+                <CaretLeftIcon
+                  weight="bold"
+                  className="group-hover:-translate-x-1 transition-all"
+                />
+                <span>Build Your Menu</span>
+              </Link>
+            </div>
+
+            <div className="w-[520px] h-[500px] overflow-hidden rounded-4xl">
+              <Image
+                src={menu}
+                alt="menu onboarding screen"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          </div>
+
+          {/* Step 03 */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="space-y-4 max-w-md">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#E85D2A] bg-[#E85D2A]/10 px-3 py-1 rounded-full block w-fit">
+                Step 03
+              </span>
+              <h3 className="text-[#101828] text-3xl font-bold font-manrope">
+                Set up your tables
+              </h3>
+              <p className="text-[#64748B] text-base leading-relaxed">
+                Create custom dining tables and generate high-resolution,
+                printable QR codes ready for instant guest ordering.
+              </p>
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-3 rounded-full bg-[#101828] text-white px-6 py-3 mt-8 cursor-pointer group hover:bg-[#101828]/90 text-sm font-semibold transition-all active:scale-95"
+              >
+                <span>Generate QR Codes</span>
+                <CaretRightIcon
+                  weight="bold"
+                  className="group-hover:translate-x-1 transition-all"
+                />
+              </Link>
+            </div>
+
+            <div className="w-[520px] h-[500px] overflow-hidden rounded-4xl">
+              <Image
+                src={tables}
+                alt="tables onboarding screen"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
