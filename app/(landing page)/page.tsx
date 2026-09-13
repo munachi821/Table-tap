@@ -239,6 +239,18 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <section className="mx-8 mt-13 p-8">
+        <div className="w-fit mx-auto flex items-center flex-col gap-1">
+          <h2 className="text-[43px] text-center text-[#101828] font-bold">
+            And for your guests? It&apos;s even{" "}
+            <span className="text-[#E85D2A]">simpler.</span>
+          </h2>
+          <p className="text-center text-lg max-w-lg text-[#6e6e6e]">
+            Scan the table, Order what you want. Enjoy your meal.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
