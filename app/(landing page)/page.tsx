@@ -7,6 +7,7 @@ import {
 import login from "@/public/login.png";
 import menu from "@/public/menu.png";
 import tables from "@/public/qr-screen.png";
+import tables_qrcode from "@/public/table-qrcode.png";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -198,6 +199,40 @@ export default function LandingPage() {
               <Image
                 src={tables}
                 alt="tables onboarding screen"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-10">
+            <div className="space-y-4 max-w-md">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#E85D2A] bg-[#E85D2A]/10 px-3 py-1 rounded-full block w-fit">
+                Step 04
+              </span>
+              <h3 className="text-[#101828] text-3xl font-bold font-manrope">
+                Go live & take orders
+              </h3>
+              <p className="text-[#64748B] text-base leading-relaxed">
+                Place your table QR codes and start serving guests. Diners scan,
+                order, and pay upfront while tickets route straight to your
+                kitchen.
+              </p>
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-3 rounded-full bg-[#101828] text-white px-6 py-3 mt-8 cursor-pointer group hover:bg-[#101828]/90 text-sm font-semibold transition-all active:scale-95"
+              >
+                <CaretLeftIcon
+                  weight="bold"
+                  className="group-hover:-translate-x-1 transition-all"
+                />
+                <span>Start Taking Orders</span>
+              </Link>
+            </div>
+
+            <div className="w-[520px] h-[500px] overflow-hidden rounded-4xl">
+              <Image
+                src={tables_qrcode}
+                alt="table QR code in dining area"
                 className="w-full h-full object-cover object-top"
               />
             </div>
