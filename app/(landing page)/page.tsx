@@ -8,6 +8,9 @@ import login from "@/public/login.png";
 import menu from "@/public/menu.png";
 import tables from "@/public/qr-screen.png";
 import tables_qrcode from "@/public/table-qrcode.png";
+import scan_img from "@/public/scan_image.png";
+import order_img from "@/public/order_image.png";
+import enjoy_img from "@/public/enjoy_image.png";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -249,6 +252,68 @@ export default function LandingPage() {
           <p className="text-center text-lg max-w-lg text-[#6e6e6e]">
             Scan the table, Order what you want. Enjoy your meal.
           </p>
+        </div>
+
+        <div className="grid grid-cols-3 mt-20 max-w-300 mx-auto">
+          <div className="bg-[#FCEFDD] rounded-2xl max-w-sm w-full relative">
+            <div className="max-w-60 pl-6 pb-5 pt-5 absolute">
+              <h2 className="text-[#101828] text-4xl font-bold font-inter">
+                Scan.
+              </h2>
+              <p className="text-lg font-manrope text-[#5A6C7B] font-medium leading-6 mt-1">
+                Scan the TableTap
+                <br /> QR code at your table.
+              </p>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden w-full">
+              <Image
+                src={scan_img}
+                alt="scan image"
+                className="object-cover w-full"
+              />
+            </div>
+          </div>
+
+          <div className="bg-[#FCEFDD] rounded-2xl max-w-sm w-full relative">
+            <div className="max-w-60 pl-6 pb-5 pt-5 absolute">
+              <h2 className="text-[#101828] text-4xl font-bold font-inter">
+                Order.
+              </h2>
+              <p className="text-lg font-manrope text-[#5A6C7B] font-medium leading-6 mt-1">
+                Choose what you want
+                <br /> and pay securely.
+              </p>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden w-full">
+              <Image
+                src={order_img}
+                alt="order image"
+                className="object-cover w-full"
+              />
+            </div>
+          </div>
+
+          <div className="bg-[#FCEFDD] rounded-2xl max-w-sm w-full relative">
+            <div className="max-w-60 pl-6 pb-5 pt-5 absolute">
+              <h2 className="text-[#101828] text-4xl font-bold font-inter">
+                Enjoy.
+              </h2>
+              <p className="text-lg font-manrope text-[#5A6C7B] font-medium leading-6 mt-1">
+                Sit back.
+                <br /> Your order is on it&apos;s way.
+              </p>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden w-full">
+              <Image
+                src={enjoy_img}
+                alt="scan image"
+                className="object-cover w-full"
+              />
+            </div>
+          </div>
         </div>
       </section>
     </div>
