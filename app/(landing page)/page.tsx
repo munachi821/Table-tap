@@ -334,7 +334,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="max-w-300 mx-auto my-20">
+      <section className="max-w-300 mx-auto mt-20 mb-20">
         <div className="w-fit mx-auto flex items-center flex-col gap-1">
           <h2 className="text-[43px] text-center text-[#101828] font-bold">
             Service without the{" "}
@@ -443,8 +443,8 @@ export default function LandingPage() {
               Digital Menu & Ordering
             </h4>
             <p>
-              Let guests browse your menu, customize their order and place it
-              directly from their phone.
+              Let guests browse, customize, and place their orders directly from
+              their phones.
             </p>
           </div>
           <div className="border border-[#EDEDEB] p-4 bg-[#FEFAF4] rounded-3xl group cursor-pointer transition-all duration-300 hover:border-[#E85D2A]/30 hover:shadow-sm">
@@ -685,8 +685,8 @@ export default function LandingPage() {
               Live Order Management
             </h4>
             <p>
-              Every order comes in instantly with the table number and details,
-              so your team stays alert.
+              Every order arrives with the table number and details, keeping
+              your team in control.
             </p>
           </div>
           <div className="border border-[#EDEDEB] p-4 bg-[#FEFAF4] rounded-3xl group cursor-pointer transition-all duration-300 hover:border-[#E85D2A]/30 hover:shadow-sm">
@@ -755,8 +755,8 @@ export default function LandingPage() {
               Kitchen & Bar Coordination
             </h4>
             <p>
-              Send orders to the right place and keep your kitchen and bar teams
-              in sync.
+              Send orders to the right place and keep kitchen and bar teams in
+              sync.
             </p>
           </div>
           <div className="border border-[#EDEDEB] p-4 bg-[#FEFAF4] rounded-3xl group cursor-pointer transition-all duration-300 hover:border-[#E85D2A]/30 hover:shadow-sm">
@@ -892,11 +892,11 @@ export default function LandingPage() {
             </div>
 
             <h4 className="font-semibold font-manrope text-lg my-3">
-              Menu & Bar Availability
+              Menu & Availability
             </h4>
             <p>
               Update dishes, prices and availability in real time, so your menu
-              reflects what&apos;s ready.
+              stays current.
             </p>
           </div>
           <div className="border border-[#EDEDEB] p-4 bg-[#FEFAF4] rounded-3xl group cursor-pointer transition-all duration-300 hover:border-[#E85D2A]/30 hover:shadow-sm">
@@ -992,12 +992,14 @@ export default function LandingPage() {
               Sales & Analytics
             </h4>
             <p>
-              See what&apos;s happening in your restaurant from sales to your
-              best selling dishes.
+              See what&apos;s happening across your restaurant, from sales to
+              your best-selling dishes.
             </p>
           </div>
         </div>
       </section>
+
+      <h1>d</h1>
     </div>
   );
 }
