@@ -18,7 +18,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#fef5e2] font-inter">
       {/* Navigation Header */}
-      <header className="fixed top-0 left-0 right-0">
+      <header className="fixed top-0 left-0 right-0 z-50">
         <div className="mx-auto px-13 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <Image
@@ -342,7 +342,7 @@ export default function LandingPage() {
           </h2>
           <p className="text-center text-lg max-w-xl text-[#6e6e6e]">
             From the first order to the final sale, TableTap gives your team the
-            tools to run service without the usual friction.
+            tools to keep service running smoothly.
           </p>
         </div>
 
@@ -992,8 +992,8 @@ export default function LandingPage() {
               Sales & Analytics
             </h4>
             <p>
-              See what&apos;s happening in your restaurant — from sales and order
-              volume to best selling dishes.
+              See what&apos;s happening in your restaurant from sales to your
+              best selling dishes.
             </p>
           </div>
         </div>
