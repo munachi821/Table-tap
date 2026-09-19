@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Fraunces, Inter, Manrope } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,6 +10,11 @@ const inter = Inter({
 const manRope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
 });
 
 export const metadata: Metadata = {
@@ -29,9 +34,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${manRope.variable} antialiased`}>
+      <body
+        className={`${inter.variable} ${manRope.variable} ${fraunces.variable} antialiased`}
+      >
         {children}
       </body>
     </html>
   );
 }
+

@@ -73,7 +73,7 @@ export default function LandingPage() {
         <div className="max-w-md h-full flex items-center">
           <div>
             <div>
-              <p className="font-bold text-5xl text-[#101828]">Less Waiting.</p>
+              <p className="font-bold text-5xl text-[#101828]">Less waiting.</p>
               <p className="font-bold text-5xl text-[#E85D2A]">More eating.</p>
             </div>
 
@@ -90,6 +90,23 @@ export default function LandingPage() {
               />
             </button>
           </div>
+        </div>
+      </section>
+
+      <section className="bg-[#D1E7FB] my-25 py-15 rounded-3xl max-w-7xl mx-auto">
+        <div className="max-w-262 mx-auto flex items-center flex-col">
+          <h2 className="text-[#101828] text-[32px] tracking-tight text-center font-bold leading-[2.8rem] font-fraunces">
+            From the first scan to the final plate, TableTap keeps orders
+            moving, payments simple, and your team in sync — so your restaurant
+            can focus on{" "}
+            <span className="text-[#E85D2A]">
+              great food and even happier guests.
+            </span>
+          </h2>
+
+          <button className="flex items-center gap-3 rounded-full bg-[#E85D2A] text-white px-6 py-3 mt-12 cursor-pointer group hover:bg-[#E85D2A]/90">
+            See TableTap in action
+          </button>
         </div>
       </section>
 

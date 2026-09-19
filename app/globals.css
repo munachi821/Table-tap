@@ -3,6 +3,7 @@
 @theme {
   --font-manrope: var(--font-manrope);
   --font-inter: var(--font-inter);
+  --font-fraunces: var(--font-fraunces);
 }
 
 .hide-scrollbar::-webkit-scrollbar {
