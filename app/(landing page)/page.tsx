@@ -334,7 +334,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="max-w-300 mx-auto mt-20 mb-20">
+      <section className="max-w-300 mx-auto my-20">
         <div className="w-fit mx-auto flex items-center flex-col gap-1">
           <h2 className="text-[43px] text-center text-[#101828] font-bold">
             Service without the{" "}
@@ -998,8 +998,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <h1>d</h1>
     </div>
   );
 }
