@@ -1053,25 +1053,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="max-w-310 mx-auto my-20 cta_bg h-120 rounded-4xl flex items-center justify-center">
-        <div className="max-w-xl flex items-center flex-col">
-          <h2 className="text-5xl font-bold text-[#E85D2A] text-center">
-            <span className="text-white">Great Service Starts</span> <br /> at
-            the table.
-          </h2>
-          <Link
-            href="/signup"
-            className="text-base flex items-center gap-2 font-semibold rounded-full bg-[#E85D2A] text-white px-10 py-4 transition-all active:scale-95 group w-fit tracking-wide mt-8"
-          >
-            Get Started{" "}
-            <ArrowRightIcon
-              weight="bold"
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </Link>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section id="faq" className="w-full my-28 px-6 scroll-mt-24">
         <div className="max-w-4xl mx-auto">
@@ -1138,22 +1119,19 @@ export default function LandingPage() {
             })}
           </div>
         </div>
+      </section>
 
-        <div className="max-w-5xl mx-auto mt-15 bg-[#FCEFDD] border border-[#F3DFC1] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-          <div>
-            <h4 className="font-bold text-[#101828] text-xl font-manrope">
-              Still have questions?
-            </h4>
-            <p className="text-sm text-[#5A6C7B] mt-1 max-w-md">
-              Our team is happy to answer any questions about menus, KDS setup,
-              or getting your restaurant started.
-            </p>
-          </div>
+      <section className="max-w-310 mx-auto my-30 cta_bg h-120 rounded-4xl flex items-center justify-center">
+        <div className="max-w-xl flex items-center flex-col">
+          <h2 className="text-5xl font-bold text-[#E85D2A] text-center">
+            <span className="text-white">Great Service Starts</span> <br /> at
+            the table.
+          </h2>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-full bg-[#E85D2A] text-white px-6 py-3 text-sm font-semibold hover:bg-[#E85D2A]/90 transition-all active:scale-95 whitespace-nowrap shadow-sm group"
+            className="text-base flex items-center gap-2 font-semibold rounded-full bg-[#E85D2A] text-white px-10 py-4 transition-all active:scale-95 group w-fit tracking-wide mt-8"
           >
-            <span>Contact Support</span>
+            Get Started{" "}
             <ArrowRightIcon
               weight="bold"
               className="group-hover:translate-x-1 transition-transform"
