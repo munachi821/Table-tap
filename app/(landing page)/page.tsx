@@ -1,6 +1,7 @@
 "use client";
 import {
   ArrowRightIcon,
+  ArrowUpIcon,
   CaretLeftIcon,
   CaretRightIcon,
   PlusIcon,
@@ -1120,6 +1121,114 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
+
+      {/* Cohesive Restaurant Footer (Pruned & Clarified) */}
+      <footer className="w-full bg-[#FAF4E5] text-[#101828] border-t border-[#101828]/10 pt-16 pb-12 px-6 sm:px-12 lg:px-20">
+        <div className="max-w-7xl mx-auto">
+          {/* Main Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-10 pb-12 border-b border-[#101828]/10">
+            {/* Brand */}
+            <div className="col-span-2 space-y-3">
+              <Link href="/" className="inline-flex items-center gap-3">
+                <Image
+                  src="/tabletap-logo.png"
+                  alt="TableTap"
+                  width={28}
+                  height={28}
+                  className="h-7 w-auto object-contain"
+                />
+                <span className="text-2xl font-bold tracking-tight text-[#101828] font-fraunces">
+                  TableTap
+                </span>
+              </Link>
+              <p className="text-sm text-[#5A6C7B] max-w-xs leading-relaxed">
+                QR ordering and upfront payments for dining rooms and bars.
+              </p>
+            </div>
+
+            {/* Product */}
+            <div className="space-y-3">
+              <h5 className="text-xs font-bold uppercase tracking-wider text-[#101828]/70">
+                Product
+              </h5>
+              <ul className="space-y-2.5 text-sm text-[#5A6C7B]">
+                <li>
+                  <a href="#features" className="hover:text-[#E85D2A] transition-colors duration-150">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <Link href="/kitchen/login" className="hover:text-[#E85D2A] transition-colors duration-150">
+                    Kitchen Display
+                  </Link>
+                </li>
+                <li>
+                  <a href="#faq" className="hover:text-[#E85D2A] transition-colors duration-150">
+                    FAQ
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Access */}
+            <div className="space-y-3">
+              <h5 className="text-xs font-bold uppercase tracking-wider text-[#101828]/70">
+                Access
+              </h5>
+              <ul className="space-y-2.5 text-sm text-[#5A6C7B]">
+                <li>
+                  <Link href="/login" className="hover:text-[#E85D2A] transition-colors duration-150">
+                    Restaurant Login
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/kitchen/login" className="hover:text-[#E85D2A] transition-colors duration-150">
+                    Kitchen Screen
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/signup" className="hover:text-[#E85D2A] transition-colors duration-150">
+                    Get Started
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div className="space-y-3">
+              <h5 className="text-xs font-bold uppercase tracking-wider text-[#101828]/70">
+                Legal
+              </h5>
+              <ul className="space-y-2.5 text-sm text-[#5A6C7B]">
+                <li>
+                  <span className="hover:text-[#101828] transition-colors duration-150 cursor-pointer">
+                    Privacy
+                  </span>
+                </li>
+                <li>
+                  <span className="hover:text-[#101828] transition-colors duration-150 cursor-pointer">
+                    Terms
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#5A6C7B]">
+            <p>© {new Date().getFullYear()} TableTap</p>
+
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="inline-flex items-center gap-2 hover:text-[#101828] transition-colors duration-150 cursor-pointer py-1.5 px-3 rounded-lg hover:bg-[#101828]/5 active:scale-[0.97] transition-transform duration-160 ease-out"
+            >
+              <span>Back to top</span>
+              <ArrowUpIcon size={14} weight="bold" />
+            </button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
