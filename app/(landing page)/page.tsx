@@ -6,7 +6,7 @@ import {
   CaretRightIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import login from "@/public/login.png";
 import menu from "@/public/menu.png";
 import tables from "@/public/qr-screen.png";
@@ -52,10 +52,27 @@ const faqs = [
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#fef5e2] font-inter">
       {/* Navigation Header */}
-      <header className="fixed top-0 left-0 right-0 z-50">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-200 ease-out ${
+          isScrolled
+            ? "bg-[#fef5e2]/85 backdrop-blur-md border-b border-[#101828]/10 shadow-xs"
+            : "bg-transparent border-b border-transparent"
+        }`}
+      >
         <div className="mx-auto px-13 h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <Image
@@ -87,7 +104,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/login"
-              className="text-[15px] font-semibold text-[#101828] hover:text-white/80 px-4 py-2 rounded-lg transition-colors"
+              className="text-[15px] font-semibold text-[#101828] hover:text-[#E85D2A] px-4 py-2 rounded-lg transition-colors"
             >
               Log in
             </Link>
