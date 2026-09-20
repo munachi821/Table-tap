@@ -1037,69 +1037,73 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="max-w-4xl mx-auto my-28 px-6 scroll-mt-24">
-        <div className="w-fit mx-auto flex items-center flex-col gap-2 mb-14 text-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#E85D2A] bg-[#E85D2A]/10 px-3.5 py-1 rounded-full">
-            Got Questions?
-          </span>
-          <h2 className="text-[43px] text-[#101828] font-bold tracking-tight">
-            Frequently asked <span className="text-[#E85D2A]">questions.</span>
-          </h2>
-          <p className="text-lg max-w-lg text-[#6e6e6e] mt-1">
-            Everything you need to know about getting TableTap set up and
-            running in your restaurant.
-          </p>
-        </div>
+      <section id="faq" className="w-full my-28 px-6 scroll-mt-24">
+        <div className="max-w-4xl mx-auto">
+          <div className="w-fit mx-auto flex items-center flex-col gap-2 mb-14 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#E85D2A] bg-[#E85D2A]/10 px-3.5 py-1 rounded-full">
+              Got Questions?
+            </span>
+            <h2 className="text-[43px] text-[#101828] font-bold tracking-tight">
+              Frequently asked{" "}
+              <span className="text-[#E85D2A]">questions.</span>
+            </h2>
+            <p className="text-lg max-w-lg text-[#6e6e6e] mt-1">
+              Everything you need to know about getting TableTap set up and
+              running in your restaurant.
+            </p>
+          </div>
 
-        <div className="space-y-3.5">
-          {faqs.map((faq, index) => {
-            const isOpen = openFaq === index;
-            return (
-              <div
-                key={index}
-                className={`border bg-[#FEFAF4] rounded-2xl transition-all duration-200 overflow-hidden ${
-                  isOpen ? "border-[#E85D2A]/40 shadow-xs" : "border-[#EDEDEB]"
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(isOpen ? null : index)}
-                  className="w-full flex items-center justify-between p-6 text-left cursor-pointer group"
-                >
-                  <span className="font-semibold text-lg text-[#101828] font-manrope group-hover:text-[#E85D2A] transition-colors pr-4">
-                    {faq.question}
-                  </span>
-                  <span
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${
-                      isOpen
-                        ? "bg-[#E85D2A] text-white rotate-45"
-                        : "bg-[#FEEFE3] text-[#E85D2A] group-hover:bg-[#E85D2A] group-hover:text-white"
-                    }`}
-                  >
-                    <PlusIcon size={18} weight="bold" />
-                  </span>
-                </button>
-
+          <div className="space-y-3.5">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
                 <div
-                  className={`grid transition-all duration-250 ease-out ${
+                  key={index}
+                  className={`border bg-[#FEFAF4] rounded-2xl transition-all duration-200 overflow-hidden ${
                     isOpen
-                      ? "grid-rows-[1fr] opacity-100"
-                      : "grid-rows-[0fr] opacity-0"
+                      ? "border-[#E85D2A]/40 shadow-xs"
+                      : "border-[#EDEDEB]"
                   }`}
                 >
-                  <div className="overflow-hidden">
-                    <p className="px-6 pb-6 text-[#5A6C7B] leading-relaxed text-[15px] font-inter">
-                      {faq.answer}
-                    </p>
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? null : index)}
+                    className="w-full flex items-center justify-between p-6 text-left cursor-pointer group"
+                  >
+                    <span className="font-semibold text-lg text-[#101828] font-manrope group-hover:text-[#E85D2A] transition-colors pr-4">
+                      {faq.question}
+                    </span>
+                    <span
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${
+                        isOpen
+                          ? "bg-[#E85D2A] text-white rotate-45"
+                          : "bg-[#FEEFE3] text-[#E85D2A] group-hover:bg-[#E85D2A] group-hover:text-white"
+                      }`}
+                    >
+                      <PlusIcon size={18} weight="bold" />
+                    </span>
+                  </button>
+
+                  <div
+                    className={`grid transition-all duration-250 ease-out ${
+                      isOpen
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="px-6 pb-6 text-[#5A6C7B] leading-relaxed text-[15px] font-inter">
+                        {faq.answer}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        {/* Still have questions banner */}
-        <div className="mt-12 bg-[#FCEFDD] border border-[#F3DFC1] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+        <div className="max-w-5xl mx-auto mt-15 bg-[#FCEFDD] border border-[#F3DFC1] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
           <div>
             <h4 className="font-bold text-[#101828] text-xl font-manrope">
               Still have questions?
@@ -1113,7 +1117,7 @@ export default function LandingPage() {
             href="/signup"
             className="inline-flex items-center gap-2 rounded-full bg-[#E85D2A] text-white px-6 py-3 text-sm font-semibold hover:bg-[#E85D2A]/90 transition-all active:scale-95 whitespace-nowrap shadow-sm group"
           >
-            <span>Get Started with TableTap</span>
+            <span>Contact Support</span>
             <ArrowRightIcon
               weight="bold"
               className="group-hover:translate-x-1 transition-transform"
@@ -1122,7 +1126,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Cohesive Restaurant Footer (Pruned & Clarified) */}
       <footer className="w-full bg-[#FAF4E5] text-[#101828] border-t border-[#101828]/10 pt-16 pb-12 px-6 sm:px-12 lg:px-20">
         <div className="max-w-7xl mx-auto">
           {/* Main Grid */}
@@ -1137,33 +1140,43 @@ export default function LandingPage() {
                   height={28}
                   className="h-7 w-auto object-contain"
                 />
-                <span className="text-2xl font-bold tracking-tight text-[#101828] font-fraunces">
+                <span className="text-2xl font-bold tracking-tight text-[#101828] font-inter">
                   TableTap
                 </span>
               </Link>
-              <p className="text-sm text-[#5A6C7B] max-w-xs leading-relaxed">
-                QR ordering and upfront payments for dining rooms and bars.
+              <p className="text-base text-[#5A6C7B] max-w-sm leading-relaxed text-pretty">
+                Less back and forth. Less waiting around. Guests order from the
+                table, your team gets the details, and service keeps moving.
               </p>
             </div>
 
             {/* Product */}
             <div className="space-y-3">
-              <h5 className="text-xs font-bold uppercase tracking-wider text-[#101828]/70">
+              <h5 className="text-base font-bold tracking-wider text-[#101828]/70">
                 Product
               </h5>
               <ul className="space-y-2.5 text-sm text-[#5A6C7B]">
                 <li>
-                  <a href="#features" className="hover:text-[#E85D2A] transition-colors duration-150">
+                  <a
+                    href="#features"
+                    className="hover:text-[#E85D2A] transition-colors duration-150"
+                  >
                     Features
                   </a>
                 </li>
                 <li>
-                  <Link href="/kitchen/login" className="hover:text-[#E85D2A] transition-colors duration-150">
+                  <Link
+                    href="/kitchen/login"
+                    className="hover:text-[#E85D2A] transition-colors duration-150"
+                  >
                     Kitchen Display
                   </Link>
                 </li>
                 <li>
-                  <a href="#faq" className="hover:text-[#E85D2A] transition-colors duration-150">
+                  <a
+                    href="#faq"
+                    className="hover:text-[#E85D2A] transition-colors duration-150"
+                  >
                     FAQ
                   </a>
                 </li>
@@ -1172,22 +1185,31 @@ export default function LandingPage() {
 
             {/* Access */}
             <div className="space-y-3">
-              <h5 className="text-xs font-bold uppercase tracking-wider text-[#101828]/70">
+              <h5 className="text-base font-bold tracking-wider text-[#101828]/70">
                 Access
               </h5>
               <ul className="space-y-2.5 text-sm text-[#5A6C7B]">
                 <li>
-                  <Link href="/login" className="hover:text-[#E85D2A] transition-colors duration-150">
+                  <Link
+                    href="/login"
+                    className="hover:text-[#E85D2A] transition-colors duration-150"
+                  >
                     Restaurant Login
                   </Link>
                 </li>
                 <li>
-                  <Link href="/kitchen/login" className="hover:text-[#E85D2A] transition-colors duration-150">
+                  <Link
+                    href="/kitchen/login"
+                    className="hover:text-[#E85D2A] transition-colors duration-150"
+                  >
                     Kitchen Screen
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup" className="hover:text-[#E85D2A] transition-colors duration-150">
+                  <Link
+                    href="/signup"
+                    className="hover:text-[#E85D2A] transition-colors duration-150"
+                  >
                     Get Started
                   </Link>
                 </li>
@@ -1196,18 +1218,18 @@ export default function LandingPage() {
 
             {/* Legal */}
             <div className="space-y-3">
-              <h5 className="text-xs font-bold uppercase tracking-wider text-[#101828]/70">
+              <h5 className="text-base font-semibold tracking-wider text-[#101828]/70">
                 Legal
               </h5>
               <ul className="space-y-2.5 text-sm text-[#5A6C7B]">
                 <li>
                   <span className="hover:text-[#101828] transition-colors duration-150 cursor-pointer">
-                    Privacy
+                    Privacy Policy
                   </span>
                 </li>
                 <li>
                   <span className="hover:text-[#101828] transition-colors duration-150 cursor-pointer">
-                    Terms
+                    Terms and Conditions
                   </span>
                 </li>
               </ul>
@@ -1221,7 +1243,7 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="inline-flex items-center gap-2 hover:text-[#101828] transition-colors duration-150 cursor-pointer py-1.5 px-3 rounded-lg hover:bg-[#101828]/5 active:scale-[0.97] transition-transform duration-160 ease-out"
+              className="inline-flex items-center gap-2 hover:text-[#101828] transition-all duration-150 cursor-pointer py-1.5 px-3 rounded-lg hover:bg-[#101828]/5 active:scale-[0.97] ease-out"
             >
               <span>Back to top</span>
               <ArrowUpIcon size={14} weight="bold" />
