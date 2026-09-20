@@ -93,7 +93,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/signup"
-              className="text-sm flex items-center gap-2 font-semibold rounded-full bg-[#fa7933] text-white px-5 py-2.5 transition-all active:scale-95 group"
+              className="text-sm flex items-center gap-2 font-semibold rounded-full bg-[#E85D2A] text-white px-5 py-2.5 transition-all active:scale-95 group"
             >
               Get Started{" "}
               <ArrowRightIcon
@@ -1033,6 +1033,25 @@ export default function LandingPage() {
               your best-selling dishes.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="max-w-310 mx-auto my-20 cta_bg h-120 rounded-4xl flex items-center justify-center">
+        <div className="max-w-xl flex items-center flex-col">
+          <h2 className="text-5xl font-bold text-[#E85D2A] text-center">
+            <span className="text-white">Great Service Starts</span> <br /> at
+            the table.
+          </h2>
+          <Link
+            href="/signup"
+            className="text-base flex items-center gap-2 font-semibold rounded-full bg-[#E85D2A] text-white px-10 py-4 transition-all active:scale-95 group w-fit tracking-wide mt-8"
+          >
+            Get Started{" "}
+            <ArrowRightIcon
+              weight="bold"
+              className="group-hover:translate-x-1 transition-transform"
+            />
+          </Link>
         </div>
       </section>
 
