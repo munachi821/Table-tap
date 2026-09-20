@@ -3,7 +3,9 @@ import {
   ArrowRightIcon,
   CaretLeftIcon,
   CaretRightIcon,
+  PlusIcon,
 } from "@phosphor-icons/react";
+import { useState } from "react";
 import login from "@/public/login.png";
 import menu from "@/public/menu.png";
 import tables from "@/public/qr-screen.png";
@@ -14,7 +16,41 @@ import enjoy_img from "@/public/enjoy_image.png";
 import Image from "next/image";
 import Link from "next/link";
 
+const faqs = [
+  {
+    question: "Do guests need to download an app or create an account?",
+    answer:
+      "No. TableTap is completely web-based. Diners simply scan the QR code at their table using their phone's camera, and your digital menu opens instantly in their browser with zero downloads or registration required.",
+  },
+  {
+    question: "How do payments work and when do we get paid?",
+    answer:
+      "Guests pay upfront right from their phones using secure debit cards, bank transfers, or USSD via Paystack. Every successful transaction is verified immediately, and payouts settle directly into your registered restaurant bank account.",
+  },
+  {
+    question: "How does our kitchen receive orders in real time?",
+    answer:
+      "The moment an order is placed and paid, it instantly pops up on your Kitchen Display System (/kitchen) with an audible chime. Tickets display the table number, ordered items, and custom chef notes, tracking preparation time automatically.",
+  },
+  {
+    question: "Can we update prices or 86 sold-out items during service?",
+    answer:
+      "Yes, in real time. From your admin dashboard, you can toggle any item or category available or unavailable with one tap. Changes reflect on every dining table's digital menu immediately, preventing customer disappointment.",
+  },
+  {
+    question: "What hardware or equipment does my restaurant need?",
+    answer:
+      "None. You don't need expensive proprietary POS terminals or specialized hardware. Your kitchen and bar staff can use any tablet (iPad or Android), phone, or computer with a web browser. All you need are your printed table QR codes.",
+  },
+  {
+    question: "Can we customize table QR codes for our dining layout?",
+    answer:
+      "Yes! You can label tables whatever you like — such as 'Patio 4', 'Bar 2', or 'Table 14' — and export crisp, printable QR cards with your restaurant's logo in one click directly from your admin panel.",
+  },
+];
+
 export default function LandingPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
   return (
     <div className="min-h-screen bg-[#fef5e2] font-inter">
       {/* Navigation Header */}
@@ -43,7 +79,7 @@ export default function LandingPage() {
               Pricing
             </li>
             <li className="cursor-pointer hover:text-[#E85D2A] transition-colors">
-              FAQ
+              <a href="#faq">FAQ</a>
             </li>
           </ul>
 
@@ -996,6 +1032,92 @@ export default function LandingPage() {
               your best-selling dishes.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="max-w-4xl mx-auto my-28 px-6 scroll-mt-24">
+        <div className="w-fit mx-auto flex items-center flex-col gap-2 mb-14 text-center">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#E85D2A] bg-[#E85D2A]/10 px-3.5 py-1 rounded-full">
+            Got Questions?
+          </span>
+          <h2 className="text-[43px] text-[#101828] font-bold tracking-tight">
+            Frequently asked <span className="text-[#E85D2A]">questions.</span>
+          </h2>
+          <p className="text-lg max-w-lg text-[#6e6e6e] mt-1">
+            Everything you need to know about getting TableTap set up and
+            running in your restaurant.
+          </p>
+        </div>
+
+        <div className="space-y-3.5">
+          {faqs.map((faq, index) => {
+            const isOpen = openFaq === index;
+            return (
+              <div
+                key={index}
+                className={`border bg-[#FEFAF4] rounded-2xl transition-all duration-200 overflow-hidden ${
+                  isOpen ? "border-[#E85D2A]/40 shadow-xs" : "border-[#EDEDEB]"
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaq(isOpen ? null : index)}
+                  className="w-full flex items-center justify-between p-6 text-left cursor-pointer group"
+                >
+                  <span className="font-semibold text-lg text-[#101828] font-manrope group-hover:text-[#E85D2A] transition-colors pr-4">
+                    {faq.question}
+                  </span>
+                  <span
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${
+                      isOpen
+                        ? "bg-[#E85D2A] text-white rotate-45"
+                        : "bg-[#FEEFE3] text-[#E85D2A] group-hover:bg-[#E85D2A] group-hover:text-white"
+                    }`}
+                  >
+                    <PlusIcon size={18} weight="bold" />
+                  </span>
+                </button>
+
+                <div
+                  className={`grid transition-all duration-250 ease-out ${
+                    isOpen
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <p className="px-6 pb-6 text-[#5A6C7B] leading-relaxed text-[15px] font-inter">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Still have questions banner */}
+        <div className="mt-12 bg-[#FCEFDD] border border-[#F3DFC1] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+          <div>
+            <h4 className="font-bold text-[#101828] text-xl font-manrope">
+              Still have questions?
+            </h4>
+            <p className="text-sm text-[#5A6C7B] mt-1 max-w-md">
+              Our team is happy to answer any questions about menus, KDS setup,
+              or getting your restaurant started.
+            </p>
+          </div>
+          <Link
+            href="/signup"
+            className="inline-flex items-center gap-2 rounded-full bg-[#E85D2A] text-white px-6 py-3 text-sm font-semibold hover:bg-[#E85D2A]/90 transition-all active:scale-95 whitespace-nowrap shadow-sm group"
+          >
+            <span>Get Started with TableTap</span>
+            <ArrowRightIcon
+              weight="bold"
+              className="group-hover:translate-x-1 transition-transform"
+            />
+          </Link>
         </div>
       </section>
     </div>
